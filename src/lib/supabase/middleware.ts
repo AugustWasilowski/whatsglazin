@@ -6,6 +6,16 @@ import { NextResponse, type NextRequest } from "next/server";
  * routes that require a signed-in member. Adapted from the Supabase SSR guide.
  */
 export async function updateSession(request: NextRequest) {
+  // Safety net: if an auth code lands anywhere but the callback (e.g. Supabase
+  // fell back to the Site URL root), route it to the callback to be exchanged.
+  const authCode = request.nextUrl.searchParams.get("code");
+  if (authCode && request.nextUrl.pathname !== "/auth/callback") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    if (!url.searchParams.get("next")) url.searchParams.set("next", "/");
+    return NextResponse.redirect(url);
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
