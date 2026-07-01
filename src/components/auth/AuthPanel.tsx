@@ -24,7 +24,7 @@ export function AuthPanel() {
   if (sent) {
     return (
       <div className="w-full max-w-sm text-center">
-        <div className="mx-auto grid h-[78px] w-[78px] place-items-center rounded-lg bg-clay-deep text-terracotta">
+        <div className="mx-auto grid h-[78px] w-[78px] place-items-center rounded-lg bg-clay-deep text-terracotta animate-[wg-pop_0.5s_cubic-bezier(0.16,1,0.3,1)_both] motion-reduce:animate-none">
           <Mail size={34} />
         </div>
         <h1 className="mt-6 font-display text-3xl text-ink">Check your email</h1>

@@ -178,11 +178,16 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
           <div className="flex flex-wrap gap-2">
             {chips.map((c) =>
               c.glaze ? (
-                <GlazeChip key={c.key} glaze={c.glaze} onRemove={() => removeChip(c.key)} />
+                <GlazeChip
+                  key={c.key}
+                  glaze={c.glaze}
+                  onRemove={() => removeChip(c.key)}
+                  className="animate-[wg-pop_0.22s_ease-out_both] motion-reduce:animate-none"
+                />
               ) : (
                 <span
                   key={c.key}
-                  className="inline-flex items-center gap-1.5 rounded-pill border border-dashed border-terracotta bg-clay-deep px-3 py-1 text-[13px] font-semibold text-terracotta"
+                  className="inline-flex items-center gap-1.5 rounded-pill border border-dashed border-terracotta bg-clay-deep px-3 py-1 text-[13px] font-semibold text-terracotta animate-[wg-pop_0.22s_ease-out_both] motion-reduce:animate-none"
                 >
                   {c.name}
                   <button

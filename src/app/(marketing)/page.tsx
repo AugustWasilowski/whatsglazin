@@ -1,15 +1,11 @@
 import Link from "next/link";
-import { GLAZES, getGlazes, pieceFill } from "@/lib/glazes";
-import { PIECES, MEMBERS } from "@/lib/data";
+import { GLAZES } from "@/lib/glazes";
+import { PIECES } from "@/lib/data";
 import { ButtonLink } from "@/components/ui/Button";
 import { PotteryCard } from "@/components/PotteryCard";
 import { GlazeTile } from "@/components/GlazeTile";
-
-const STATS = [
-  { n: PIECES.length, label: "pieces" },
-  { n: MEMBERS.length, label: "members" },
-  { n: GLAZES.length, label: "glazes" },
-];
+import { LandingHero } from "@/components/landing/LandingHero";
+import { Reveal } from "@/components/motion/Reveal";
 
 const STEPS = [
   { n: "01", color: "text-celadon", title: "Shoot it", body: "Snap the piece straight off the kiln shelf — one hand, one tap. Add a few angles if you like." },
@@ -17,80 +13,15 @@ const STEPS = [
   { n: "03", color: "text-cobalt", title: "It's remembered", body: "It joins a gallery the whole studio can search — by colour, recipe, maker, and combination." },
 ];
 
-/** Landing — "1c: Living gallery wall". Static structure; GSAP motion lands in Phase 6. */
+/** Landing — "1c: Living gallery wall". GSAP showpiece motion in LandingHero + Reveal. */
 export default function Landing() {
-  // Build a dense wall from the seed pieces (repeated to fill the grid).
-  const wall = Array.from({ length: 24 }, (_, i) => PIECES[i % PIECES.length]);
-
   return (
     <>
-      {/* ---------- HERO ---------- */}
-      <section className="relative overflow-hidden">
-        {/* masonry wall */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 columns-3 gap-3 p-3 sm:columns-4 lg:columns-6"
-        >
-          {wall.map((p, i) => (
-            <div
-              key={i}
-              className="mb-3 w-full break-inside-avoid rounded-md"
-              style={{
-                background: pieceFill(getGlazes(p.glazeIds)),
-                aspectRatio: i % 3 === 0 ? "3 / 4" : i % 3 === 1 ? "1 / 1" : "4 / 5",
-              }}
-            />
-          ))}
-        </div>
-        {/* warm scrim for legibility */}
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(105deg, rgba(241,231,214,0.97) 30%, rgba(241,231,214,0.72) 48%, rgba(241,231,214,0.12) 68%, transparent)",
-          }}
-        />
-
-        <div className="relative mx-auto w-full max-w-[1180px] px-6 py-24 sm:px-10 sm:py-32">
-          <div className="max-w-[640px]">
-            <p className="mb-5 font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-terracotta">
-              The Fine Line · Portland, OR
-            </p>
-            <h1 className="font-display text-[15vw] leading-[0.92] tracking-[-0.02em] text-ink sm:text-[84px]">
-              A wall of<br />what<br />we made.
-            </h1>
-            <p className="mt-6 max-w-[520px] text-lg leading-relaxed text-ink-3">
-              Snap a piece straight off the kiln shelf, log the glaze in three
-              taps, and it joins a gallery the whole studio can search — by
-              colour, recipe, and maker.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <ButtonLink href="/add" size="lg">Add your piece</ButtonLink>
-              <ButtonLink href="/gallery" variant="secondary" size="lg">
-                Browse the gallery
-              </ButtonLink>
-            </div>
-            <dl className="mt-10 flex gap-8">
-              {STATS.map((s) => (
-                <div key={s.label}>
-                  <dt className="sr-only">{s.label}</dt>
-                  <dd className="font-display text-3xl text-ink">
-                    {s.n}
-                    <span className="ml-1.5 align-middle text-sm font-sans font-medium text-slip">
-                      {s.label}
-                    </span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-      </section>
+      <LandingHero />
 
       {/* ---------- HOW IT WORKS ---------- */}
       <section className="bg-bone">
-        <div className="mx-auto w-full max-w-[1180px] px-6 py-16 sm:px-10 sm:py-20">
+        <Reveal className="mx-auto w-full max-w-[1180px] px-6 py-16 sm:px-10 sm:py-20">
           <p className="font-sans text-[12px] font-medium uppercase tracking-[0.2em] text-terracotta">
             Three taps at the shelf
           </p>
@@ -106,7 +37,7 @@ export default function Landing() {
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* ---------- RECENT PIECES ---------- */}
@@ -118,11 +49,11 @@ export default function Landing() {
               See all {PIECES.length} →
             </Link>
           </div>
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <Reveal className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4" stagger={0.06}>
             {PIECES.slice(0, 4).map((p, i) => (
               <PotteryCard key={p.id} piece={p} priority={i === 0} />
             ))}
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -135,17 +66,17 @@ export default function Landing() {
               Explore all {GLAZES.length} →
             </Link>
           </div>
-          <div className="mt-8 grid grid-cols-3 gap-4 sm:grid-cols-6">
+          <Reveal className="mt-8 grid grid-cols-3 gap-4 sm:grid-cols-6" stagger={0.05}>
             {GLAZES.slice(0, 6).map((g) => (
               <GlazeTile key={g.id} glaze={g} />
             ))}
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* ---------- CTA ---------- */}
       <section className="bg-kiln text-bone">
-        <div className="mx-auto w-full max-w-[1180px] px-6 py-20 text-center sm:px-10 sm:py-28">
+        <Reveal className="mx-auto w-full max-w-[1180px] px-6 py-20 text-center sm:px-10 sm:py-28">
           <h2 className="font-display text-4xl leading-tight sm:text-[56px]">
             Made something?<br />
             <span className="text-terracotta-soft">Add it to the wall.</span>
@@ -155,7 +86,7 @@ export default function Landing() {
               Continue with Google · Apple · Email
             </ButtonLink>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* ---------- FOOTER ---------- */}
