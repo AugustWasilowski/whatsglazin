@@ -75,7 +75,7 @@ export function AuthPanel() {
         </div>
         <h1 className="mt-6 font-display text-3xl text-ink">Enter your code</h1>
         <p className="mt-2 text-ink-2">
-          We emailed a 6-digit code to <strong>{email}</strong>. It&rsquo;s good for
+          We emailed a sign-in code to <strong>{email}</strong>. It&rsquo;s good for
           a few minutes.
         </p>
 
@@ -95,13 +95,13 @@ export function AuthPanel() {
             inputMode="numeric"
             autoComplete="one-time-code"
             pattern="[0-9]*"
-            maxLength={6}
+            maxLength={10}
             required
             autoFocus
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-            placeholder="123456"
-            className="h-14 w-full rounded-md border-[1.5px] border-line-strong bg-bone px-4 text-center font-mono text-2xl tracking-[0.4em] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
+            placeholder="Code from email"
+            className="h-14 w-full rounded-md border-[1.5px] border-line-strong bg-bone px-4 text-center font-mono text-xl tracking-[0.3em] text-ink placeholder:tracking-normal placeholder:text-base placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
           />
           <button
             type="submit"
