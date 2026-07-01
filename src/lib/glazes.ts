@@ -129,9 +129,24 @@ export function glazeFill(baseHex: string, shade2Hex: string): string {
   ].join(", ");
 }
 
-/** Fill for a single glaze swatch. */
+/** Fill for a single glaze swatch (gradient). */
 export function swatchFill(glaze: Glaze): string {
   return glazeFill(glaze.baseHex, glaze.shade2Hex);
+}
+
+// Studio glazes with a real cropped swatch photo in /public/glazes.
+// (floating-blue is absent — that tile is missing from the board.)
+const SWATCH_IMAGE_SLUGS = new Set([
+  "satin-white", "jr-clear", "nutmeg", "440-tan", "bone", "jr-blue-celadon",
+  "spearmint", "oribe-6", "weathered-bronze", "metallic-black", "ketchup", "butterscotch",
+]);
+
+/** Background for a single glaze swatch: the real fired-tile photo when we
+ *  have one, otherwise the gradient. Use in `style={{ background: swatchBg(g) }}`. */
+export function swatchBg(glaze: Glaze): string {
+  return SWATCH_IMAGE_SLUGS.has(glaze.slug)
+    ? `url('/glazes/${glaze.slug}.jpg') center/cover`
+    : swatchFill(glaze);
 }
 
 /** Fill for a piece: single glaze uses its own stops; a combo blends the

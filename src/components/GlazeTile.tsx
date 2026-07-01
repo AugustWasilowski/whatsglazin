@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { swatchFill } from "@/lib/glazes";
+import { swatchBg } from "@/lib/glazes";
 import type { Glaze } from "@/lib/types";
 
 /**
@@ -22,7 +22,7 @@ export function GlazeTile({
     <Link href={`/glazes/${glaze.slug}`} className={cn("group block", className)}>
       <div
         className={cn("relative w-full overflow-hidden rounded-card", swatchClassName)}
-        style={{ background: swatchFill(glaze) }}
+        style={{ background: swatchBg(glaze) }}
       >
         <span
           className="absolute right-2.5 top-2.5 font-mono text-[10px] uppercase tracking-wider opacity-80"

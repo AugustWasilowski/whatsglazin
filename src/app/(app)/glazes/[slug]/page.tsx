@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { getGlazeBySlug, getPieces, coOccurring } from "@/lib/db";
-import { swatchFill } from "@/lib/glazes";
+import { swatchBg } from "@/lib/glazes";
 import { PotteryCard } from "@/components/PotteryCard";
 import { BackButton } from "@/components/ui/BackButton";
 
@@ -34,7 +34,7 @@ export default async function GlazeDetail({
 
   return (
     <div>
-      <header className="relative flex h-[220px] items-end" style={{ background: swatchFill(glaze) }}>
+      <header className="relative flex h-[220px] items-end" style={{ background: swatchBg(glaze) }}>
         <div className="absolute left-4 top-4">
           <BackButton fallback="/glazes" />
         </div>
@@ -72,7 +72,7 @@ export default async function GlazeDetail({
                   href={`/glazes/${g.slug}`}
                   className="inline-flex items-center gap-2 rounded-pill border border-line bg-bone py-1.5 pl-1.5 pr-3 text-sm font-medium text-ink transition-colors hover:border-slip"
                 >
-                  <span className="h-6 w-6 rounded-full" style={{ background: swatchFill(g) }} aria-hidden />
+                  <span className="h-6 w-6 rounded-full" style={{ background: swatchBg(g) }} aria-hidden />
                   {g.name}
                   <span className="text-xs text-slip">×{count}</span>
                 </Link>

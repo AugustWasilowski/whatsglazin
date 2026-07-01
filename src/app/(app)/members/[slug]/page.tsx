@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMemberBySlug, getPieces } from "@/lib/db";
-import { swatchFill } from "@/lib/glazes";
+import { swatchBg } from "@/lib/glazes";
 import { Avatar } from "@/components/ui/Avatar";
 import { PotteryCard } from "@/components/PotteryCard";
 import type { Glaze } from "@/lib/types";
@@ -77,7 +77,7 @@ export default async function MemberProfile({
                 href={`/glazes/${g.slug}`}
                 className="inline-flex items-center gap-2 rounded-pill border border-line bg-bone py-1.5 pl-1.5 pr-3 text-sm font-medium text-ink transition-colors hover:border-slip"
               >
-                <span className="h-6 w-6 rounded-full" style={{ background: swatchFill(g) }} aria-hidden />
+                <span className="h-6 w-6 rounded-full" style={{ background: swatchBg(g) }} aria-hidden />
                 {g.name}
               </Link>
             ))}

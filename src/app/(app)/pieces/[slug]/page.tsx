@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { getPieceBySlug } from "@/lib/db";
-import { pieceFill, swatchFill } from "@/lib/glazes";
+import { pieceFill, swatchBg } from "@/lib/glazes";
 import { BackButton } from "@/components/ui/BackButton";
 import { timeAgo } from "@/lib/utils";
 
@@ -92,7 +92,7 @@ export default async function PieceDetail({
             {glazes.map((g) => (
               <li key={g.id}>
                 <Link href={`/glazes/${g.slug}`} className="flex items-center gap-3 p-3 transition-colors hover:bg-clay/50">
-                  <span className="h-11 w-11 shrink-0 rounded-md" style={{ background: swatchFill(g) }} aria-hidden />
+                  <span className="h-11 w-11 shrink-0 rounded-md" style={{ background: swatchBg(g) }} aria-hidden />
                   <span className="min-w-0 flex-1">
                     <span className="block font-semibold text-ink">{g.name}</span>
                     <span className="block text-xs text-slip">{g.family} · {g.finish}</span>

@@ -2,7 +2,7 @@
 
 import { useId, useMemo, useRef, useState } from "react";
 import Fuse from "fuse.js";
-import { swatchFill } from "@/lib/glazes";
+import { swatchBg } from "@/lib/glazes";
 import type { Glaze } from "@/lib/types";
 
 /**
@@ -124,7 +124,7 @@ export function GlazeTypeahead({
             >
               <span
                 className="h-6 w-6 shrink-0 rounded-md"
-                style={{ background: swatchFill(g) }}
+                style={{ background: swatchBg(g) }}
                 aria-hidden
               />
               <span className="flex-1 font-medium text-ink">{g.name}</span>
