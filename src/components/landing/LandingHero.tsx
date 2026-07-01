@@ -94,7 +94,7 @@ export function LandingHero() {
       <div className="relative mx-auto w-full max-w-[1180px] px-6 py-24 sm:px-10 sm:py-32">
         <div className="max-w-[640px]">
           <p className="hero-fade mb-5 font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-terracotta">
-            The Fine Line · Portland, OR
+            The Fine Line · St. Charles, IL
           </p>
           <h1 className="font-display text-[15vw] leading-[0.92] tracking-[-0.02em] text-ink sm:text-[84px]">
             {HEADLINE.map((line) => (
