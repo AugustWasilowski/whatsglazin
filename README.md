@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WhatsGlazin
 
-## Getting Started
+A living gallery and glaze library for **The Fine Line** pottery studio. Members
+snap a finished piece straight off the kiln shelf, log the glazes they used, and
+it joins a gallery the whole studio can browse and search — by color, glaze,
+maker, and combination.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Next.js 16** (App Router) + **React 19**, TypeScript
+- **Tailwind CSS v4**
+- **Supabase** — Postgres + Row Level Security, Auth (email OTP), Storage
+- **GSAP** for gallery motion, **Fuse.js** for fuzzy search
+- Deployed to **Fly.io** (standalone Docker output)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Getting started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Install**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   npm install
+   ```
 
-## Learn More
+2. **Configure environment** — copy the template and fill in your Supabase
+   project values:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   cp .env.example .env
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   - `NEXT_PUBLIC_SUPABASE_URL` — your project URL (`https://<ref>.supabase.co`)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the anon/publishable key (RLS enforces access)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   The anon key is the only key the app needs; every write goes through RLS.
 
-## Deploy on Vercel
+3. **Set up the database** — follow [`supabase/README.md`](supabase/README.md):
+   run `schema.sql` (tables, RLS, storage bucket, new-user trigger) then
+   `seed.sql` (studio glazes + demo content) in the Supabase SQL editor. Enable
+   the **Email** provider and set the OTP length to **6 digits**.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Run**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000).
+
+## Scripts
+
+- `npm run dev` — local dev server
+- `npm run build` / `npm run start` — production build / serve
+- `npm run lint` — ESLint
+- `npm run seed:gen` — regenerate `supabase/seed.sql` from the typed data in `src/lib/`
+
+## Project layout
+
+- `src/app/(marketing)` — public landing page
+- `src/app/(app)` — the studio app (gallery, glazes, members, add/edit piece, you)
+- `src/app/auth` — OTP sign-in, callback, sign-out
+- `src/lib` — Supabase clients, data access (`db.ts`), server actions (`actions.ts`)
+- `supabase/` — schema, seed, and setup notes
+
+## Deployment
+
+Configured for Fly.io via `fly.toml` and the multi-stage `Dockerfile`
+(`output: "standalone"`). Set `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` as build-time env/secrets so the image host and
+client are wired correctly. CI deploys from `.github/workflows/fly-deploy.yml`.

@@ -36,11 +36,24 @@ export function GlazeLibrary({ glazes }: { glazes: GlazeWithCount[] }) {
         />
       </div>
 
-      <div className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-        {results.map((g) => (
-          <GlazeTile key={g.id} glaze={g} count={g.pieceCount} swatchClassName="aspect-[4/3]" />
-        ))}
-      </div>
+      {results.length ? (
+        <div className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+          {results.map((g) => (
+            <GlazeTile key={g.id} glaze={g} count={g.pieceCount} swatchClassName="aspect-[4/3]" />
+          ))}
+        </div>
+      ) : (
+        <div className="mt-8 rounded-card border border-dashed border-line-strong bg-bone/60 p-10 text-center">
+          <p className="font-display text-2xl text-ink">
+            {glazes.length ? "No glazes match" : "No glazes yet"}
+          </p>
+          <p className="mt-1 text-sm text-slip">
+            {glazes.length
+              ? "Try a different name, family, or finish."
+              : "Glazes appear here as members log the ones they use."}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

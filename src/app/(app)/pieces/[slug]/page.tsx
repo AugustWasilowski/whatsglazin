@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { getPieceBySlug } from "@/lib/db";
+import { getSessionMember } from "@/lib/auth";
 import { pieceFill, swatchBg } from "@/lib/glazes";
 import { BackButton } from "@/components/ui/BackButton";
+import { PieceGallery } from "@/components/pieces/PieceGallery";
+import { PieceOwnerActions } from "@/components/pieces/PieceOwnerActions";
 import { timeAgo } from "@/lib/utils";
 
 export async function generateMetadata({
@@ -31,44 +33,25 @@ export default async function PieceDetail({
   const piece = await getPieceBySlug(slug);
   if (!piece) notFound();
 
+  const { member } = await getSessionMember();
+  const isOwner = Boolean(member && member.id === piece.makerId);
+
   const { glazes, maker } = piece;
   const primary = glazes[0];
-  const cover = piece.photos[0]?.url ?? null;
 
   return (
     <div>
-      <div className="relative h-[340px] w-full" style={{ background: pieceFill(glazes) }}>
-        {cover && (
-          <Image
-            src={cover}
-            alt={piece.title ?? piece.form}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority
-          />
-        )}
-        <div className="absolute left-4 top-4">
-          <BackButton />
-        </div>
-        <span className="absolute right-4 top-4 rounded-pill bg-ink/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-bone backdrop-blur-sm">
-          Photo 1 / {piece.photos.length} · {piece.form}
-        </span>
-        {piece.photos.length > 1 && (
-          <div className="absolute bottom-4 left-4 flex gap-2">
-            {piece.photos.map((ph, i) => (
-              <span
-                key={i}
-                className={`relative h-11 w-11 overflow-hidden rounded-md border-2 ${i === 0 ? "border-bone" : "border-bone/40"}`}
-                style={{ background: pieceFill(glazes) }}
-                aria-hidden
-              >
-                {ph.url && <Image src={ph.url} alt="" fill sizes="44px" className="object-cover" />}
-              </span>
-            ))}
+      <PieceGallery
+        photos={piece.photos}
+        fill={pieceFill(glazes)}
+        form={piece.form}
+        alt={piece.title ?? piece.form}
+        overlay={
+          <div className="absolute left-4 top-4">
+            <BackButton />
           </div>
-        )}
-      </div>
+        }
+      />
 
       <div className="mx-auto w-full max-w-[760px] px-5 py-7 sm:px-8">
         <h1 className="font-display text-3xl text-ink">{piece.title ?? piece.form}</h1>
@@ -136,6 +119,8 @@ export default async function PieceDetail({
             See more in {primary.name} <ChevronRight size={16} />
           </Link>
         )}
+
+        {isOwner && <PieceOwnerActions slug={piece.slug} />}
       </div>
     </div>
   );

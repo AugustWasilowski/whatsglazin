@@ -155,23 +155,60 @@ create policy piece_photos_write on public.piece_photos for all to authenticated
 
 -- ----------------------------------------------------------------------------
 -- Storage: a public-read bucket for piece photos.
--- Members upload under a path prefixed with their own member id.
+-- Members upload under a path prefixed with their own member id, and the
+-- policies below ENFORCE that prefix — a member can only write or delete files
+-- under their own folder, never overwrite or remove another member's photos.
 -- ----------------------------------------------------------------------------
 insert into storage.buckets (id, name, public)
 values ('pieces', 'pieces', true)
 on conflict (id) do nothing;
 
+-- The caller's member id, used to gate storage writes to their own folder.
+create or replace function public.current_member_id()
+returns text
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select id from public.members where auth_id = auth.uid();
+$$;
+
 drop policy if exists pieces_photos_read on storage.objects;
 create policy pieces_photos_read on storage.objects for select
   using (bucket_id = 'pieces');
 
+-- Insert only under `<my-member-id>/…`, and only real raster image extensions.
+-- Mirrors the server action's validation as a defense-in-depth backstop for
+-- anyone calling the Storage API directly with their own JWT.
 drop policy if exists pieces_photos_upload on storage.objects;
 create policy pieces_photos_upload on storage.objects for insert to authenticated
-  with check (bucket_id = 'pieces');
+  with check (
+    bucket_id = 'pieces'
+    and (storage.foldername(name))[1] = public.current_member_id()
+    and lower(storage.extension(name)) = any (
+      array['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic', 'heif']
+    )
+  );
+
+-- Update (upsert overwrites) is also gated to the owner's own folder.
+drop policy if exists pieces_photos_update on storage.objects;
+create policy pieces_photos_update on storage.objects for update to authenticated
+  using (
+    bucket_id = 'pieces'
+    and (storage.foldername(name))[1] = public.current_member_id()
+  )
+  with check (
+    bucket_id = 'pieces'
+    and (storage.foldername(name))[1] = public.current_member_id()
+  );
 
 drop policy if exists pieces_photos_delete on storage.objects;
 create policy pieces_photos_delete on storage.objects for delete to authenticated
-  using (bucket_id = 'pieces');
+  using (
+    bucket_id = 'pieces'
+    and (storage.foldername(name))[1] = public.current_member_id()
+  );
 
 -- ----------------------------------------------------------------------------
 -- Auto-create a member row on first sign-in.

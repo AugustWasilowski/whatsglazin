@@ -134,11 +134,18 @@ export async function getPieceBySlug(slug: string): Promise<EnrichedPiece | null
 
 /* ------------------------------- members ------------------------------- */
 
+/** The public roster: only members who have logged at least one piece. This
+ *  keeps unconfirmed / never-active accounts (e.g. anyone who merely requested
+ *  a sign-in code) out of the studio's public member list. */
 export async function getMembers(): Promise<Member[]> {
   const supabase = await createClient();
   const { data, error } = await supabase.from("members").select("*").order("name");
   if (error) throw error;
-  return (data ?? []).map(mapMember);
+  const members = (data ?? []).map(mapMember);
+
+  const pieces = await getPieces();
+  const makers = new Set(pieces.map((p) => p.makerId));
+  return members.filter((m) => makers.has(m.id));
 }
 
 export async function getMemberBySlug(slug: string): Promise<Member | null> {

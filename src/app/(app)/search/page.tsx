@@ -7,8 +7,17 @@ export const metadata: Metadata = {
   description: "Search The Fine Line by glaze, maker, or piece.",
 };
 
-// The search tab reuses the gallery browser (search + glaze filters).
+// The search tab reuses the gallery browser but with its own heading and an
+// auto-focused search field, so it doesn't read as a duplicate of /gallery.
 export default async function SearchPage() {
   const [pieces, glazes] = await Promise.all([getPieces(), getGlazes()]);
-  return <GalleryBrowser pieces={pieces} glazes={glazes} />;
+  return (
+    <GalleryBrowser
+      pieces={pieces}
+      glazes={glazes}
+      eyebrow="Find a piece"
+      heading="Search"
+      autoFocus
+    />
+  );
 }

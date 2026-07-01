@@ -1,38 +1,75 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Camera, Plus, Check, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Camera, Plus, Check, ChevronDown, X } from "lucide-react";
 import { GlazeTypeahead } from "./GlazeTypeahead";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { GlazeChip } from "@/components/ui/GlazeChip";
-import { createPiece } from "@/lib/actions";
-import type { Glaze } from "@/lib/types";
+import { createPiece, updatePiece } from "@/lib/actions";
+import type { EnrichedPiece, Glaze } from "@/lib/types";
 
-type Photo = { id: string; url: string; file: File };
+// Existing photos have a real URL and no File; new ones carry the File to upload.
+type Photo = { id: string; url: string; file?: File };
 type Chip = { key: string; glaze?: Glaze; name: string };
 type Step = "form" | "saving" | "success";
 
 let uid = 0;
 const nextId = () => `u${uid++}`;
 
-export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [chips, setChips] = useState<Chip[]>([]);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+/**
+ * Add or edit a piece. In "edit" mode it's pre-filled from `initial` and submits
+ * to updatePiece; otherwise it creates a new piece.
+ */
+export function AddPieceFlow({
+  glazes,
+  mode = "create",
+  initial,
+}: {
+  glazes: Glaze[];
+  mode?: "create" | "edit";
+  initial?: EnrichedPiece;
+}) {
+  const isEdit = mode === "edit";
+
+  const [photos, setPhotos] = useState<Photo[]>(() =>
+    isEdit && initial
+      ? initial.photos
+          .filter((p) => p.url)
+          .map((p) => ({ id: nextId(), url: p.url as string }))
+      : [],
+  );
+  const [chips, setChips] = useState<Chip[]>(() =>
+    isEdit && initial
+      ? initial.glazes.map((g) => ({ key: g.id, glaze: g, name: g.name }))
+      : [],
+  );
+  const [showAdvanced, setShowAdvanced] = useState(isEdit);
   const [step, setStep] = useState<Step>("form");
   const [error, setError] = useState<string | null>(null);
   const [savedSlug, setSavedSlug] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   // Optional details
-  const [title, setTitle] = useState("");
-  const [form, setForm] = useState("");
-  const [clayBody, setClayBody] = useState("");
-  const [firing, setFiring] = useState("");
-  const [notes, setNotes] = useState("");
+  const [title, setTitle] = useState(initial?.title ?? "");
+  const [form, setForm] = useState(isEdit ? initial?.form ?? "" : "");
+  const [clayBody, setClayBody] = useState(initial?.clayBody ?? "");
+  const [firing, setFiring] = useState(initial?.firing?.join(" · ") ?? "");
+  const [notes, setNotes] = useState(initial?.notes ?? "");
 
   const fileInput = useRef<HTMLInputElement>(null);
   const selectedGlazeIds = chips.filter((c) => c.glaze).map((c) => c.glaze!.id);
   const canSubmit = photos.length > 0 && chips.length > 0;
+
+  // Warn before losing unsaved work on reload / close / hard navigation.
+  useEffect(() => {
+    if (!dirty || step !== "form") return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty, step]);
 
   function addFiles(files: FileList | null) {
     if (!files) return;
@@ -42,20 +79,33 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
       file: f,
     }));
     setPhotos((prev) => [...prev, ...incoming]);
+    setDirty(true);
+  }
+
+  function removePhoto(id: string) {
+    setPhotos((prev) => {
+      const gone = prev.find((p) => p.id === id);
+      if (gone?.file) URL.revokeObjectURL(gone.url); // only new (blob) URLs
+      return prev.filter((p) => p.id !== id);
+    });
+    setDirty(true);
   }
 
   function addGlaze(id: string) {
     const g = glazes.find((x) => x.id === id);
     if (!g || chips.some((c) => c.key === id)) return;
     setChips((prev) => [...prev, { key: id, glaze: g, name: g.name }]);
+    setDirty(true);
   }
   function addNewGlaze(name: string) {
     const key = `new-${name.toLowerCase()}`;
     if (chips.some((c) => c.key === key)) return;
     setChips((prev) => [...prev, { key, name }]);
+    setDirty(true);
   }
   function removeChip(key: string) {
     setChips((prev) => prev.filter((c) => c.key !== key));
+    setDirty(true);
   }
 
   async function submit() {
@@ -71,10 +121,21 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
       "glazes",
       JSON.stringify(chips.map((c) => (c.glaze ? { id: c.glaze.id } : { newName: c.name }))),
     );
-    photos.forEach((p) => fd.append("photos", p.file, p.file.name));
 
-    const res = await createPiece(fd);
+    if (isEdit) {
+      // Send the final ordered photo list; append only the new files, in order.
+      const order = photos.map((p) => (p.file ? { new: true } : { keep: p.url }));
+      fd.set("photoOrder", JSON.stringify(order));
+      photos.forEach((p) => p.file && fd.append("photos", p.file, p.file.name));
+    } else {
+      photos.forEach((p) => p.file && fd.append("photos", p.file, p.file.name));
+    }
+
+    const res =
+      isEdit && initial ? await updatePiece(initial.slug, fd) : await createPiece(fd);
+
     if (res.ok) {
+      setDirty(false);
       setSavedSlug(res.slug);
       setStep("success");
     } else {
@@ -84,7 +145,7 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
   }
 
   function reset() {
-    photos.forEach((p) => URL.revokeObjectURL(p.url));
+    photos.forEach((p) => p.file && URL.revokeObjectURL(p.url));
     setPhotos([]);
     setChips([]);
     setShowAdvanced(false);
@@ -94,6 +155,7 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
     setFiring("");
     setNotes("");
     setSavedSlug(null);
+    setDirty(false);
     setStep("form");
   }
 
@@ -103,7 +165,9 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
       <div className="grid min-h-[60vh] place-items-center px-6 text-center">
         <div>
           <div className="mx-auto h-12 w-12 animate-[wg-spin_0.8s_linear_infinite] rounded-full border-[3px] border-line-strong border-t-terracotta motion-reduce:animate-none" />
-          <p className="mt-4 text-ink-2">Saving to the studio…</p>
+          <p className="mt-4 text-ink-2">
+            {isEdit ? "Saving your changes…" : "Saving to the studio…"}
+          </p>
         </div>
       </div>
     );
@@ -118,15 +182,21 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
           <div className="mx-auto grid h-[88px] w-[88px] animate-[wg-pop_0.4s_cubic-bezier(0.16,1,0.3,1)_both] place-items-center rounded-full bg-success-bg text-success motion-reduce:animate-none">
             <Check size={44} strokeWidth={2.6} />
           </div>
-          <h1 className="mt-6 font-display text-3xl text-ink">It&rsquo;s in the studio.</h1>
-          <p className="mt-2 text-ink-2">Now searchable by {names}.</p>
+          <h1 className="mt-6 font-display text-3xl text-ink">
+            {isEdit ? "Changes saved." : "It’s in the studio."}
+          </h1>
+          <p className="mt-2 text-ink-2">
+            {isEdit ? "Your piece is updated." : `Now searchable by ${names}.`}
+          </p>
           <div className="mt-7 flex flex-col gap-3">
             <ButtonLink href={savedSlug ? `/pieces/${savedSlug}` : "/gallery"} size="lg">
               See your piece
             </ButtonLink>
-            <Button variant="secondary" size="lg" onClick={reset}>
-              Add another
-            </Button>
+            {!isEdit && (
+              <Button variant="secondary" size="lg" onClick={reset}>
+                Add another
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -136,8 +206,10 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
   // ---------- FORM ----------
   return (
     <div className="mx-auto w-full max-w-[560px] px-5 py-8 sm:px-6">
-      <h1 className="font-display text-4xl text-ink">Add a piece</h1>
-      <p className="mt-1 text-slip">Photo → glaze → done.</p>
+      <h1 className="font-display text-4xl text-ink">{isEdit ? "Edit piece" : "Add a piece"}</h1>
+      <p className="mt-1 text-slip">
+        {isEdit ? "Update the photos, glazes, or details." : "Photo → glaze → done."}
+      </p>
 
       {error && (
         <p className="mt-4 rounded-md border border-error-line bg-error-bg px-4 py-2.5 text-sm text-error">
@@ -151,7 +223,10 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
         accept="image/*"
         multiple
         className="hidden"
-        onChange={(e) => addFiles(e.target.files)}
+        onChange={(e) => {
+          addFiles(e.target.files);
+          e.target.value = ""; // allow re-picking the same file after a remove
+        }}
       />
 
       {/* Dropzone / photos */}
@@ -170,9 +245,20 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
       ) : (
         <div className="mt-6 flex flex-wrap gap-3">
           {photos.map((p) => (
-            <div key={p.id} className="relative h-24 w-24 overflow-hidden rounded-md border border-line">
+            <div
+              key={p.id}
+              className="group relative h-24 w-24 overflow-hidden rounded-md border border-line"
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={p.url} alt="" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removePhoto(p.id)}
+                aria-label="Remove photo"
+                className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-ink/70 text-bone backdrop-blur-sm transition-colors hover:bg-ink"
+              >
+                <X size={14} />
+              </button>
             </div>
           ))}
           <button
@@ -243,16 +329,16 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
         </button>
         {showAdvanced && (
           <div className="grid gap-3 px-4 pb-4">
-            <Field label="Title" placeholder="Everyday bowl" value={title} onChange={setTitle} />
-            <Field label="Form" placeholder="Tumbler, Bowl, Vase…" value={form} onChange={setForm} />
-            <Field label="Clay body" placeholder="Stoneware" value={clayBody} onChange={setClayBody} />
-            <Field label="Firing" placeholder="Cone 6 · oxidation" value={firing} onChange={setFiring} />
+            <Field label="Title" placeholder="Everyday bowl" value={title} onChange={(v) => { setTitle(v); setDirty(true); }} />
+            <Field label="Form" placeholder="Tumbler, Bowl, Vase…" value={form} onChange={(v) => { setForm(v); setDirty(true); }} />
+            <Field label="Clay body" placeholder="Stoneware" value={clayBody} onChange={(v) => { setClayBody(v); setDirty(true); }} />
+            <Field label="Firing" placeholder="Cone 6 · oxidation" value={firing} onChange={(v) => { setFiring(v); setDirty(true); }} />
             <div>
               <label className="mb-1.5 block text-sm font-medium text-ink-2">Notes</label>
               <textarea
                 rows={3}
                 value={notes}
-                onChange={(e) => setNotes(e.target.value)}
+                onChange={(e) => { setNotes(e.target.value); setDirty(true); }}
                 placeholder="How you glazed it, what happened in the kiln…"
                 className="w-full rounded-md border-[1.5px] border-line-strong bg-bone px-3 py-2 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
               />
@@ -264,8 +350,15 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
       {/* Sticky submit */}
       <div className="sticky bottom-20 z-10 mt-6 md:bottom-4">
         <Button size="lg" onClick={submit} disabled={!canSubmit} className="min-h-[52px] w-full">
-          Add this piece
+          {isEdit ? "Save changes" : "Add this piece"}
         </Button>
+        {!canSubmit && (
+          <p className="mt-2 text-center text-xs text-slip">
+            {photos.length === 0
+              ? "Add at least one photo to continue."
+              : "Add at least one glaze to continue."}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -16,6 +16,14 @@ export default async function MembersPage() {
   return (
     <div className="mx-auto w-full max-w-[1180px] px-5 py-8 sm:px-10">
       <h1 className="font-display text-4xl text-ink sm:text-5xl">Members</h1>
+      {members.length === 0 ? (
+        <div className="mt-8 rounded-card border border-dashed border-line-strong bg-bone/60 p-10 text-center">
+          <p className="font-display text-2xl text-ink">No members yet</p>
+          <p className="mt-1 text-sm text-slip">
+            Makers show up here once they’ve logged a piece.
+          </p>
+        </div>
+      ) : (
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {members.map((m) => {
           const count = countByMaker.get(m.id) ?? 0;
@@ -38,6 +46,7 @@ export default async function MembersPage() {
           );
         })}
       </div>
+      )}
     </div>
   );
 }

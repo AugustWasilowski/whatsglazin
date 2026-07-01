@@ -22,12 +22,14 @@ required for these steps.
 npm run seed:gen
 ```
 
-## Auth providers (Phase 3)
+## Auth providers
 
 Enable in [Authentication → Providers](https://supabase.com/dashboard/project/znlqvdyutuohqvriffum/auth/providers):
-- **Email** (magic link) — on by default.
+- **Email** — sign-in is a 6-digit OTP code emailed to the member (on by default).
 - **Google** — needs a Google Cloud OAuth client.
-- **Apple** — needs an Apple Developer account + Services ID/key.
+
+Set the email OTP length to **6 digits** under Authentication → Email templates /
+provider settings so it matches the sign-in form.
 
 Redirect URLs to add (Authentication → URL Configuration):
 - `http://localhost:3000/auth/callback` (dev)

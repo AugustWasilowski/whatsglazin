@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import Fuse from "fuse.js";
 import { X } from "lucide-react";
 import { useGSAP } from "@gsap/react";
@@ -12,13 +13,20 @@ import type { EnrichedPiece, Glaze } from "@/lib/types";
 type SearchItem = { piece: EnrichedPiece; title: string; maker: string; glazes: string };
 
 /** Gallery browser — fuzzy search + single-glaze filter chips over a masonry,
- *  with a GSAP Flip reflow when the result set changes. */
+ *  with a GSAP Flip reflow when the result set changes. The eyebrow/heading are
+ *  overridable so /search can reuse this with its own identity. */
 export function GalleryBrowser({
   pieces,
   glazes,
+  eyebrow = "The Fine Line",
+  heading = "Gallery",
+  autoFocus = false,
 }: {
   pieces: EnrichedPiece[];
   glazes: Glaze[];
+  eyebrow?: string;
+  heading?: string;
+  autoFocus?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [filterGlaze, setFilterGlaze] = useState<string | null>(null);
@@ -93,9 +101,9 @@ export function GalleryBrowser({
   return (
     <div className="mx-auto w-full max-w-[1180px] px-5 py-8 sm:px-10">
       <p className="font-sans text-[12px] font-medium uppercase tracking-[0.2em] text-terracotta">
-        The Fine Line
+        {eyebrow}
       </p>
-      <h1 className="mt-1 font-display text-4xl text-ink sm:text-5xl">Gallery</h1>
+      <h1 className="mt-1 font-display text-4xl text-ink sm:text-5xl">{heading}</h1>
 
       <div className="mt-6">
         <label htmlFor="gallery-search" className="sr-only">
@@ -104,6 +112,7 @@ export function GalleryBrowser({
         <input
           id="gallery-search"
           type="search"
+          autoFocus={autoFocus}
           value={query}
           onChange={(e) => {
             captureFlip();
@@ -174,10 +183,21 @@ export function GalleryBrowser({
             </div>
           ))}
         </div>
-      ) : (
+      ) : isFiltering ? (
         <div className="mt-12 rounded-card border border-dashed border-line-strong bg-bone/60 p-10 text-center">
           <p className="font-display text-2xl text-ink">Nothing matches yet</p>
           <p className="mt-1 text-sm text-slip">Try a different glaze, maker, or search term.</p>
+        </div>
+      ) : (
+        <div className="mt-12 rounded-card border border-dashed border-line-strong bg-bone/60 p-10 text-center">
+          <p className="font-display text-2xl text-ink">No pieces yet</p>
+          <p className="mt-1 text-sm text-slip">
+            The gallery fills up as members log their work.{" "}
+            <Link href="/add" className="font-medium text-terracotta hover:text-terracotta-hover">
+              Add the first piece
+            </Link>
+            .
+          </p>
         </div>
       )}
     </div>

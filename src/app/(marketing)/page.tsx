@@ -23,13 +23,18 @@ export default async function Landing() {
     getMembers(),
   ]);
 
-  // Build the hero wall from real pieces (or glaze swatches if none yet).
+  // Build the hero wall from real pieces (or glaze swatches if none yet, or a
+  // neutral clay gradient when the studio is brand-new and has neither).
+  const FALLBACK_FILL = "linear-gradient(135deg, #C4B49A, #8A7A64)";
   const wall: WallTile[] = Array.from({ length: 24 }, (_, i) => {
     const aspect = ASPECTS[i % 3];
     if (pieces.length) {
       return { fill: pieceFill(pieces[i % pieces.length].glazes), aspect };
     }
-    return { fill: swatchFill(glazes[i % glazes.length]), aspect };
+    if (glazes.length) {
+      return { fill: swatchFill(glazes[i % glazes.length]), aspect };
+    }
+    return { fill: FALLBACK_FILL, aspect };
   });
 
   const stats = [
