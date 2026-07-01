@@ -10,7 +10,7 @@ import { Reveal } from "@/components/motion/Reveal";
 const STEPS = [
   { n: "01", color: "text-celadon", title: "Shoot it", body: "Snap the piece straight off the kiln shelf — one hand, one tap. Add a few angles if you like." },
   { n: "02", color: "text-terracotta", title: "Log the glaze", body: "Start typing and the studio's glazes surface instantly. Tap to add — layer as many as you dipped." },
-  { n: "03", color: "text-cobalt", title: "It's remembered", body: "It joins a gallery the whole studio can search — by colour, recipe, maker, and combination." },
+  { n: "03", color: "text-cobalt", title: "It's remembered", body: "It joins a gallery the whole studio can search — by color, recipe, maker, and combination." },
 ];
 
 const ASPECTS = ["3 / 4", "1 / 1", "4 / 5"];
@@ -108,7 +108,7 @@ export default async function Landing() {
           </h2>
           <div className="mt-8 flex justify-center">
             <ButtonLink href="/auth" size="lg" className="rounded-pill px-8">
-              Continue with Google · Apple · Email
+              Continue with Google or Email
             </ButtonLink>
           </div>
         </Reveal>

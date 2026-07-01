@@ -5,12 +5,12 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-/** Auth panel — Google/Apple SSO + passwordless email magic link. */
+/** Auth panel — Google SSO + passwordless email magic link. */
 export function AuthPanel() {
   const [supabase] = useState(() => createClient());
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
-  const [busy, setBusy] = useState<null | "google" | "apple" | "email">(null);
+  const [busy, setBusy] = useState<null | "google" | "email">(null);
   const [error, setError] = useState<string | null>(null);
 
   function callbackUrl() {
@@ -19,23 +19,18 @@ export function AuthPanel() {
     return `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
   }
 
-  async function oauth(provider: "google" | "apple") {
-    setBusy(provider);
+  async function signInWithGoogle() {
+    setBusy("google");
     setError(null);
     const { error } = await supabase.auth.signInWithOAuth({
-      provider,
+      provider: "google",
       options: { redirectTo: callbackUrl() },
     });
     if (error) {
-      // e.g. provider not yet enabled in the Supabase dashboard.
-      setError(
-        provider === "apple"
-          ? "Apple sign-in isn’t set up yet — try Google or email."
-          : error.message,
-      );
+      setError(error.message);
       setBusy(null);
     }
-    // On success the browser redirects to the provider.
+    // On success the browser redirects to Google.
   }
 
   async function sendMagicLink(e: React.FormEvent) {
@@ -127,21 +122,12 @@ export function AuthPanel() {
       <div className="mt-6 flex flex-col gap-3">
         <button
           type="button"
-          onClick={() => oauth("google")}
+          onClick={signInWithGoogle}
           disabled={busy !== null}
           className="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-md border border-line-strong bg-bone px-5 font-semibold text-ink transition-colors hover:bg-clay/40 disabled:opacity-60"
         >
           <GoogleG />
           {busy === "google" ? "Redirecting…" : "Continue with Google"}
-        </button>
-        <button
-          type="button"
-          onClick={() => oauth("apple")}
-          disabled={busy !== null}
-          className="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-md bg-ink px-5 font-semibold text-bone transition-colors hover:bg-kiln disabled:opacity-60"
-        >
-          <AppleGlyph />
-          Continue with Apple
         </button>
       </div>
 
@@ -198,10 +184,3 @@ function GoogleG() {
   );
 }
 
-function AppleGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden>
-      <path d="M16.36 12.9c.03 2.9 2.55 3.86 2.58 3.88-.02.07-.4 1.38-1.33 2.73-.8 1.17-1.63 2.33-2.94 2.35-1.29.02-1.7-.76-3.17-.76-1.47 0-1.93.74-3.15.79-1.27.05-2.23-1.26-3.04-2.42-1.65-2.4-2.91-6.77-1.22-9.72.84-1.47 2.34-2.4 3.97-2.42 1.24-.03 2.42.84 3.17.84.76 0 2.18-1.04 3.68-.89.63.03 2.4.25 3.53 1.92-.09.06-2.11 1.24-2.08 3.7ZM14.4 4.6c.67-.81 1.11-1.94.99-3.06-.96.04-2.12.64-2.81 1.44-.62.72-1.16 1.86-1.02 2.96 1.07.08 2.17-.54 2.84-1.34Z" />
-    </svg>
-  );
-}

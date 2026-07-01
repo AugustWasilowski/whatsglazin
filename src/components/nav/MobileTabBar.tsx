@@ -12,12 +12,12 @@ const TABS = [
   { href: "/you", label: "You", icon: User },
 ];
 
-/** Mobile bottom tab bar with a raised terracotta "Add" FAB in the centre. */
+/** Mobile bottom tab bar with a raised terracotta "Add" FAB in the center. */
 export function MobileTabBar() {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
-  // Split tabs 2 / 2 around the centre FAB.
+  // Split tabs 2 / 2 around the center FAB.
   const left = TABS.slice(0, 2);
   const right = TABS.slice(2);
 

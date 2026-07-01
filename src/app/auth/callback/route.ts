@@ -13,6 +13,14 @@ function publicOrigin(request: Request): string {
   return `${proto}://${host}`;
 }
 
+/** Only allow internal absolute paths — blocks open redirects (//evil.com etc.). */
+function safeNext(next: string | null): string {
+  if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) {
+    return "/gallery";
+  }
+  return next;
+}
+
 /**
  * OAuth + magic-link return here with a `code`. Exchange it for a session
  * (sets the auth cookies), then continue to the requested page.
@@ -20,7 +28,7 @@ function publicOrigin(request: Request): string {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/gallery";
+  const next = safeNext(searchParams.get("next"));
   const base = publicOrigin(request);
 
   if (code) {

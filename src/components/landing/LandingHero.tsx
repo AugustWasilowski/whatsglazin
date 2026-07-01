@@ -88,7 +88,7 @@ export function LandingHero({
           </h1>
           <p className="hero-fade mt-6 max-w-[520px] text-lg leading-relaxed text-ink-3">
             Snap a piece straight off the kiln shelf, log the glaze in three taps,
-            and it joins a gallery the whole studio can search — by colour, recipe,
+            and it joins a gallery the whole studio can search — by color, recipe,
             and maker.
           </p>
           <div className="hero-fade mt-8 flex flex-wrap gap-3">

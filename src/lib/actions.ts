@@ -22,28 +22,66 @@ export async function createPiece(formData: FormData): Promise<CreatePieceResult
 
   const supabase = await createClient();
 
+  const cap = (s: string, n: number) => s.slice(0, n);
   const str = (k: string) => ((formData.get(k) as string) ?? "").trim();
-  const title = str("title");
-  const form = str("form") || "Vessel";
-  const clayBody = str("clayBody");
-  const notes = str("notes");
+  const title = cap(str("title"), 120);
+  const form = cap(str("form"), 40) || "Vessel";
+  const clayBody = cap(str("clayBody"), 60);
+  const notes = cap(str("notes"), 2000);
   const firingRaw = str("firing");
   const firing = firingRaw
-    ? firingRaw.split(/[,·]/).map((s) => s.trim().toUpperCase()).filter(Boolean)
+    ? firingRaw
+        .split(/[,·]/)
+        .map((s) => cap(s.trim().toUpperCase(), 24))
+        .filter(Boolean)
+        .slice(0, 6)
     : null;
 
+  // Validate the glaze list: known shape, capped count, capped new-name length.
   let glazeEntries: GlazeEntry[] = [];
   try {
-    glazeEntries = JSON.parse(str("glazes") || "[]");
+    const parsed = JSON.parse(str("glazes") || "[]");
+    if (Array.isArray(parsed)) {
+      glazeEntries = parsed
+        .filter((e) => e && (typeof e.id === "string" || typeof e.newName === "string"))
+        .slice(0, 12)
+        .map((e) => ({
+          id: typeof e.id === "string" ? e.id : undefined,
+          newName: typeof e.newName === "string" ? cap(e.newName.trim(), 60) : undefined,
+        }));
+    }
   } catch {
     glazeEntries = [];
   }
   if (glazeEntries.length === 0) return { ok: false, error: "Add at least one glaze." };
 
+  // Only accept real raster images, capped in size and count. Blocks SVG (script
+  // vector) and non-image payloads from being uploaded to the public bucket.
+  const ALLOWED_TYPES = new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+    "image/heic",
+    "image/heif",
+  ]);
+  const MAX_PHOTO_BYTES = 15 * 1024 * 1024;
   const photos = formData
     .getAll("photos")
-    .filter((f): f is File => f instanceof File && f.size > 0);
-  if (photos.length === 0) return { ok: false, error: "Add at least one photo." };
+    .filter(
+      (f): f is File =>
+        f instanceof File &&
+        f.size > 0 &&
+        f.size <= MAX_PHOTO_BYTES &&
+        ALLOWED_TYPES.has(f.type),
+    )
+    .slice(0, 8);
+  if (photos.length === 0) {
+    return {
+      ok: false,
+      error: "Add at least one photo (JPG, PNG, WebP, or HEIC, under 15 MB).",
+    };
+  }
 
   // 1) the piece
   const base = slugify(title || form) || "piece";

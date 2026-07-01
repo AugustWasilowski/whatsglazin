@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s · WhatsGlazin",
   },
   description:
-    "Snap a piece straight off the kiln shelf, log the glaze in three taps, and it joins a gallery the whole studio can search — by colour, recipe, and maker.",
+    "Snap a piece straight off the kiln shelf, log the glaze in three taps, and it joins a gallery the whole studio can search — by color, recipe, and maker.",
   applicationName: "WhatsGlazin",
   appleWebApp: { capable: true, title: "WhatsGlazin", statusBarStyle: "default" },
   openGraph: {
