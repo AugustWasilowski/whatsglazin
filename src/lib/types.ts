@@ -1,22 +1,25 @@
 /** Core domain types for WhatsGlazin. These mirror the Supabase schema
  *  introduced in Phase 2 so screens can be built against typed data now. */
 
-export type GlazeFamily =
-  | "Celadon"
-  | "Iron"
-  | "Feldspathic"
-  | "Ash"
-  | "Ash·Blue"
-  | "Copper"
-  | "Liner";
+/** Loose grouping used for display/search. Freeform so real studio glazes
+ *  (which don't follow a fixed taxonomy) can carry whatever fits. */
+export type GlazeFamily = string;
 
-export type GlazeFinish = "satin" | "glossy" | "matte" | "runny" | "dry matte";
+export type GlazeFinish =
+  | "satin"
+  | "glossy"
+  | "matte"
+  | "runny"
+  | "dry matte"
+  | "metallic";
 
 export interface Glaze {
   id: string;
   slug: string;
   name: string;
   family: GlazeFamily;
+  /** Cone the glaze is fired to (6 or 10 at The Fine Line). */
+  cone: number;
   /** Swatch gradient endpoints. */
   baseHex: string;
   shade2Hex: string;
