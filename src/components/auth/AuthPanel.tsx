@@ -1,0 +1,162 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { Mail } from "lucide-react";
+
+/**
+ * Auth panel — SSO one-tap + passwordless email.
+ * NOTE: handlers are stubbed until Supabase keys land (Phase 3). `sendMagicLink`
+ * will call supabase.auth.signInWithOtp; the SSO buttons will call
+ * signInWithOAuth({ provider: "google" | "apple" }).
+ */
+export function AuthPanel() {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+
+  function sendMagicLink(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    // TODO(Phase 3): await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo }})
+    setSent(true);
+  }
+
+  if (sent) {
+    return (
+      <div className="w-full max-w-sm text-center">
+        <div className="mx-auto grid h-[78px] w-[78px] place-items-center rounded-lg bg-clay-deep text-terracotta">
+          <Mail size={34} />
+        </div>
+        <h1 className="mt-6 font-display text-3xl text-ink">Check your email</h1>
+        <p className="mt-2 text-ink-2">
+          We sent a one-tap sign-in link to <strong>{email}</strong>. It&rsquo;s good for
+          15 minutes.
+        </p>
+        <div className="mt-6 flex flex-col gap-3">
+          <a
+            href="mailto:"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-md border border-line-strong bg-clay-deep/70 px-5 font-semibold text-ink hover:bg-clay-deep"
+          >
+            Open mail app
+          </a>
+          <p className="text-sm text-slip">
+            Didn&rsquo;t get it?{" "}
+            <button onClick={() => setSent(false)} className="font-medium text-celadon hover:text-ink">
+              Resend
+            </button>{" "}
+            ·{" "}
+            <button onClick={() => { setSent(false); setEmail(""); }} className="font-medium text-celadon hover:text-ink">
+              Use a different email
+            </button>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-sm">
+      <div className="flex flex-col items-center text-center">
+        {/* logo tile */}
+        <span
+          className="grid h-[66px] w-[66px] place-items-center overflow-hidden rounded-lg"
+          style={{
+            background:
+              "conic-gradient(from 210deg, #8FA98A, #55708A, #B0552F, #C98A4E, #3F7A66, #8FA98A)",
+          }}
+          aria-hidden
+        >
+          <span
+            className="h-full w-full"
+            style={{
+              background:
+                "repeating-linear-gradient(135deg, rgba(255,255,255,.14) 0 8px, rgba(28,18,8,.10) 8px 16px)",
+            }}
+          />
+        </span>
+        <h1 className="mt-4 font-display text-[32px] leading-none text-ink">
+          What&rsquo;sGlazin<span className="text-terracotta">?</span>
+        </h1>
+        <p className="mt-2 text-ink-2">
+          Sign in to log your pieces and browse the studio.
+        </p>
+      </div>
+
+      <div className="mt-7 flex flex-col gap-3">
+        {/* Google */}
+        <button
+          type="button"
+          className="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-md border border-line-strong bg-bone px-5 font-semibold text-ink transition-colors hover:bg-clay/40"
+        >
+          <GoogleG />
+          Continue with Google
+        </button>
+        {/* Apple */}
+        <button
+          type="button"
+          className="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-md bg-ink px-5 font-semibold text-bone transition-colors hover:bg-kiln"
+        >
+          <AppleGlyph />
+          Continue with Apple
+        </button>
+      </div>
+
+      <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-slip">
+        <span className="h-px flex-1 bg-line-strong" />
+        or with email
+        <span className="h-px flex-1 bg-line-strong" />
+      </div>
+
+      <form onSubmit={sendMagicLink} className="flex flex-col gap-3">
+        <label htmlFor="email" className="sr-only">
+          Email address
+        </label>
+        <div className="relative">
+          <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slip" />
+          <input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@thefineline.studio"
+            className="h-12 w-full rounded-md border-[1.5px] border-line-strong bg-bone pl-11 pr-4 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
+          />
+        </div>
+        <button
+          type="submit"
+          className="inline-flex min-h-[48px] items-center justify-center rounded-md bg-terracotta px-5 font-semibold text-on-terracotta shadow-[var(--shadow-glow)] transition-colors hover:bg-terracotta-hover"
+        >
+          Email me a magic link
+        </button>
+      </form>
+
+      <p className="mt-5 text-center text-xs text-slip">
+        By continuing you agree to the{" "}
+        <Link href="/terms" className="underline hover:text-ink">
+          member terms
+        </Link>
+        .
+      </p>
+    </div>
+  );
+}
+
+function GoogleG() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+      <path fill="#4285F4" d="M23.06 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h6.2a5.3 5.3 0 0 1-2.3 3.48v2.89h3.72c2.18-2 3.44-4.96 3.44-8.38Z" />
+      <path fill="#34A853" d="M12 24c3.1 0 5.7-1.03 7.6-2.78l-3.72-2.89c-1.03.69-2.35 1.1-3.88 1.1-2.98 0-5.5-2.01-6.4-4.72H1.76v2.98A12 12 0 0 0 12 24Z" />
+      <path fill="#FBBC05" d="M5.6 14.71a7.2 7.2 0 0 1 0-4.42V7.31H1.76a12 12 0 0 0 0 10.38l3.84-2.98Z" />
+      <path fill="#EA4335" d="M12 4.75c1.68 0 3.19.58 4.38 1.72l3.28-3.28C17.7 1.2 15.1 0 12 0A12 12 0 0 0 1.76 7.31l3.84 2.98C6.5 6.76 9.02 4.75 12 4.75Z" />
+    </svg>
+  );
+}
+
+function AppleGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden>
+      <path d="M16.36 12.9c.03 2.9 2.55 3.86 2.58 3.88-.02.07-.4 1.38-1.33 2.73-.8 1.17-1.63 2.33-2.94 2.35-1.29.02-1.7-.76-3.17-.76-1.47 0-1.93.74-3.15.79-1.27.05-2.23-1.26-3.04-2.42-1.65-2.4-2.91-6.77-1.22-9.72.84-1.47 2.34-2.4 3.97-2.42 1.24-.03 2.42.84 3.17.84.76 0 2.18-1.04 3.68-.89.63.03 2.4.25 3.53 1.92-.09.06-2.11 1.24-2.08 3.7ZM14.4 4.6c.67-.81 1.11-1.94.99-3.06-.96.04-2.12.64-2.81 1.44-.62.72-1.16 1.86-1.02 2.96 1.07.08 2.17-.54 2.84-1.34Z" />
+    </svg>
+  );
+}
