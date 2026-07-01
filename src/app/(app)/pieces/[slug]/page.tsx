@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { getPieceBySlug } from "@/lib/db";
 import { pieceFill, swatchFill } from "@/lib/glazes";
@@ -32,10 +33,21 @@ export default async function PieceDetail({
 
   const { glazes, maker } = piece;
   const primary = glazes[0];
+  const cover = piece.photos[0]?.url ?? null;
 
   return (
     <div>
       <div className="relative h-[340px] w-full" style={{ background: pieceFill(glazes) }}>
+        {cover && (
+          <Image
+            src={cover}
+            alt={piece.title ?? piece.form}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+        )}
         <div className="absolute left-4 top-4">
           <BackButton />
         </div>
@@ -44,13 +56,15 @@ export default async function PieceDetail({
         </span>
         {piece.photos.length > 1 && (
           <div className="absolute bottom-4 left-4 flex gap-2">
-            {piece.photos.map((_, i) => (
+            {piece.photos.map((ph, i) => (
               <span
                 key={i}
-                className={`h-11 w-11 rounded-md border-2 ${i === 0 ? "border-bone" : "border-bone/40"}`}
+                className={`relative h-11 w-11 overflow-hidden rounded-md border-2 ${i === 0 ? "border-bone" : "border-bone/40"}`}
                 style={{ background: pieceFill(glazes) }}
                 aria-hidden
-              />
+              >
+                {ph.url && <Image src={ph.url} alt="" fill sizes="44px" className="object-cover" />}
+              </span>
             ))}
           </div>
         )}

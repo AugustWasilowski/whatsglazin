@@ -1,14 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
 import { Camera, Plus, Check, ChevronDown } from "lucide-react";
 import { GlazeTypeahead } from "./GlazeTypeahead";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { GlazeChip } from "@/components/ui/GlazeChip";
+import { createPiece } from "@/lib/actions";
 import type { Glaze } from "@/lib/types";
 
-type Photo = { id: string; url: string; progress: number };
+type Photo = { id: string; url: string; file: File };
 type Chip = { key: string; glaze?: Glaze; name: string };
 type Step = "form" | "saving" | "success";
 
@@ -20,30 +20,28 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
   const [chips, setChips] = useState<Chip[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [step, setStep] = useState<Step>("form");
-  const fileInput = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [savedSlug, setSavedSlug] = useState<string | null>(null);
 
+  // Optional details
+  const [title, setTitle] = useState("");
+  const [form, setForm] = useState("");
+  const [clayBody, setClayBody] = useState("");
+  const [firing, setFiring] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const fileInput = useRef<HTMLInputElement>(null);
   const selectedGlazeIds = chips.filter((c) => c.glaze).map((c) => c.glaze!.id);
-  const canSubmit = photos.length > 0 && chips.length > 0 && photos.every((p) => p.progress >= 100);
+  const canSubmit = photos.length > 0 && chips.length > 0;
 
   function addFiles(files: FileList | null) {
     if (!files) return;
     const incoming: Photo[] = Array.from(files).map((f) => ({
       id: nextId(),
       url: URL.createObjectURL(f),
-      progress: 0,
+      file: f,
     }));
     setPhotos((prev) => [...prev, ...incoming]);
-    // Simulate upload progress (real upload lands in Phase 5).
-    incoming.forEach((p) => {
-      const tick = setInterval(() => {
-        setPhotos((prev) =>
-          prev.map((x) =>
-            x.id === p.id ? { ...x, progress: Math.min(100, x.progress + 25) } : x,
-          ),
-        );
-      }, 180);
-      setTimeout(() => clearInterval(tick), 900);
-    });
   }
 
   function addGlaze(id: string) {
@@ -60,10 +58,29 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
     setChips((prev) => prev.filter((c) => c.key !== key));
   }
 
-  function submit() {
+  async function submit() {
+    setError(null);
     setStep("saving");
-    // Simulated save (Phase 5 = real insert + upload).
-    setTimeout(() => setStep("success"), 1400);
+    const fd = new FormData();
+    fd.set("title", title);
+    fd.set("form", form);
+    fd.set("clayBody", clayBody);
+    fd.set("firing", firing);
+    fd.set("notes", notes);
+    fd.set(
+      "glazes",
+      JSON.stringify(chips.map((c) => (c.glaze ? { id: c.glaze.id } : { newName: c.name }))),
+    );
+    photos.forEach((p) => fd.append("photos", p.file, p.file.name));
+
+    const res = await createPiece(fd);
+    if (res.ok) {
+      setSavedSlug(res.slug);
+      setStep("success");
+    } else {
+      setError(res.error);
+      setStep("form");
+    }
   }
 
   function reset() {
@@ -71,6 +88,12 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
     setPhotos([]);
     setChips([]);
     setShowAdvanced(false);
+    setTitle("");
+    setForm("");
+    setClayBody("");
+    setFiring("");
+    setNotes("");
+    setSavedSlug(null);
     setStep("form");
   }
 
@@ -98,7 +121,9 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
           <h1 className="mt-6 font-display text-3xl text-ink">It&rsquo;s in the studio.</h1>
           <p className="mt-2 text-ink-2">Now searchable by {names}.</p>
           <div className="mt-7 flex flex-col gap-3">
-            <ButtonLink href="/gallery" size="lg">See it in the gallery</ButtonLink>
+            <ButtonLink href={savedSlug ? `/pieces/${savedSlug}` : "/gallery"} size="lg">
+              See your piece
+            </ButtonLink>
             <Button variant="secondary" size="lg" onClick={reset}>
               Add another
             </Button>
@@ -114,11 +139,16 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
       <h1 className="font-display text-4xl text-ink">Add a piece</h1>
       <p className="mt-1 text-slip">Photo → glaze → done.</p>
 
+      {error && (
+        <p className="mt-4 rounded-md border border-error-line bg-error-bg px-4 py-2.5 text-sm text-error">
+          {error}
+        </p>
+      )}
+
       <input
         ref={fileInput}
         type="file"
         accept="image/*"
-        capture="environment"
         multiple
         className="hidden"
         onChange={(e) => addFiles(e.target.files)}
@@ -143,11 +173,6 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
             <div key={p.id} className="relative h-24 w-24 overflow-hidden rounded-md border border-line">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={p.url} alt="" className="h-full w-full object-cover" />
-              {p.progress < 100 && (
-                <div className="absolute inset-0 grid place-items-center bg-ink/40 font-mono text-xs text-bone">
-                  {p.progress}%
-                </div>
-              )}
             </div>
           ))}
           <button
@@ -214,20 +239,20 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
           className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-ink-2"
         >
           Optional details
-          <ChevronDown
-            size={18}
-            className={`transition-transform ${showAdvanced ? "rotate-180" : ""}`}
-          />
+          <ChevronDown size={18} className={`transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
         </button>
         {showAdvanced && (
           <div className="grid gap-3 px-4 pb-4">
-            <Field label="Title" placeholder="Everyday bowl" />
-            <Field label="Clay body" placeholder="Stoneware" />
-            <Field label="Firing" placeholder="Cone 10 · reduction" />
+            <Field label="Title" placeholder="Everyday bowl" value={title} onChange={setTitle} />
+            <Field label="Form" placeholder="Tumbler, Bowl, Vase…" value={form} onChange={setForm} />
+            <Field label="Clay body" placeholder="Stoneware" value={clayBody} onChange={setClayBody} />
+            <Field label="Firing" placeholder="Cone 6 · oxidation" value={firing} onChange={setFiring} />
             <div>
               <label className="mb-1.5 block text-sm font-medium text-ink-2">Notes</label>
               <textarea
                 rows={3}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
                 placeholder="How you glazed it, what happened in the kiln…"
                 className="w-full rounded-md border-[1.5px] border-line-strong bg-bone px-3 py-2 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
               />
@@ -238,27 +263,32 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
 
       {/* Sticky submit */}
       <div className="sticky bottom-20 z-10 mt-6 md:bottom-4">
-        <Button
-          size="lg"
-          onClick={submit}
-          disabled={!canSubmit}
-          className="min-h-[52px] w-full"
-        >
-          {photos.length > 0 && !photos.every((p) => p.progress >= 100)
-            ? "Uploading photos…"
-            : "Add this piece"}
+        <Button size="lg" onClick={submit} disabled={!canSubmit} className="min-h-[52px] w-full">
+          Add this piece
         </Button>
       </div>
     </div>
   );
 }
 
-function Field({ label, placeholder }: { label: string; placeholder: string }) {
+function Field({
+  label,
+  placeholder,
+  value,
+  onChange,
+}: {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <div>
       <label className="mb-1.5 block text-sm font-medium text-ink-2">{label}</label>
       <input
         type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="h-11 w-full rounded-md border-[1.5px] border-line-strong bg-bone px-3 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
       />

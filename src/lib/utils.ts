@@ -5,6 +5,16 @@ export function cn(...inputs: ClassValue[]): string {
   return clsx(inputs);
 }
 
+/** URL-safe slug from arbitrary text. */
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+}
+
 /** Up to two uppercase initials from a name. */
 export function initialsOf(name: string): string {
   return name
