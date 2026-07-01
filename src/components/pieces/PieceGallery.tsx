@@ -27,14 +27,17 @@ export function PieceGallery({
   const current = photos[active] ?? photos[0];
 
   return (
-    <div className="relative h-[340px] w-full" style={{ background: fill }}>
+    <div
+      className="relative h-[62vh] max-h-[720px] min-h-[360px] w-full"
+      style={{ background: fill }}
+    >
       {current?.url && (
         <Image
           src={current.url}
           alt={current.alt ?? alt}
           fill
           sizes="100vw"
-          className="object-cover"
+          className="object-contain"
           placeholder={current.blurDataURL ? "blur" : "empty"}
           blurDataURL={current.blurDataURL}
           priority
