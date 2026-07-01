@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#DCD1BF;color:#2A2018;font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.05;mix-blend-mode:multiply;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  @keyframes wg-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes wg-spin{to{transform:rotate(360deg)}}
+  @keyframes wg-shimmer{0%{background-position:-160% 0}100%{background-position:260% 0}}
+  @keyframes wg-pulse{0%,100%{opacity:.55}50%{opacity:.85}}
+  @keyframes wg-ring{to{stroke-dashoffset:0}}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+</style>
+</helmet>
+
+<div style="max-width:1240px;margin:0 auto;padding:72px 40px 8px">
+  <div style="font:500 12px/1 'Hanken Grotesk';letter-spacing:.22em;text-transform:uppercase;color:#8A6A4A;margin-bottom:22px">The Fine Line · Pottery Studio · Est. 2014</div>
+  <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:28px 48px;justify-content:space-between">
+    <div style="max-width:760px">
+      <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:104px;line-height:.92;letter-spacing:-.02em;margin:0 0 24px;color:#2A2018">What's<br>Glazin<span style="color:#B0552F">?</span></h1>
+      <p style="font-size:22px;line-height:1.5;color:#4A3D2E;margin:0;max-width:620px">Pull a piece from the kiln, snap it, and log the glaze in three taps. WhatsGlazin turns every firing into a living gallery — and a glaze library the whole studio can search.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;min-width:230px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="font:500 12px/1 'Hanken Grotesk';color:#5E7E63;border:1px solid #B7C3B0;background:#EDF0E7;border-radius:999px;padding:8px 13px">Mobile-first</span>
+        <span style="font:500 12px/1 'Hanken Grotesk';color:#8A6A4A;border:1px solid #D8CDB9;background:#F1EADB;border-radius:999px;padding:8px 13px">Type-ahead glaze search</span>
+        <span style="font:500 12px/1 'Hanken Grotesk';color:#4E6E88;border:1px solid #B4C4D2;background:#E7EDF2;border-radius:999px;padding:8px 13px">GSAP showpiece</span>
+        <span style="font:500 12px/1 'Hanken Grotesk';color:#8A6A4A;border:1px solid #D8CDB9;background:#F1EADB;border-radius:999px;padding:8px 13px">WCAG AA · reduced-motion</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:1240px;margin:0 auto;padding:32px 40px 0">
+  <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:20px;padding:30px 34px;box-shadow:0 1px 2px rgba(42,34,22,.05),0 22px 44px -30px rgba(42,34,22,.4)">
+    <div style="font:600 11px/1 'Hanken Grotesk';letter-spacing:.18em;text-transform:uppercase;color:#B0552F;margin-bottom:16px">Design note · read me first</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px 34px">
+      <div>
+        <div style="font:600 15px 'Hanken Grotesk';margin-bottom:7px">The material is the brand</div>
+        <p style="margin:0;font-size:14px;line-height:1.6;color:#5A4D3C">Warm ceramic neutrals — bone, unfired clay, wet stoneware, kiln-shadow — keep the UI quiet so pottery photos carry the color. Accents are pulled straight from real glaze chemistry.</p>
+      </div>
+      <div>
+        <div style="font:600 15px 'Hanken Grotesk';margin-bottom:7px">Capture is instant, browse is a showpiece</div>
+        <p style="margin:0;font-size:14px;line-height:1.6;color:#5A4D3C">Spectacle (GSAP scroll sequences, staggered reveals, material shimmer) lives on landing &amp; browse. The upload flow is stripped to photo → glaze → done, with motion confined to gentle confirmation.</p>
+      </div>
+      <div>
+        <div style="font:600 15px 'Hanken Grotesk';margin-bottom:7px">Studio-first, but themeable</div>
+        <p style="margin:0;font-size:14px;line-height:1.6;color:#5A4D3C">Every screen is built for The Fine Line and its glazes. The system is fully tokenized, so opening it to other studios later is a re-theme, not a rebuild.</p>
+      </div>
+    </div>
+    <div style="margin-top:22px;padding-top:20px;border-top:1px solid #E7DDC9;display:flex;flex-wrap:wrap;gap:10px 22px;font:500 13px 'Hanken Grotesk';color:#8A7A64">
+      <span>Type: <b style="color:#2A2018;font-family:'Young Serif',serif;font-weight:400">Young Serif</b> display + <b style="color:#2A2018">Hanken Grotesk</b> UI</span>
+      <span>·</span>
+      <span>Jump to: Tokens → Components → Landing → App prototype → Upload flow → Auth</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TOKENS ===================== -->
+<section style="max-width:1240px;margin:0 auto;padding:72px 40px 24px">
+  <div style="font:600 11px/1 'Hanken Grotesk';letter-spacing:.2em;text-transform:uppercase;color:#8A6A4A;margin-bottom:12px">01 — Foundations</div>
+  <h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:44px;margin:0 0 8px;letter-spacing:-.01em">Design tokens</h2>
+  <p style="font-size:16px;color:#5A4D3C;max-width:640px;margin:0 0 40px">Two neutral families for surfaces &amp; ink, plus a glaze-chemistry accent set. Everything below is a token — swap the theme, keep the app.</p>
+
+  <div style="font:600 12px 'Hanken Grotesk';letter-spacing:.05em;color:#8A7A64;margin-bottom:14px">Ceramic neutrals — the canvas</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:44px">
+    <sc-for list="{{ neutrals }}" as="t" hint-placeholder-count="6">
+      <div style="border:1px solid #E0D6C2;border-radius:14px;overflow:hidden;background:#F6F1E7">
+        <div style="height:82px;background:{{ t.hex }};border-bottom:1px solid rgba(42,34,22,.08)"></div>
+        <div style="padding:11px 13px">
+          <div style="font:600 13px 'Hanken Grotesk'">{{ t.name }}</div>
+          <div style="font:500 11px ui-monospace,Menlo,monospace;color:#9A8A72;margin-top:3px">{{ t.hex }}</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="font:600 12px 'Hanken Grotesk';letter-spacing:.05em;color:#8A7A64;margin-bottom:14px">Glaze accents — pulled from real chemistry</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px">
+    <sc-for list="{{ glazeTokens }}" as="g" hint-placeholder-count="6">
+      <div style="border:1px solid #E0D6C2;border-radius:14px;overflow:hidden;background:#F6F1E7">
+        <div style="height:82px;background:{{ g.swatch }};border-bottom:1px solid rgba(42,34,22,.08);position:relative">
+          <span style="position:absolute;left:10px;bottom:8px;font:500 10px 'Hanken Grotesk';letter-spacing:.05em;color:{{ g.on }};opacity:.9">{{ g.finish }}</span>
+        </div>
+        <div style="padding:11px 13px">
+          <div style="font:600 13px 'Hanken Grotesk'">{{ g.name }}</div>
+          <div style="font:500 11px ui-monospace,Menlo,monospace;color:#9A8A72;margin-top:3px">{{ g.chem }}</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:28px;margin-top:44px;align-items:start">
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:18px;padding:26px 28px">
+      <div style="font:600 12px 'Hanken Grotesk';letter-spacing:.05em;color:#8A7A64;margin-bottom:20px">Type scale — Young Serif display / Hanken Grotesk UI</div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #EDE4D2;padding-bottom:14px"><span style="font:500 10px ui-monospace,monospace;color:#B0A48C;width:70px;flex:none">Display</span><span style="font-family:'Young Serif',serif;font-size:46px;line-height:1">Celadon</span></div>
+        <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #EDE4D2;padding-bottom:14px"><span style="font:500 10px ui-monospace,monospace;color:#B0A48C;width:70px;flex:none">H1 34</span><span style="font-family:'Young Serif',serif;font-size:30px;line-height:1">Glaze library</span></div>
+        <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #EDE4D2;padding-bottom:14px"><span style="font:500 10px ui-monospace,monospace;color:#B0A48C;width:70px;flex:none">H3 20</span><span style="font:600 20px 'Hanken Grotesk'">Twilight Jar</span></div>
+        <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #EDE4D2;padding-bottom:14px"><span style="font:500 10px ui-monospace,monospace;color:#B0A48C;width:70px;flex:none">Body 16</span><span style="font:400 16px/1.5 'Hanken Grotesk'">Milky lavender-blue with optical opalescence.</span></div>
+        <div style="display:flex;align-items:baseline;gap:16px"><span style="font:500 10px ui-monospace,monospace;color:#B0A48C;width:70px;flex:none">Mono 11</span><span style="font:500 11px ui-monospace,Menlo,monospace;letter-spacing:.04em;color:#8A7A64">FIRED · CONE 10 · REDUCTION</span></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:18px;padding:24px 26px">
+        <div style="font:600 12px 'Hanken Grotesk';letter-spacing:.05em;color:#8A7A64;margin-bottom:16px">Spacing · 4-pt base</div>
+        <div style="display:flex;align-items:flex-end;gap:10px">
+          <sc-for list="{{ spacing }}" as="s" hint-placeholder-count="6">
+            <div style="text-align:center"><div style="width:26px;background:#C98A4E;border-radius:4px;height:{{ s.px }}"></div><div style="font:500 10px ui-monospace,monospace;color:#9A8A72;margin-top:6px">{{ s.n }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:18px;padding:24px 26px">
+        <div style="font:600 12px 'Hanken Grotesk';letter-spacing:.05em;color:#8A7A64;margin-bottom:16px">Radii &amp; elevation · thrown, not corporate</div>
+        <div style="display:flex;gap:14px;align-items:center">
+          <div style="width:56px;height:56px;background:#EDE4D2;border:1px solid #D8CDB9;border-radius:8px"></div>
+          <div style="width:56px;height:56px;background:#EDE4D2;border:1px solid #D8CDB9;border-radius:14px"></div>
+          <div style="width:56px;height:56px;background:#EDE4D2;border:1px solid #D8CDB9;border-radius:20px"></div>
+          <div style="width:56px;height:56px;background:#F6F1E7;border-radius:18px;box-shadow:0 1px 2px rgba(42,34,22,.06),0 14px 26px -14px rgba(42,34,22,.45)"></div>
+        </div>
+        <div style="font:500 11px 'Hanken Grotesk';color:#9A8A72;margin-top:12px">8 · 14 · 20 px · soft warm shadow</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COMPONENTS ===================== -->
+<section style="max-width:1240px;margin:0 auto;padding:56px 40px 24px">
+  <div style="font:600 11px/1 'Hanken Grotesk';letter-spacing:.2em;text-transform:uppercase;color:#8A6A4A;margin-bottom:12px">02 — Kit</div>
+  <h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:44px;margin:0 0 8px;letter-spacing:-.01em">Core components</h2>
+  <p style="font-size:16px;color:#5A4D3C;max-width:640px;margin:0 0 40px">The pieces every screen is built from. All live — buttons press, chips remove, the type-ahead filters real glaze data.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:22px">
+
+    <!-- Buttons -->
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:18px;padding:24px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:18px">Buttons</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <button style="all:unset;box-sizing:border-box;cursor:pointer;text-align:center;background:#B0552F;color:#FBF7EE;font:600 15px 'Hanken Grotesk';padding:14px;border-radius:14px;min-height:48px">Add this piece</button>
+        <button style="all:unset;box-sizing:border-box;cursor:pointer;text-align:center;background:#EDE4D2;color:#3A2E1E;font:600 15px 'Hanken Grotesk';padding:14px;border-radius:14px;min-height:48px;border:1px solid #D8CDB9">Secondary</button>
+        <button style="all:unset;box-sizing:border-box;cursor:pointer;text-align:center;color:#5E7E63;font:600 15px 'Hanken Grotesk';padding:14px;border-radius:14px;min-height:48px">Ghost / link</button>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#FBF7EE;border:1px solid #D8CDB9;border-radius:14px;padding:12px;font:600 14px 'Hanken Grotesk';min-height:48px"><span style="font-family:Georgia,serif;font-weight:700;font-size:16px;background:conic-gradient(from -45deg,#EA4335,#FBBC05,#34A853,#4285F4,#EA4335);-webkit-background-clip:text;background-clip:text;color:transparent">G</span>Google</div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#2A2018;border:1px solid #2A2018;border-radius:14px;padding:12px;font:600 14px 'Hanken Grotesk';color:#FBF7EE;min-height:48px"><span style="font-size:17px;line-height:0;margin-top:-2px">&#63743;</span>Apple</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inputs + type-ahead (live) -->
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:18px;padding:24px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:18px">Type-ahead glaze search · live</div>
+      <label style="font:600 12px 'Hanken Grotesk';color:#6B5E4C;display:block;margin-bottom:7px">Glaze used</label>
+      <div style="position:relative">
+        <input value="{{ taQuery }}" onInput="{{ onTa }}" placeholder="Try &ldquo;celadon&rdquo;, &ldquo;iron&rdquo;, &ldquo;ash&rdquo;&hellip;" aria-label="Search glazes" style="width:100%;box-sizing:border-box;background:#FBF7EE;border:1.5px solid #D8CDB9;border-radius:12px;padding:13px 14px;font:500 15px 'Hanken Grotesk';color:#2A2018;min-height:48px">
+      </div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
+        <sc-for list="{{ taSug }}" as="g" hint-placeholder-count="0">
+          <button onClick="{{ g.add }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;background:#FBF7EE;border:1px solid #EAE0CD">
+            <span style="width:22px;height:22px;border-radius:6px;flex:none;background:{{ g.hex }}"></span>
+            <span style="font:600 14px 'Hanken Grotesk';color:#2A2018">{{ g.name }}</span>
+            <span style="font:500 11px 'Hanken Grotesk';color:#9A8A72;margin-left:auto">{{ g.family }}</span>
+          </button>
+        </sc-for>
+        <sc-if value="{{ taShowNew }}" hint-placeholder-val="">
+          <button onClick="{{ taAddNew }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;border:1px dashed #C98A4E;color:#B0552F;font:600 14px 'Hanken Grotesk'">+ Add &ldquo;{{ taQuery }}&rdquo; as a new glaze</button>
+        </sc-if>
+      </div>
+      <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ upChips }}" as="c" hint-placeholder-count="2">
+          <span style="display:inline-flex;align-items:center;gap:7px;background:{{ c.hex }};color:{{ c.on }};border-radius:999px;padding:7px 8px 7px 12px;font:600 13px 'Hanken Grotesk'">{{ c.name }}<button onClick="{{ c.remove }}" aria-label="Remove" style="all:unset;cursor:pointer;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.28);font-size:12px;line-height:1">&times;</button></span>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- Pottery card (live) -->
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:18px;padding:24px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:18px">Pottery card</div>
+      <button onClick="{{ activePiece.open }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;background:#FBF7EE;border:1px solid #EAE0CD;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(42,34,22,.05),0 14px 26px -18px rgba(42,34,22,.45)">
+        <div style="height:190px;background:{{ activePiece.thumb }};position:relative">
+          <span style="position:absolute;right:10px;top:10px;font:500 10px ui-monospace,monospace;letter-spacing:.05em;color:rgba(255,255,255,.85);background:rgba(20,14,8,.28);padding:4px 8px;border-radius:6px">PHOTO · {{ activePiece.form }}</span>
+        </div>
+        <div style="padding:14px 15px 16px">
+          <div style="font:600 16px 'Hanken Grotesk';color:#2A2018">{{ activePiece.title }}</div>
+          <div style="font:500 13px 'Hanken Grotesk';color:#8A7A64;margin-top:2px">{{ activePiece.maker }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:11px">
+            <sc-for list="{{ activePiece.chips }}" as="c" hint-placeholder-count="2">
+              <span style="display:inline-flex;align-items:center;gap:6px;font:600 11px 'Hanken Grotesk';color:#5A4D3C;background:#F1EADB;border:1px solid #E4DAC6;border-radius:999px;padding:4px 9px 4px 7px"><span style="width:11px;height:11px;border-radius:50%;background:{{ c.hex }}"></span>{{ c.name }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Toasts + skeleton -->
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:18px;padding:24px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:18px">Feedback &amp; loading</div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div style="display:flex;align-items:center;gap:11px;background:#EDF0E7;border:1px solid #C4D2BC;border-radius:12px;padding:12px 14px">
+          <span style="width:22px;height:22px;border-radius:50%;background:#5E7E63;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none">&#10003;</span>
+          <span style="font:600 14px 'Hanken Grotesk';color:#2E4331">Piece added to the studio gallery</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:11px;background:#F6E7E1;border:1px solid #E0BBAC;border-radius:12px;padding:12px 14px">
+          <span style="width:22px;height:22px;border-radius:50%;background:#B0552F;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none">!</span>
+          <span style="font:600 14px 'Hanken Grotesk';color:#7E3320">Upload failed — tap to retry</span>
+        </div>
+        <div style="display:flex;gap:11px;margin-top:4px">
+          <div style="flex:1;height:74px;border-radius:12px;background:linear-gradient(90deg,#EAE0CD 8%,#F3ECDD 20%,#EAE0CD 32%);background-size:200% 100%;animation:wg-shimmer 1.4s linear infinite"></div>
+          <div style="flex:1;height:74px;border-radius:12px;background:linear-gradient(90deg,#EAE0CD 8%,#F3ECDD 20%,#EAE0CD 32%);background-size:200% 100%;animation:wg-shimmer 1.4s linear infinite"></div>
+        </div>
+        <div style="font:500 11px 'Hanken Grotesk';color:#9A8A72">Skeletons shimmer while photos decode — never a blank grid.</div>
+      </div>
+    </div>
+
+    <!-- Dropzone -->
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:18px;padding:24px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:18px">Upload dropzone</div>
+      <div style="border:2px dashed #C9B48F;border-radius:16px;background:#FBF7EE;padding:26px 18px;text-align:center">
+        <div style="width:52px;height:52px;border-radius:16px;background:#B0552F;color:#FBF7EE;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px">&#128247;</div>
+        <div style="font:600 15px 'Hanken Grotesk';color:#2A2018">Tap to shoot or pick</div>
+        <div style="font:500 13px 'Hanken Grotesk';color:#8A7A64;margin-top:4px">Add up to 6 angles · JPG, HEIC, PNG</div>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:18px;padding:24px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:18px">Navigation</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#FBF7EE;border:1px solid #EAE0CD;border-radius:12px;padding:10px 14px;margin-bottom:14px">
+        <span style="font-family:'Young Serif',serif;font-size:18px">WhatsGlazin</span>
+        <div style="display:flex;gap:16px;font:600 13px 'Hanken Grotesk';color:#8A7A64"><span style="color:#2A2018">Browse</span><span>Glazes</span><span>Add</span></div>
+      </div>
+      <div style="display:flex;justify-content:space-around;background:#FBF7EE;border:1px solid #EAE0CD;border-radius:16px;padding:10px 6px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B0552F;font:600 10px 'Hanken Grotesk'"><span style="font-size:19px">&#9633;</span>Browse</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#A99A82;font:600 10px 'Hanken Grotesk'"><span style="font-size:19px">&#9673;</span>Glazes</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#FBF7EE;font:600 10px 'Hanken Grotesk'"><span style="width:40px;height:40px;border-radius:14px;background:#B0552F;display:inline-flex;align-items:center;justify-content:center;font-size:22px;margin-top:-16px;box-shadow:0 8px 16px -6px rgba(176,85,47,.6)">+</span><span style="color:#A99A82">Add</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#A99A82;font:600 10px 'Hanken Grotesk'"><span style="font-size:19px">&#9711;</span>You</div>
+      </div>
+    </div>
+
+  </div>
+</section><!-- ===================== LANDING OPTIONS ===================== -->
+<section style="max-width:1240px;margin:0 auto;padding:56px 40px 8px">
+  <div style="font:600 11px/1 'Hanken Grotesk';letter-spacing:.2em;text-transform:uppercase;color:#8A6A4A;margin-bottom:12px">03 — Landing · the showpiece</div>
+  <h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:44px;margin:0 0 8px;letter-spacing:-.01em">Three hero directions</h2>
+  <p style="font-size:16px;color:#5A4D3C;max-width:680px;margin:0">All three share the type &amp; palette — they differ in what the wow moment is. Dashed pills mark the GSAP scroll choreography. Pick one to carry forward, or mix.</p>
+</section>
+
+<div style="padding:22px 40px 20px;display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start">
+
+  <!-- 1a Kinetic type + turning piece -->
+  <div id="1a" style="scroll-margin-top:16px">
+    <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:11px"><span style="font:600 11px ui-monospace,monospace;background:#2A2018;color:#fff;padding:3px 8px;border-radius:5px">1a</span><span style="font:600 13px 'Hanken Grotesk';color:#2A2018">Kinetic type + turning piece</span><span style="font:500 12px 'Hanken Grotesk';color:#8A7A64">editorial · type-led</span></div>
+    <div style="width:1040px;background:#FBF7EE;border:1px solid #D8CDB9;border-radius:16px;overflow:hidden;box-shadow:0 30px 60px -34px rgba(42,34,22,.5)">
+      <div style="display:flex;align-items:center;gap:8px;padding:11px 15px;background:#EDE4D2;border-bottom:1px solid #D8CDB9"><span style="width:11px;height:11px;border-radius:50%;background:#C98A4E"></span><span style="width:11px;height:11px;border-radius:50%;background:#A99A82"></span><span style="width:11px;height:11px;border-radius:50%;background:#8FA98A"></span><span style="margin-left:12px;font:500 12px ui-monospace,monospace;color:#9A8A72">thefineline.studio</span></div>
+      <div style="position:relative;padding:30px 40px;min-height:560px;background:radial-gradient(120% 90% at 82% 15%,#F1E7D6,#FBF7EE 60%)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:26px">
+          <span style="font-family:'Young Serif',serif;font-size:22px">WhatsGlazin</span>
+          <div style="display:flex;align-items:center;gap:22px;font:600 13px 'Hanken Grotesk';color:#5A4D3C"><span>Gallery</span><span>Glazes</span><span>Members</span><span style="background:#B0552F;color:#FBF7EE;padding:9px 16px;border-radius:11px">Sign in</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:center">
+          <div>
+            <div style="font:600 12px 'Hanken Grotesk';letter-spacing:.16em;text-transform:uppercase;color:#B0552F;margin-bottom:16px">The Fine Line · living archive</div>
+            <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:78px;line-height:.94;letter-spacing:-.02em;margin:0 0 20px">Every firing,<br>remembered<br>in <span style="color:#8FA98A">glaze</span>.</h1>
+            <p style="font:400 18px/1.55 'Hanken Grotesk';color:#4A3D2E;max-width:400px;margin:0 0 26px">Snap the piece, log the glaze, and it joins a gallery the whole studio can search by colour, recipe and maker.</p>
+            <div style="display:flex;gap:12px"><span style="background:#B0552F;color:#FBF7EE;font:600 15px 'Hanken Grotesk';padding:14px 24px;border-radius:13px">Add a piece</span><span style="border:1px solid #C9B48F;color:#3A2E1E;font:600 15px 'Hanken Grotesk';padding:14px 24px;border-radius:13px">Browse the gallery</span></div>
+          </div>
+          <div style="position:relative;display:flex;align-items:center;justify-content:center">
+            <div style="width:300px;height:300px;border-radius:50%;background:conic-gradient(from 0deg,#8FA98A,#6E8A6C,#8FA98A,#A9C0A2,#8FA98A);box-shadow:0 40px 70px -30px rgba(42,34,22,.6),inset 0 0 60px rgba(20,14,8,.25);position:relative;overflow:hidden">
+              <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.08) 0 12px,rgba(28,18,8,.06) 12px 24px)"></div>
+              <span style="position:absolute;left:14px;bottom:14px;font:500 10px ui-monospace,monospace;color:rgba(255,255,255,.9)">HERO PIECE</span>
+            </div>
+            <span style="position:absolute;bottom:-6px;right:8px;font:500 11px 'Hanken Grotesk';color:#5E7E63;border:1px dashed #5E7E63;border-radius:999px;padding:5px 10px;background:#EDF0E7">&#9680; GSAP · scrub-rotate on the wheel</span>
+          </div>
+        </div>
+        <span style="position:absolute;left:40px;bottom:16px;font:500 11px 'Hanken Grotesk';color:#B0552F;border:1px dashed #C98A4E;border-radius:999px;padding:5px 10px;background:#F7EEE2">&#9680; GSAP · headline splits &amp; rises word-by-word on load</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1b Full-bleed dark + glaze ticker -->
+  <div id="1b" style="scroll-margin-top:16px">
+    <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:11px"><span style="font:600 11px ui-monospace,monospace;background:#2A2018;color:#fff;padding:3px 8px;border-radius:5px">1b</span><span style="font:600 13px 'Hanken Grotesk';color:#2A2018">Full-bleed piece + glaze ticker</span><span style="font:500 12px 'Hanken Grotesk';color:#8A7A64">dark · photo-led · dramatic</span></div>
+    <div style="width:1040px;background:#FBF7EE;border:1px solid #D8CDB9;border-radius:16px;overflow:hidden;box-shadow:0 30px 60px -34px rgba(42,34,22,.5)">
+      <div style="display:flex;align-items:center;gap:8px;padding:11px 15px;background:#EDE4D2;border-bottom:1px solid #D8CDB9"><span style="width:11px;height:11px;border-radius:50%;background:#C98A4E"></span><span style="width:11px;height:11px;border-radius:50%;background:#A99A82"></span><span style="width:11px;height:11px;border-radius:50%;background:#8FA98A"></span><span style="margin-left:12px;font:500 12px ui-monospace,monospace;color:#9A8A72">thefineline.studio</span></div>
+      <div style="position:relative;min-height:560px;background:linear-gradient(155deg,#2E2016,#241A12 60%,#2A2018);color:#F0E4D2;overflow:hidden">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.03) 0 14px,rgba(0,0,0,.15) 14px 28px)"></div>
+        <div style="position:absolute;right:-40px;top:40px;width:460px;height:480px;border-radius:40% 44% 46% 42%;background:radial-gradient(60% 60% at 40% 30%,#5C3A22,#2E2016 78%);box-shadow:inset 0 0 80px rgba(0,0,0,.5),0 40px 80px -30px #000"></div>
+        <div style="position:relative;padding:30px 40px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:60px">
+            <span style="font-family:'Young Serif',serif;font-size:22px;color:#F0E4D2">WhatsGlazin</span>
+            <div style="display:flex;align-items:center;gap:22px;font:600 13px 'Hanken Grotesk';color:#C9B79E"><span>Gallery</span><span>Glazes</span><span style="background:#C98A4E;color:#2A2018;padding:9px 16px;border-radius:11px">Sign in</span></div>
+          </div>
+          <div style="max-width:520px">
+            <div style="font:600 12px 'Hanken Grotesk';letter-spacing:.16em;text-transform:uppercase;color:#C98A4E;margin-bottom:18px">Featured this week · Ash Vessel No.4</div>
+            <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:80px;line-height:.92;letter-spacing:-.02em;margin:0 0 22px">The kiln<br>keeps<br><span style="color:#C98A4E">secrets</span>.</h1>
+            <p style="font:400 18px/1.55 'Hanken Grotesk';color:#D8C6A2;max-width:420px;margin:0 0 28px">We keep the recipes. Every piece in the studio, every glaze that made it — one searchable archive.</p>
+            <div style="display:flex;gap:12px"><span style="background:#C98A4E;color:#2A2018;font:600 15px 'Hanken Grotesk';padding:14px 24px;border-radius:13px">Explore the archive</span><span style="border:1px solid rgba(216,198,162,.4);color:#F0E4D2;font:600 15px 'Hanken Grotesk';padding:14px 24px;border-radius:13px">Add a piece</span></div>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(20,14,8,.5);border-top:1px solid rgba(216,198,162,.16);padding:12px 0;overflow:hidden;white-space:nowrap;font:600 13px 'Hanken Grotesk';letter-spacing:.08em;color:#C9B79E">&nbsp;&nbsp;CELADON &nbsp;&bull;&nbsp; TENMOKU &nbsp;&bull;&nbsp; SHINO &nbsp;&bull;&nbsp; CHUN BLUE &nbsp;&bull;&nbsp; IRON RED &nbsp;&bull;&nbsp; NUKA OATMEAL &nbsp;&bull;&nbsp; COPPER GREEN &nbsp;&bull;&nbsp; ASH FALLS &nbsp;&bull;&nbsp; KAKI PERSIMMON &nbsp;&bull;&nbsp; CELADON &nbsp;&bull;&nbsp; TENMOKU &nbsp;&bull;&nbsp;</div>
+        <span style="position:absolute;bottom:52px;right:24px;font:500 11px 'Hanken Grotesk';color:#C98A4E;border:1px dashed #C98A4E;border-radius:999px;padding:5px 10px;background:rgba(46,32,22,.6)">&#9680; GSAP · glaze ticker marquee, parallax hero on scroll</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1c Living gallery wall -->
+  <div id="1c" style="scroll-margin-top:16px">
+    <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:11px"><span style="font:600 11px ui-monospace,monospace;background:#2A2018;color:#fff;padding:3px 8px;border-radius:5px">1c</span><span style="font:600 13px 'Hanken Grotesk';color:#2A2018">Living gallery wall</span><span style="font:500 12px 'Hanken Grotesk';color:#8A7A64">community-led · the work IS the hero</span></div>
+    <div style="width:1040px;background:#FBF7EE;border:1px solid #D8CDB9;border-radius:16px;overflow:hidden;box-shadow:0 30px 60px -34px rgba(42,34,22,.5)">
+      <div style="display:flex;align-items:center;gap:8px;padding:11px 15px;background:#EDE4D2;border-bottom:1px solid #D8CDB9"><span style="width:11px;height:11px;border-radius:50%;background:#C98A4E"></span><span style="width:11px;height:11px;border-radius:50%;background:#A99A82"></span><span style="width:11px;height:11px;border-radius:50%;background:#8FA98A"></span><span style="margin-left:12px;font:500 12px ui-monospace,monospace;color:#9A8A72">thefineline.studio</span></div>
+      <div style="position:relative;min-height:560px;padding:26px 30px;background:#F1E7D6">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <span style="font-family:'Young Serif',serif;font-size:22px">WhatsGlazin</span>
+          <div style="display:flex;align-items:center;gap:20px;font:600 13px 'Hanken Grotesk';color:#5A4D3C"><span>Gallery</span><span>Glazes</span><span style="background:#B0552F;color:#FBF7EE;padding:9px 16px;border-radius:11px">Sign in</span></div>
+        </div>
+        <div style="columns:5;column-gap:12px">
+          <sc-for list="{{ pieces }}" as="p" hint-placeholder-count="10">
+            <div style="break-inside:avoid;margin-bottom:12px;border-radius:12px;overflow:hidden;position:relative;background:{{ p.thumb }};padding-top:{{ p.pad }};box-shadow:0 8px 18px -12px rgba(42,34,22,.5)"></div>
+          </sc-for>
+        </div>
+        <div style="position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:440px;background:rgba(251,247,238,.9);backdrop-filter:blur(6px);border:1px solid #E0D6C2;border-radius:20px;padding:30px 32px;text-align:center;box-shadow:0 30px 60px -26px rgba(42,34,22,.55)">
+          <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:52px;line-height:1;letter-spacing:-.01em;margin:0 0 14px">A wall of<br>what we made.</h1>
+          <p style="font:400 16px/1.5 'Hanken Grotesk';color:#4A3D2E;margin:0 0 22px">217 pieces &bull; 34 members &bull; 10 studio glazes. Every one searchable by the glaze that made it.</p>
+          <div style="display:flex;gap:10px;justify-content:center"><span style="background:#B0552F;color:#FBF7EE;font:600 15px 'Hanken Grotesk';padding:13px 22px;border-radius:12px">Add your piece</span><span style="border:1px solid #C9B48F;color:#3A2E1E;font:600 15px 'Hanken Grotesk';padding:13px 22px;border-radius:12px">Browse</span></div>
+        </div>
+        <span style="position:absolute;left:30px;bottom:16px;font:500 11px 'Hanken Grotesk';color:#5E7E63;border:1px dashed #5E7E63;border-radius:999px;padding:5px 10px;background:#EDF0E7">&#9680; GSAP · masonry staggers in on scroll, card lifts &amp; peels its glaze tags on hover</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- ===================== 1C DEVELOPED — FULL LANDING ===================== -->
+<section style="max-width:1240px;margin:0 auto;padding:56px 40px 8px">
+  <div style="font:600 11px/1 'Hanken Grotesk';letter-spacing:.2em;text-transform:uppercase;color:#8A6A4A;margin-bottom:12px">03b — <a href="#1c" style="color:#B0552F;text-decoration:none">1c</a> developed · the full landing</div>
+  <h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:44px;margin:0 0 8px;letter-spacing:-.01em">Living gallery wall — full page</h2>
+  <p style="font-size:16px;color:#5A4D3C;max-width:700px;margin:0">The chosen direction, built out end to end: hero wall → what-is-this → featured pieces → glaze-library peek → community CTA → footer. Dashed pills mark the GSAP scroll choreography for the build.</p>
+</section>
+
+<div style="padding:24px 40px 20px">
+  <div style="width:1180px;max-width:100%;margin:0 auto;background:#F1E7D6;border:1px solid #D8CDB9;border-radius:18px;overflow:hidden;box-shadow:0 40px 80px -44px rgba(42,34,22,.6)">
+
+    <!-- browser chrome -->
+    <div style="display:flex;align-items:center;gap:8px;padding:11px 16px;background:#EDE4D2;border-bottom:1px solid #D8CDB9"><span style="width:11px;height:11px;border-radius:50%;background:#C98A4E"></span><span style="width:11px;height:11px;border-radius:50%;background:#A99A82"></span><span style="width:11px;height:11px;border-radius:50%;background:#8FA98A"></span><span style="margin-left:14px;background:#FBF7EE;border:1px solid #E0D6C2;border-radius:8px;padding:5px 14px;font:500 12px ui-monospace,monospace;color:#8A7A64">whatsglazin.com</span></div>
+
+    <!-- HERO: gallery wall + intro card -->
+    <div style="position:relative;min-height:660px;overflow:hidden">
+      <div style="position:absolute;inset:0;columns:6;column-gap:12px;padding:12px;opacity:.96">
+        <sc-for list="{{ pieces }}" as="p" hint-placeholder-count="12">
+          <div style="break-inside:avoid;margin-bottom:12px;border-radius:12px;overflow:hidden;background:{{ p.thumb }};padding-top:{{ p.pad }};box-shadow:0 10px 22px -14px rgba(42,34,22,.5)"></div>
+        </sc-for>
+      </div>
+      <div style="position:absolute;inset:0;background:linear-gradient(105deg,rgba(241,231,214,.97) 30%,rgba(241,231,214,.72) 48%,rgba(241,231,214,.12) 68%,transparent)"></div>
+      <div style="position:relative;padding:26px 44px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:70px">
+          <span style="font-family:'Young Serif',serif;font-size:24px">WhatsGlazin</span>
+          <div style="display:flex;align-items:center;gap:26px;font:600 14px 'Hanken Grotesk';color:#4A3D2E"><span>Gallery</span><span>Glazes</span><span>Members</span><span style="background:#B0552F;color:#FBF7EE;padding:10px 18px;border-radius:12px">Sign in</span></div>
+        </div>
+        <div style="max-width:560px">
+          <div style="display:inline-flex;align-items:center;gap:8px;font:600 12px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;background:#F7EEE2;border:1px solid #E4C9B4;border-radius:999px;padding:7px 13px;margin-bottom:22px"><span style="width:7px;height:7px;border-radius:50%;background:#5E7E63"></span>The Fine Line · Portland, OR</div>
+          <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:84px;line-height:.94;letter-spacing:-.02em;margin:0 0 22px">A wall of<br>what<br>we made.</h1>
+          <p style="font:400 20px/1.55 'Hanken Grotesk';color:#4A3D2E;max-width:440px;margin:0 0 30px">Snap a piece straight off the kiln shelf, log the glaze in three taps, and it joins a gallery the whole studio can search — by colour, recipe, and maker.</p>
+          <div style="display:flex;gap:13px;margin-bottom:30px"><span style="background:#B0552F;color:#FBF7EE;font:600 16px 'Hanken Grotesk';padding:15px 28px;border-radius:14px;box-shadow:0 14px 26px -12px rgba(176,85,47,.6)">Add your piece</span><span style="background:#FBF7EE;border:1px solid #C9B48F;color:#3A2E1E;font:600 16px 'Hanken Grotesk';padding:15px 28px;border-radius:14px">Browse the gallery</span></div>
+          <div style="display:flex;gap:30px">
+            <div><div style="font-family:'Young Serif',serif;font-size:30px">217</div><div style="font:500 12px 'Hanken Grotesk';color:#8A7A64">pieces logged</div></div>
+            <div><div style="font-family:'Young Serif',serif;font-size:30px">34</div><div style="font:500 12px 'Hanken Grotesk';color:#8A7A64">members</div></div>
+            <div><div style="font-family:'Young Serif',serif;font-size:30px">10</div><div style="font:500 12px 'Hanken Grotesk';color:#8A7A64">studio glazes</div></div>
+          </div>
+        </div>
+        <span style="position:absolute;left:44px;bottom:14px;font:500 11px 'Hanken Grotesk';color:#5E7E63;border:1px dashed #5E7E63;border-radius:999px;padding:6px 12px;background:#EDF0E7">&#9680; GSAP · wall masonry staggers in (0.04s each) + slow parallax drift; scrim fades as you scroll past</span>
+      </div>
+    </div>
+
+    <!-- WHAT IS THIS -->
+    <div style="background:#FBF7EE;padding:60px 44px;border-top:1px solid #E4DAC6">
+      <div style="text-align:center;margin-bottom:42px">
+        <div style="font:600 12px 'Hanken Grotesk';letter-spacing:.16em;text-transform:uppercase;color:#B0552F;margin-bottom:12px">Three taps at the shelf</div>
+        <h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:46px;margin:0;letter-spacing:-.01em">The kiln forgets. We don't.</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+        <div style="background:#F6F1E7;border:1px solid #E4DAC6;border-radius:18px;padding:28px">
+          <div style="font-family:'Young Serif',serif;font-size:38px;color:#C98A4E;margin-bottom:14px">01</div>
+          <div style="font:600 20px 'Hanken Grotesk';margin-bottom:8px">Shoot it</div>
+          <p style="margin:0;font:400 15px/1.6 'Hanken Grotesk';color:#5A4D3C">Camera-first upload. Multiple angles, straight from your phone at the studio.</p>
+        </div>
+        <div style="background:#F6F1E7;border:1px solid #E4DAC6;border-radius:18px;padding:28px">
+          <div style="font-family:'Young Serif',serif;font-size:38px;color:#8FA98A;margin-bottom:14px">02</div>
+          <div style="font:600 20px 'Hanken Grotesk';margin-bottom:8px">Log the glaze</div>
+          <p style="margin:0;font:400 15px/1.6 'Hanken Grotesk';color:#5A4D3C">Type-ahead finds the studio glaze instantly. Combinations welcome — add every layer.</p>
+        </div>
+        <div style="background:#F6F1E7;border:1px solid #E4DAC6;border-radius:18px;padding:28px">
+          <div style="font-family:'Young Serif',serif;font-size:38px;color:#4E6E88;margin-bottom:14px">03</div>
+          <div style="font:600 20px 'Hanken Grotesk';margin-bottom:8px">It's remembered</div>
+          <p style="margin:0;font:400 15px/1.6 'Hanken Grotesk';color:#5A4D3C">Your piece is searchable forever — and it teaches the next member what that glaze really does.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURED PIECES -->
+    <div style="background:#F1E7D6;padding:58px 44px;border-top:1px solid #E4DAC6">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px">
+        <div><div style="font:600 12px 'Hanken Grotesk';letter-spacing:.16em;text-transform:uppercase;color:#B0552F;margin-bottom:8px">Fresh out of the kiln</div><h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:38px;margin:0;letter-spacing:-.01em">Recent pieces</h2></div>
+        <span style="font:600 14px 'Hanken Grotesk';color:#5E7E63">See all 217 &#8594;</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px">
+        <sc-for list="{{ featured }}" as="p" hint-placeholder-count="4">
+          <div style="background:#FBF7EE;border:1px solid #EAE0CD;border-radius:16px;overflow:hidden;box-shadow:0 10px 22px -16px rgba(42,34,22,.5)">
+            <div style="height:190px;background:{{ p.thumb }};position:relative"><sc-if value="{{ p.combo }}" hint-placeholder-val=""><span style="position:absolute;right:9px;top:9px;font:600 9px 'Hanken Grotesk';letter-spacing:.05em;color:#fff;background:rgba(20,14,8,.4);padding:3px 8px;border-radius:6px">COMBO</span></sc-if></div>
+            <div style="padding:13px 14px 15px">
+              <div style="font:600 16px 'Hanken Grotesk'">{{ p.title }}</div>
+              <div style="font:500 12px 'Hanken Grotesk';color:#8A7A64;margin-top:2px">{{ p.maker }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px">
+                <sc-for list="{{ p.chips }}" as="c" hint-placeholder-count="1"><span style="display:inline-flex;align-items:center;gap:5px;font:600 10px 'Hanken Grotesk';color:#5A4D3C;background:#F1EADB;border-radius:999px;padding:3px 8px 3px 6px"><span style="width:9px;height:9px;border-radius:50%;background:{{ c.hex }}"></span>{{ c.name }}</span></sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- GLAZE LIBRARY PEEK -->
+    <div style="background:#FBF7EE;padding:58px 44px;border-top:1px solid #E4DAC6">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px">
+        <div><div style="font:600 12px 'Hanken Grotesk';letter-spacing:.16em;text-transform:uppercase;color:#B0552F;margin-bottom:8px">The studio's palette</div><h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:38px;margin:0;letter-spacing:-.01em">A living glaze library</h2></div>
+        <span style="font:600 14px 'Hanken Grotesk';color:#5E7E63">Explore all 10 &#8594;</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px">
+        <sc-for list="{{ glazePeek }}" as="g" hint-placeholder-count="6">
+          <div style="text-align:center">
+            <div style="height:120px;border-radius:16px;background:{{ g.swatch }};box-shadow:0 10px 22px -14px rgba(42,34,22,.5),inset 0 0 20px rgba(20,14,8,.14);margin-bottom:11px"></div>
+            <div style="font:600 14px 'Hanken Grotesk'">{{ g.name }}</div>
+            <div style="font:500 11px 'Hanken Grotesk';color:#8A7A64;margin-top:2px">{{ g.count }} pieces</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="text-align:center;margin-top:22px"><span style="font:500 11px 'Hanken Grotesk';color:#5E7E63;border:1px dashed #5E7E63;border-radius:999px;padding:6px 12px;background:#EDF0E7">&#9680; GSAP · each swatch catches a material shimmer sweep on hover</span></div>
+    </div>
+
+    <!-- COMMUNITY CTA -->
+    <div style="position:relative;background:linear-gradient(155deg,#2E2016,#241A12);color:#F0E4D2;padding:72px 44px;text-align:center;overflow:hidden">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.03) 0 16px,rgba(0,0,0,.14) 16px 32px)"></div>
+      <div style="position:relative">
+        <h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:56px;line-height:1;margin:0 0 16px;letter-spacing:-.01em">Made something?<br><span style="color:#C98A4E">Add it to the wall.</span></h2>
+        <p style="font:400 18px/1.5 'Hanken Grotesk';color:#D8C6A2;max-width:460px;margin:0 auto 30px">It takes three taps and it makes every member of The Fine Line a little bit better at glazing.</p>
+        <span style="display:inline-block;background:#C98A4E;color:#2A2018;font:600 17px 'Hanken Grotesk';padding:16px 34px;border-radius:15px">Continue with Google &middot; Apple &middot; Email</span>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="background:#241A12;color:#B9A98E;padding:30px 44px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;border-top:1px solid rgba(216,198,162,.14)">
+      <span style="font-family:'Young Serif',serif;font-size:18px;color:#F0E4D2">WhatsGlazin</span>
+      <div style="display:flex;gap:22px;font:500 13px 'Hanken Grotesk'"><span>Gallery</span><span>Glazes</span><span>Members</span><span>About the studio</span></div>
+      <span style="font:500 13px 'Hanken Grotesk'">whatsglazin.com &middot; The Fine Line, est. 2014</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== INTERACTIVE APP ===================== -->
+<section style="max-width:1240px;margin:0 auto;padding:56px 40px 8px">
+  <div style="font:600 11px/1 'Hanken Grotesk';letter-spacing:.2em;text-transform:uppercase;color:#8A6A4A;margin-bottom:12px">04 — App prototype · it's live</div>
+  <h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:44px;margin:0 0 8px;letter-spacing:-.01em">Tap through the whole app</h2>
+  <p style="font-size:16px;color:#5A4D3C;max-width:700px;margin:0">One real prototype. Search &amp; filter the gallery, open a piece, jump to any glaze it used, browse the library, add a piece. Everything below responds. Motion on browse is showpiece; the Add flow stays instant.</p>
+</section>
+
+<div style="padding:26px 40px 20px;display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+
+  <!-- PHONE -->
+  <div style="flex:none">
+  <div style="width:390px;height:820px;background:#1B140D;border-radius:52px;padding:11px;box-shadow:0 50px 80px -40px rgba(42,34,22,.8),0 0 0 2px #2E241A;position:relative">
+    <div style="position:absolute;top:22px;left:50%;transform:translateX(-50%);width:120px;height:30px;background:#1B140D;border-radius:0 0 18px 18px;z-index:20"></div>
+    <div style="width:100%;height:100%;background:#F1E7D6;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;position:relative">
+
+      <!-- status bar -->
+      <div style="flex:none;display:flex;justify-content:space-between;align-items:center;padding:16px 26px 6px;font:600 13px 'Hanken Grotesk';color:#2A2018"><span>9:41</span><span style="font-size:11px;letter-spacing:.1em">&#9673;&#9673;&#9673; &#128246; &#128267;</span></div>
+
+      <!-- scroll area -->
+      <div style="flex:1;overflow-y:auto;overflow-x:hidden">
+
+        <!-- ===== BROWSE ===== -->
+        <sc-if value="{{ isBrowse }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:6px 18px 24px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+              <div>
+                <div style="font:600 10px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F">The Fine Line</div>
+                <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:32px;margin:3px 0 0;letter-spacing:-.01em">Gallery</h1>
+              </div>
+              <button onClick="{{ goProfile }}" style="all:unset;cursor:pointer;width:40px;height:40px;border-radius:50%;background:linear-gradient(150deg,#C98A4E,#8FA98A);display:flex;align-items:center;justify-content:center;font:700 15px 'Hanken Grotesk';color:#2A2018">JP</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;background:#FBF7EE;border:1.5px solid #E0D6C2;border-radius:13px;padding:11px 13px;margin-bottom:13px">
+              <span style="color:#A99A82;font-size:15px">&#9906;</span>
+              <input value="{{ gQuery }}" onInput="{{ onSearch }}" placeholder="Search glaze, maker, piece&hellip;" aria-label="Search gallery" style="flex:1;min-width:0;border:none;outline:none;background:transparent;font:500 15px 'Hanken Grotesk';color:#2A2018">
+            </div>
+            <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin:0 -18px 6px;padding-left:18px;padding-right:18px">
+              <sc-for list="{{ filterChips }}" as="c" hint-placeholder-count="6">
+                <button onClick="{{ c.toggle }}" style="all:unset;box-sizing:border-box;cursor:pointer;flex:none;display:inline-flex;align-items:center;gap:7px;background:{{ c.bg }};color:{{ c.fg }};border:1.5px solid {{ c.bd }};border-radius:999px;padding:8px 13px;font:600 13px 'Hanken Grotesk';min-height:38px"><span style="width:12px;height:12px;border-radius:50%;background:{{ c.hex }};border:1px solid rgba(0,0,0,.12)"></span>{{ c.name }}</button>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:6px 2px 14px;font:500 13px 'Hanken Grotesk';color:#8A7A64">
+              <span>{{ resultCount }} pieces</span>
+              <sc-if value="{{ hasFilter }}" hint-placeholder-val=""><button onClick="{{ clearFilter }}" style="all:unset;cursor:pointer;color:#B0552F;font-weight:600">Clear filters &times;</button></sc-if>
+            </div>
+            <div style="columns:2;column-gap:12px">
+              <sc-for list="{{ filteredPieces }}" as="p" hint-placeholder-count="8">
+                <button onClick="{{ p.open }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;break-inside:avoid;margin-bottom:12px;background:#FBF7EE;border:1px solid #EAE0CD;border-radius:14px;overflow:hidden;box-shadow:0 6px 16px -12px rgba(42,34,22,.5)">
+                  <div style="background:{{ p.thumb }};padding-top:{{ p.pad }};position:relative">
+                    <sc-if value="{{ p.combo }}" hint-placeholder-val=""><span style="position:absolute;right:7px;top:7px;font:600 9px 'Hanken Grotesk';letter-spacing:.05em;color:#fff;background:rgba(20,14,8,.4);padding:3px 7px;border-radius:6px">COMBO</span></sc-if>
+                  </div>
+                  <div style="padding:10px 11px 12px">
+                    <div style="font:600 14px 'Hanken Grotesk';color:#2A2018;line-height:1.2">{{ p.title }}</div>
+                    <div style="font:500 12px 'Hanken Grotesk';color:#8A7A64;margin-top:2px">{{ p.maker }}</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">
+                      <sc-for list="{{ p.chips }}" as="c" hint-placeholder-count="1">
+                        <span style="display:inline-flex;align-items:center;gap:5px;font:600 10px 'Hanken Grotesk';color:#5A4D3C;background:#F1EADB;border-radius:999px;padding:3px 8px 3px 6px"><span style="width:9px;height:9px;border-radius:50%;background:{{ c.hex }}"></span>{{ c.name }}</span>
+                      </sc-for>
+                    </div>
+                  </div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== PIECE DETAIL ===== -->
+        <sc-if value="{{ isPiece }}" hint-placeholder-val="">
+          <div>
+            <div style="position:relative;background:{{ activePiece.thumb }};height:340px">
+              <button onClick="{{ goBrowse }}" style="all:unset;cursor:pointer;position:absolute;left:16px;top:14px;width:40px;height:40px;border-radius:50%;background:rgba(251,247,238,.85);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;font-size:18px;color:#2A2018">&#8592;</button>
+              <span style="position:absolute;right:16px;top:18px;font:500 10px ui-monospace,monospace;color:rgba(255,255,255,.9);background:rgba(20,14,8,.32);padding:5px 9px;border-radius:7px">PHOTO 1 / 3 · {{ activePiece.form }}</span>
+              <div style="position:absolute;left:16px;bottom:14px;display:flex;gap:8px">
+                <div style="width:46px;height:46px;border-radius:10px;border:2px solid #FBF7EE;background:{{ activePiece.thumb }}"></div>
+                <div style="width:46px;height:46px;border-radius:10px;border:1px solid rgba(255,255,255,.5);background:{{ activePiece.thumb }};opacity:.75"></div>
+                <div style="width:46px;height:46px;border-radius:10px;border:1px solid rgba(255,255,255,.5);background:{{ activePiece.thumb }};opacity:.6"></div>
+              </div>
+            </div>
+            <div style="padding:20px 20px 26px">
+              <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:30px;margin:0 0 4px;letter-spacing:-.01em">{{ activePiece.title }}</h1>
+              <div style="font:500 14px 'Hanken Grotesk';color:#8A7A64;margin-bottom:18px">{{ activePiece.form }} &bull; by {{ activePiece.maker }} &bull; {{ activePiece.when }} ago</div>
+              <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:11px">Glazes used · tap to explore</div>
+              <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:22px">
+                <sc-for list="{{ apGlazes }}" as="g" hint-placeholder-count="2">
+                  <button onClick="{{ g.open }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:13px;background:#FBF7EE;border:1px solid #EAE0CD;border-radius:14px;padding:12px 13px">
+                    <span style="width:44px;height:44px;border-radius:11px;flex:none;background:{{ g.hex }};box-shadow:inset 0 0 12px rgba(20,14,8,.2)"></span>
+                    <span style="flex:1"><span style="display:block;font:600 15px 'Hanken Grotesk';color:#2A2018">{{ g.name }}</span><span style="display:block;font:500 12px 'Hanken Grotesk';color:#8A7A64;margin-top:1px">{{ g.family }} &bull; {{ g.finish }}</span></span>
+                    <span style="color:#C9B48F;font-size:17px">&#8250;</span>
+                  </button>
+                </sc-for>
+              </div>
+              <div style="background:#EFE6D4;border:1px solid #E4DAC6;border-radius:14px;padding:15px 16px;margin-bottom:20px">
+                <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#8A7A64;margin-bottom:8px">Firing &amp; notes</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+                  <span style="font:500 11px ui-monospace,monospace;background:#FBF7EE;border:1px solid #E0D6C2;border-radius:7px;padding:5px 9px;color:#5A4D3C">CONE 10</span>
+                  <span style="font:500 11px ui-monospace,monospace;background:#FBF7EE;border:1px solid #E0D6C2;border-radius:7px;padding:5px 9px;color:#5A4D3C">REDUCTION</span>
+                  <span style="font:500 11px ui-monospace,monospace;background:#FBF7EE;border:1px solid #E0D6C2;border-radius:7px;padding:5px 9px;color:#5A4D3C">STONEWARE</span>
+                </div>
+                <p style="margin:0;font:400 14px/1.55 'Hanken Grotesk';color:#5A4D3C">Dipped to the shoulder, ash poured over the top third. Ran further than expected — wadded the foot next time.</p>
+              </div>
+              <button onClick="{{ seeMoreOpen }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:block;text-align:center;width:100%;background:#EDE4D2;border:1px solid #D8CDB9;color:#3A2E1E;font:600 15px 'Hanken Grotesk';padding:14px;border-radius:14px;min-height:48px">See more in {{ seeMoreGlaze }} &#8594;</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== GLAZE LIBRARY ===== -->
+        <sc-if value="{{ isGlazeLib }}" hint-placeholder-val="">
+          <div style="padding:6px 18px 24px">
+            <div style="font:600 10px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F">The Fine Line</div>
+            <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:32px;margin:3px 0 14px;letter-spacing:-.01em">Glaze library</h1>
+            <div style="display:flex;align-items:center;gap:9px;background:#FBF7EE;border:1.5px solid #E0D6C2;border-radius:13px;padding:11px 13px;margin-bottom:16px"><span style="color:#A99A82">&#9906;</span><span style="font:500 15px 'Hanken Grotesk';color:#A99A82">Search 10 studio glazes&hellip;</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <sc-for list="{{ allGlazes }}" as="g" hint-placeholder-count="8">
+                <button onClick="{{ g.open }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:16px;overflow:hidden;background:#FBF7EE;border:1px solid #EAE0CD;box-shadow:0 6px 16px -12px rgba(42,34,22,.5)">
+                  <div style="height:96px;background:{{ g.swatch }};position:relative">
+                    <span style="position:absolute;right:8px;top:8px;font:600 9px 'Hanken Grotesk';letter-spacing:.05em;color:{{ g.on }};opacity:.85;text-transform:uppercase">{{ g.finish }}</span>
+                  </div>
+                  <div style="padding:10px 12px 12px">
+                    <div style="font:600 14px 'Hanken Grotesk';color:#2A2018">{{ g.name }}</div>
+                    <div style="font:500 12px 'Hanken Grotesk';color:#8A7A64;margin-top:2px">{{ g.family }} &bull; {{ g.count }} pieces</div>
+                  </div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== GLAZE DETAIL ===== -->
+        <sc-if value="{{ isGlazeDetail }}" hint-placeholder-val="">
+          <div>
+            <div style="position:relative;height:220px;background:{{ ag.swatch }}">
+              <button onClick="{{ goGlaze }}" style="all:unset;cursor:pointer;position:absolute;left:16px;top:14px;width:40px;height:40px;border-radius:50%;background:rgba(251,247,238,.85);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;font-size:18px;color:#2A2018">&#8592;</button>
+              <div style="position:absolute;left:20px;bottom:16px">
+                <div style="font:600 10px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:{{ ag.on }};opacity:.85">{{ ag.family }} &bull; {{ ag.finish }}</div>
+                <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:38px;margin:2px 0 0;color:{{ ag.on }}">{{ ag.name }}</h1>
+              </div>
+            </div>
+            <div style="padding:20px 20px 26px">
+              <p style="margin:0 0 16px;font:400 16px/1.6 'Hanken Grotesk';color:#4A3D2E">{{ ag.desc }}</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+                <span style="font:500 11px ui-monospace,monospace;background:#EFE6D4;border:1px solid #E0D6C2;border-radius:7px;padding:6px 10px;color:#5A4D3C">{{ ag.chem }}</span>
+                <span style="font:500 11px ui-monospace,monospace;background:#EFE6D4;border:1px solid #E0D6C2;border-radius:7px;padding:6px 10px;color:#5A4D3C">{{ ag.finish }}</span>
+                <span style="font:500 11px ui-monospace,monospace;background:#EFE6D4;border:1px solid #E0D6C2;border-radius:7px;padding:6px 10px;color:#5A4D3C">CONE 10</span>
+              </div>
+              <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:12px">{{ glazeCount }} pieces in this glaze</div>
+              <div style="columns:2;column-gap:12px">
+                <sc-for list="{{ glazePieces }}" as="p" hint-placeholder-count="4">
+                  <button onClick="{{ p.open }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;break-inside:avoid;margin-bottom:12px;border-radius:12px;overflow:hidden;background:#FBF7EE;border:1px solid #EAE0CD">
+                    <div style="background:{{ p.thumb }};padding-top:{{ p.pad }}"></div>
+                    <div style="padding:8px 10px 10px"><div style="font:600 13px 'Hanken Grotesk'">{{ p.title }}</div><div style="font:500 11px 'Hanken Grotesk';color:#8A7A64">{{ p.maker }}</div></div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== PROFILE ===== -->
+        <sc-if value="{{ isProfile }}" hint-placeholder-val="">
+          <div style="padding:6px 18px 24px">
+            <div style="display:flex;align-items:center;gap:14px;margin:10px 0 18px">
+              <div style="width:66px;height:66px;border-radius:50%;background:linear-gradient(150deg,#C98A4E,#8FA98A);display:flex;align-items:center;justify-content:center;font:700 24px 'Hanken Grotesk';color:#2A2018">JP</div>
+              <div><h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:28px;margin:0;letter-spacing:-.01em">{{ profileMaker }}</h1><div style="font:500 13px 'Hanken Grotesk';color:#8A7A64;margin-top:2px">Member since 2019 &bull; Wheel &amp; handbuild</div></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:22px">
+              <div style="flex:1;background:#FBF7EE;border:1px solid #EAE0CD;border-radius:13px;padding:13px;text-align:center"><div style="font-family:'Young Serif',serif;font-size:26px">{{ makerCount }}</div><div style="font:500 11px 'Hanken Grotesk';color:#8A7A64">pieces</div></div>
+              <div style="flex:1;background:#FBF7EE;border:1px solid #EAE0CD;border-radius:13px;padding:13px;text-align:center"><div style="font-family:'Young Serif',serif;font-size:26px">3</div><div style="font:500 11px 'Hanken Grotesk';color:#8A7A64">glazes</div></div>
+              <div style="flex:1;background:#FBF7EE;border:1px solid #EAE0CD;border-radius:13px;padding:13px;text-align:center"><div style="font-family:'Young Serif',serif;font-size:26px">148</div><div style="font:500 11px 'Hanken Grotesk';color:#8A7A64">saves</div></div>
+            </div>
+            <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:11px">Glazes they reach for</div>
+            <div style="display:flex;gap:9px;overflow-x:auto;margin:0 -18px 22px;padding:0 18px 6px">
+              <sc-for list="{{ makerGlazes }}" as="g" hint-placeholder-count="3">
+                <button onClick="{{ g.open }}" style="all:unset;cursor:pointer;flex:none;text-align:center"><span style="display:block;width:56px;height:56px;border-radius:16px;background:{{ g.hex }};box-shadow:inset 0 0 14px rgba(20,14,8,.22)"></span><span style="display:block;font:600 11px 'Hanken Grotesk';color:#5A4D3C;margin-top:6px">{{ g.name }}</span></button>
+              </sc-for>
+            </div>
+            <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:11px">Their pieces</div>
+            <div style="columns:2;column-gap:12px">
+              <sc-for list="{{ makerPieces }}" as="p" hint-placeholder-count="4">
+                <button onClick="{{ p.open }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;break-inside:avoid;margin-bottom:12px;border-radius:12px;overflow:hidden;background:#FBF7EE;border:1px solid #EAE0CD">
+                  <div style="background:{{ p.thumb }};padding-top:{{ p.pad }}"></div>
+                  <div style="padding:8px 10px 10px"><div style="font:600 13px 'Hanken Grotesk'">{{ p.title }}</div></div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== UPLOAD (live, fast) ===== -->
+        <sc-if value="{{ isUpload }}" hint-placeholder-val="">
+          <div style="padding:8px 18px 26px;position:relative">
+            <sc-if value="{{ upActive }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:30px;margin:6px 0 4px;letter-spacing:-.01em">Add a piece</h1>
+                <div style="font:500 13px 'Hanken Grotesk';color:#8A7A64;margin-bottom:16px">Photo &#8594; glaze &#8594; done. Everything else is optional.</div>
+
+                <div style="display:flex;gap:9px;margin-bottom:20px">
+                  <div style="width:96px;height:96px;border-radius:14px;background:linear-gradient(158deg,#8FA98A,#6E8A6C);position:relative;flex:none;box-shadow:0 8px 16px -10px rgba(42,34,22,.5)"><span style="position:absolute;right:6px;top:6px;width:20px;height:20px;border-radius:50%;background:rgba(20,14,8,.4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px">&times;</span></div>
+                  <div style="width:96px;height:96px;border-radius:14px;background:#EAE0CD;position:relative;flex:none;overflow:hidden"><div style="position:absolute;inset:0;background:linear-gradient(90deg,#EAE0CD 8%,#F3ECDD 20%,#EAE0CD 32%);background-size:200% 100%;animation:wg-shimmer 1.3s linear infinite"></div><div style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);font:600 9px 'Hanken Grotesk';color:#8A7A64">62%</div></div>
+                  <button style="all:unset;box-sizing:border-box;cursor:pointer;width:96px;height:96px;border-radius:14px;border:2px dashed #C9B48F;background:#FBF7EE;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex:none;color:#B0552F"><span style="font-size:22px">&#128247;</span><span style="font:600 11px 'Hanken Grotesk'">Add angle</span></button>
+                </div>
+
+                <label style="font:600 12px 'Hanken Grotesk';color:#3A2E1E;display:block;margin-bottom:8px">Glaze(s) used <span style="color:#B0552F">*</span></label>
+                <div style="display:flex;align-items:center;gap:9px;background:#FBF7EE;border:1.5px solid #C9B48F;border-radius:13px;padding:12px 13px">
+                  <span style="color:#A99A82">&#9906;</span>
+                  <input value="{{ taQuery }}" onInput="{{ onTa }}" placeholder="Type to search studio glazes&hellip;" aria-label="Search and add a glaze" style="flex:1;min-width:0;border:none;outline:none;background:transparent;font:500 15px 'Hanken Grotesk';color:#2A2018">
+                </div>
+
+                <div style="margin-top:9px;display:flex;flex-direction:column;gap:6px">
+                  <sc-for list="{{ taSug }}" as="g" hint-placeholder-count="0">
+                    <button onClick="{{ g.add }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:11px;background:#FBF7EE;border:1px solid #EAE0CD;min-height:46px">
+                      <span style="width:26px;height:26px;border-radius:8px;flex:none;background:{{ g.hex }}"></span>
+                      <span style="font:600 14px 'Hanken Grotesk';color:#2A2018">{{ g.name }}</span>
+                      <span style="font:500 11px 'Hanken Grotesk';color:#9A8A72;margin-left:auto">{{ g.family }}</span>
+                      <span style="color:#5E7E63;font-size:18px;font-weight:700">+</span>
+                    </button>
+                  </sc-for>
+                  <sc-if value="{{ taShowNew }}" hint-placeholder-val="">
+                    <button onClick="{{ taAddNew }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:9px;padding:11px;border-radius:11px;border:1.5px dashed #C98A4E;color:#B0552F;font:600 14px 'Hanken Grotesk';min-height:46px"><span style="font-size:17px">+</span>New glaze: &ldquo;{{ taQuery }}&rdquo;</button>
+                  </sc-if>
+                </div>
+
+                <sc-if value="{{ upHasGlazes }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
+                    <sc-for list="{{ upChips }}" as="c" hint-placeholder-count="2">
+                      <span style="display:inline-flex;align-items:center;gap:8px;background:{{ c.hex }};color:{{ c.on }};border-radius:999px;padding:8px 9px 8px 13px;font:600 14px 'Hanken Grotesk'">{{ c.name }}<button onClick="{{ c.remove }}" aria-label="Remove glaze" style="all:unset;cursor:pointer;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.3);font-size:13px">&times;</button></span>
+                    </sc-for>
+                  </div>
+                  <div style="font:500 12px 'Hanken Grotesk';color:#8A7A64;margin-top:8px">Layered or combined? Add every glaze — order is kept.</div>
+                </sc-if>
+
+                <button onClick="{{ toggleAdv }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:18px;padding:13px 15px;background:#EFE6D4;border:1px solid #E4DAC6;border-radius:13px;font:600 14px 'Hanken Grotesk';color:#3A2E1E"><span>Optional details</span><span style="color:#8A7A64">title, notes, clay, firing &#9662;</span></button>
+                <sc-if value="{{ showAdv }}" hint-placeholder-val="">
+                  <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+                    <input placeholder="Title (optional)" style="width:100%;box-sizing:border-box;background:#FBF7EE;border:1.5px solid #E0D6C2;border-radius:12px;padding:12px 13px;font:500 14px 'Hanken Grotesk';color:#2A2018;outline:none">
+                    <div style="display:flex;gap:10px">
+                      <input placeholder="Clay body" style="flex:1;min-width:0;box-sizing:border-box;background:#FBF7EE;border:1.5px solid #E0D6C2;border-radius:12px;padding:12px 13px;font:500 14px 'Hanken Grotesk';outline:none">
+                      <input placeholder="Cone / firing" style="flex:1;min-width:0;box-sizing:border-box;background:#FBF7EE;border:1.5px solid #E0D6C2;border-radius:12px;padding:12px 13px;font:500 14px 'Hanken Grotesk';outline:none">
+                    </div>
+                    <textarea placeholder="Notes — what you'd do differently" rows="2" style="width:100%;box-sizing:border-box;background:#FBF7EE;border:1.5px solid #E0D6C2;border-radius:12px;padding:12px 13px;font:500 14px 'Hanken Grotesk';outline:none;resize:none"></textarea>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ upSaving }}" hint-placeholder-val="">
+              <div style="min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+                <div style="width:60px;height:60px;border-radius:50%;border:4px solid #EAE0CD;border-top-color:#B0552F;animation:wg-spin .8s linear infinite"></div>
+                <div style="font:600 16px 'Hanken Grotesk';color:#5A4D3C">Saving to the studio&hellip;</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ upSuccess }}" hint-placeholder-val="">
+              <div style="min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 10px">
+                <div style="width:88px;height:88px;border-radius:50%;background:#5E7E63;color:#FBF7EE;display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:22px;box-shadow:0 16px 30px -14px rgba(94,126,99,.8);animation:wg-up .4s ease">&#10003;</div>
+                <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:32px;margin:0 0 8px;letter-spacing:-.01em">It's in the studio.</h1>
+                <p style="font:400 15px/1.5 'Hanken Grotesk';color:#5A4D3C;margin:0 0 26px;max-width:270px">Your piece is now searchable by every glaze you logged.</p>
+                <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px">
+                  <button onClick="{{ goBrowse }}" style="all:unset;box-sizing:border-box;cursor:pointer;text-align:center;background:#B0552F;color:#FBF7EE;font:600 15px 'Hanken Grotesk';padding:14px;border-radius:14px;min-height:48px">See it in the gallery</button>
+                  <button onClick="{{ upReset }}" style="all:unset;box-sizing:border-box;cursor:pointer;text-align:center;background:#EDE4D2;border:1px solid #D8CDB9;color:#3A2E1E;font:600 15px 'Hanken Grotesk';padding:14px;border-radius:14px;min-height:48px">Add another</button>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+      </div>
+
+      <!-- sticky submit bar for upload -->
+      <sc-if value="{{ showSubmitBar }}" hint-placeholder-val="">
+        <div style="flex:none;padding:11px 18px;background:rgba(241,231,214,.92);backdrop-filter:blur(8px);border-top:1px solid #E0D6C2">
+          <button onClick="{{ upSubmit }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:block;text-align:center;width:100%;background:#B0552F;color:#FBF7EE;font:600 16px 'Hanken Grotesk';padding:15px;border-radius:15px;min-height:52px;box-shadow:0 10px 22px -10px rgba(176,85,47,.6)">Add this piece</button>
+        </div>
+      </sc-if>
+
+      <!-- bottom nav -->
+      <div style="flex:none;display:flex;justify-content:space-around;align-items:flex-end;background:#FBF7EE;border-top:1px solid #E4DAC6;padding:9px 8px 22px">
+        <button onClick="{{ goBrowse }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;color:{{ navBrowse }};font:600 10px 'Hanken Grotesk'"><span style="font-size:20px">&#9638;</span>Browse</button>
+        <button onClick="{{ goGlaze }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;color:#A99A82;font:600 10px 'Hanken Grotesk'"><span style="font-size:20px">&#9673;</span>Glazes</button>
+        <button onClick="{{ goUpload }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;color:#A99A82;font:600 10px 'Hanken Grotesk'"><span style="width:46px;height:46px;border-radius:16px;background:#B0552F;color:#FBF7EE;display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-top:-20px;box-shadow:0 10px 20px -6px rgba(176,85,47,.65)">+</span>Add</button>
+        <button onClick="{{ goGlaze }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;color:#A99A82;font:600 10px 'Hanken Grotesk'"><span style="font-size:20px">&#9711;</span>Search</button>
+        <button onClick="{{ goProfile }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;color:{{ navProfile }};font:600 10px 'Hanken Grotesk'"><span style="font-size:20px">&#9737;</span>You</button>
+      </div>
+
+    </div>
+  </div>
+  </div>
+
+  <!-- side notes -->
+  <div style="flex:1;min-width:260px;max-width:360px;display:flex;flex-direction:column;gap:16px;padding-top:20px">
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:16px;padding:20px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:12px">Try it</div>
+      <ul style="margin:0;padding-left:18px;font:400 14px/1.7 'Hanken Grotesk';color:#5A4D3C">
+        <li>Filter the gallery by a glaze chip — results reflow.</li>
+        <li>Open any piece, then tap a glaze to jump to its library page.</li>
+        <li>Hit <b>+ Add</b>, type &ldquo;cel&rdquo; or &ldquo;iron&rdquo;, and pick a glaze in one tap.</li>
+        <li>Add a second glaze for a combination, then submit.</li>
+      </ul>
+    </div>
+    <div style="background:#EDF0E7;border:1px dashed #5E7E63;border-radius:16px;padding:18px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5E7E63;margin-bottom:9px">&#9680; GSAP · browse</div>
+      <p style="margin:0;font:400 13px/1.6 'Hanken Grotesk';color:#3E5540">Cards stagger up on scroll; tapping a piece runs a shared-element transition into the detail photo. Filtering reflows the grid with FLIP so pieces glide to new spots instead of snapping.</p>
+    </div>
+    <div style="background:#F7EEE2;border:1px dashed #C98A4E;border-radius:16px;padding:18px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#B0552F;margin-bottom:9px">&#9680; Motion · add flow (restrained)</div>
+      <p style="margin:0;font:400 13px/1.6 'Hanken Grotesk';color:#6B4A2E">No blocking animation. Chips pop in on select (120ms), the submit is instant, and the only celebration is the check-mark scale on success. Never make a member wait to log a piece.</p>
+    </div>
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:16px;padding:18px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#8A7A64;margin-bottom:9px">Reduced motion</div>
+      <p style="margin:0;font:400 13px/1.6 'Hanken Grotesk';color:#5A4D3C">With <code style="font:500 12px ui-monospace,monospace;color:#B0552F">prefers-reduced-motion</code> set, all reveals become instant cross-fades, the spinner becomes a static progress label, and parallax is disabled — the app stays calm and fully usable.</p>
+    </div>
+  </div>
+
+</div><!-- ===================== UPLOAD FILMSTRIP ===================== -->
+<section style="max-width:1240px;margin:0 auto;padding:56px 40px 8px">
+  <div style="font:600 11px/1 'Hanken Grotesk';letter-spacing:.2em;text-transform:uppercase;color:#8A6A4A;margin-bottom:12px">05 — Add a piece · state by state</div>
+  <h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:44px;margin:0 0 8px;letter-spacing:-.01em">The heart of the app</h2>
+  <p style="font-size:16px;color:#5A4D3C;max-width:700px;margin:0">The required path never grows past <b>photo → glaze → done</b>. Type-ahead means picking an existing studio glaze is one tap; a genuinely new glaze is a lightweight inline add. Here are the four moments, frozen.</p>
+</section>
+
+<div style="padding:24px 40px 20px;display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start">
+
+  <!-- Empty -->
+  <div style="flex:none">
+    <div style="font:600 12px 'Hanken Grotesk';color:#2A2018;margin-bottom:10px"><span style="font:600 10px ui-monospace,monospace;background:#8A7A64;color:#fff;padding:2px 7px;border-radius:5px;margin-right:8px">1</span>Empty</div>
+    <div style="width:300px;height:600px;background:#1B140D;border-radius:40px;padding:9px;box-shadow:0 30px 50px -30px rgba(42,34,22,.7)">
+      <div style="width:100%;height:100%;background:#F1E7D6;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:14px 18px 4px;display:flex;justify-content:space-between;font:600 12px 'Hanken Grotesk';color:#2A2018"><span>9:41</span><span style="font-size:10px">&#9673;&#9673;&#9673;</span></div>
+        <div style="padding:6px 18px">
+          <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:26px;margin:6px 0 2px">Add a piece</h1>
+          <div style="font:500 12px 'Hanken Grotesk';color:#8A7A64;margin-bottom:16px">Photo &#8594; glaze &#8594; done.</div>
+          <div style="border:2px dashed #C9B48F;border-radius:16px;background:#FBF7EE;padding:30px 14px;text-align:center;margin-bottom:18px">
+            <div style="width:50px;height:50px;border-radius:15px;background:#B0552F;color:#FBF7EE;display:inline-flex;align-items:center;justify-content:center;font-size:23px;margin-bottom:10px">&#128247;</div>
+            <div style="font:600 15px 'Hanken Grotesk'">Tap to shoot or pick</div>
+            <div style="font:500 12px 'Hanken Grotesk';color:#8A7A64;margin-top:3px">Add multiple angles</div>
+          </div>
+          <label style="font:600 12px 'Hanken Grotesk';color:#3A2E1E;display:block;margin-bottom:7px">Glaze(s) used *</label>
+          <div style="display:flex;align-items:center;gap:9px;background:#FBF7EE;border:1.5px solid #E0D6C2;border-radius:12px;padding:12px 13px"><span style="color:#A99A82">&#9906;</span><span style="font:500 14px 'Hanken Grotesk';color:#A99A82">Search studio glazes&hellip;</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggesting -->
+  <div style="flex:none">
+    <div style="font:600 12px 'Hanken Grotesk';color:#2A2018;margin-bottom:10px"><span style="font:600 10px ui-monospace,monospace;background:#8A7A64;color:#fff;padding:2px 7px;border-radius:5px;margin-right:8px">2</span>Typing &middot; suggesting</div>
+    <div style="width:300px;height:600px;background:#1B140D;border-radius:40px;padding:9px;box-shadow:0 30px 50px -30px rgba(42,34,22,.7)">
+      <div style="width:100%;height:100%;background:#F1E7D6;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:14px 18px 4px;display:flex;justify-content:space-between;font:600 12px 'Hanken Grotesk';color:#2A2018"><span>9:41</span><span style="font-size:10px">&#9673;&#9673;&#9673;</span></div>
+        <div style="padding:6px 18px">
+          <div style="display:flex;gap:8px;margin-bottom:16px"><div style="width:64px;height:64px;border-radius:12px;background:linear-gradient(158deg,#8FA98A,#6E8A6C)"></div><div style="width:64px;height:64px;border-radius:12px;border:2px dashed #C9B48F;background:#FBF7EE;display:flex;align-items:center;justify-content:center;color:#B0552F;font-size:20px">+</div></div>
+          <label style="font:600 12px 'Hanken Grotesk';color:#3A2E1E;display:block;margin-bottom:7px">Glaze(s) used *</label>
+          <div style="display:flex;align-items:center;gap:9px;background:#FBF7EE;border:1.5px solid #C98A4E;border-radius:12px;padding:12px 13px;box-shadow:0 0 0 3px rgba(201,138,78,.16)"><span style="color:#A99A82">&#9906;</span><span style="font:600 14px 'Hanken Grotesk';color:#2A2018">iron</span><span style="width:1.5px;height:16px;background:#B0552F;animation:wg-pulse 1s infinite"></span></div>
+          <div style="margin-top:9px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:11px;background:#FBF7EE;border:1px solid #EAE0CD"><span style="width:24px;height:24px;border-radius:7px;background:#A5482B"></span><span style="font:600 14px 'Hanken Grotesk'">Iron Red</span><span style="font:500 11px 'Hanken Grotesk';color:#9A8A72;margin-left:auto">Iron</span></div>
+            <div style="display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:11px;background:#FBF7EE;border:1px solid #EAE0CD"><span style="width:24px;height:24px;border-radius:7px;background:#2E2016"></span><span style="font:600 14px 'Hanken Grotesk'">Tenmoku</span><span style="font:500 11px 'Hanken Grotesk';color:#9A8A72;margin-left:auto">Iron</span></div>
+            <div style="display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:11px;background:#FBF7EE;border:1px solid #EAE0CD"><span style="width:24px;height:24px;border-radius:7px;background:#B4622C"></span><span style="font:600 14px 'Hanken Grotesk'">Kaki Persimmon</span></div>
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 11px;border-radius:11px;border:1.5px dashed #C98A4E;color:#B0552F;font:600 13px 'Hanken Grotesk'"><span style="font-size:16px">+</span>New glaze: &ldquo;iron&rdquo;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selected / combo -->
+  <div style="flex:none">
+    <div style="font:600 12px 'Hanken Grotesk';color:#2A2018;margin-bottom:10px"><span style="font:600 10px ui-monospace,monospace;background:#5E7E63;color:#fff;padding:2px 7px;border-radius:5px;margin-right:8px">3</span>Selected &middot; combination</div>
+    <div style="width:300px;height:600px;background:#1B140D;border-radius:40px;padding:9px;box-shadow:0 30px 50px -30px rgba(42,34,22,.7)">
+      <div style="width:100%;height:100%;background:#F1E7D6;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:14px 18px 4px;display:flex;justify-content:space-between;font:600 12px 'Hanken Grotesk';color:#2A2018"><span>9:41</span><span style="font-size:10px">&#9673;&#9673;&#9673;</span></div>
+        <div style="flex:1;overflow:hidden;padding:6px 18px">
+          <div style="display:flex;gap:8px;margin-bottom:16px"><div style="width:60px;height:60px;border-radius:12px;background:linear-gradient(158deg,#8FA98A,#5E6455)"></div><div style="width:60px;height:60px;border-radius:12px;background:linear-gradient(158deg,#7E8574,#5E6455)"></div><div style="width:60px;height:60px;border-radius:12px;border:2px dashed #C9B48F;background:#FBF7EE;display:flex;align-items:center;justify-content:center;color:#B0552F;font-size:18px">+</div></div>
+          <label style="font:600 12px 'Hanken Grotesk';color:#3A2E1E;display:block;margin-bottom:7px">Glaze(s) used *</label>
+          <div style="display:flex;align-items:center;gap:9px;background:#FBF7EE;border:1.5px solid #E0D6C2;border-radius:12px;padding:11px 13px"><span style="color:#A99A82">&#9906;</span><span style="font:500 14px 'Hanken Grotesk';color:#A99A82">Add another&hellip;</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:12px">
+            <span style="display:inline-flex;align-items:center;gap:7px;background:#8FA98A;color:#22301F;border-radius:999px;padding:7px 8px 7px 12px;font:600 13px 'Hanken Grotesk'">Studio Celadon<span style="width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.32);font-size:11px">&times;</span></span>
+            <span style="display:inline-flex;align-items:center;gap:7px;background:#7E8574;color:#EDF0E9;border-radius:999px;padding:7px 8px 7px 12px;font:600 13px 'Hanken Grotesk'">Ash Falls<span style="width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.28);font-size:11px">&times;</span></span>
+          </div>
+          <div style="font:500 11px 'Hanken Grotesk';color:#8A7A64;margin-top:8px">Celadon dipped, ash poured over the top &mdash; order kept.</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding:12px 14px;background:#EFE6D4;border:1px solid #E4DAC6;border-radius:12px;font:600 13px 'Hanken Grotesk';color:#3A2E1E"><span>Optional details</span><span style="color:#8A7A64;font-size:12px">&#9662;</span></div>
+        </div>
+        <div style="flex:none;padding:11px 18px 16px;background:rgba(241,231,214,.95);border-top:1px solid #E0D6C2"><div style="text-align:center;background:#B0552F;color:#FBF7EE;font:600 15px 'Hanken Grotesk';padding:14px;border-radius:14px">Add this piece</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success -->
+  <div style="flex:none">
+    <div style="font:600 12px 'Hanken Grotesk';color:#2A2018;margin-bottom:10px"><span style="font:600 10px ui-monospace,monospace;background:#5E7E63;color:#fff;padding:2px 7px;border-radius:5px;margin-right:8px">4</span>Success</div>
+    <div style="width:300px;height:600px;background:#1B140D;border-radius:40px;padding:9px;box-shadow:0 30px 50px -30px rgba(42,34,22,.7)">
+      <div style="width:100%;height:100%;background:#F1E7D6;border-radius:32px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 26px">
+        <div style="width:84px;height:84px;border-radius:50%;background:#5E7E63;color:#FBF7EE;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:20px;box-shadow:0 16px 30px -14px rgba(94,126,99,.8)">&#10003;</div>
+        <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:30px;margin:0 0 8px;letter-spacing:-.01em">It's in the studio.</h1>
+        <p style="font:400 14px/1.5 'Hanken Grotesk';color:#5A4D3C;margin:0 0 24px">Now searchable by Studio Celadon + Ash Falls.</p>
+        <div style="width:100%;display:flex;flex-direction:column;gap:10px"><div style="background:#B0552F;color:#FBF7EE;font:600 14px 'Hanken Grotesk';padding:13px;border-radius:13px">See it in the gallery</div><div style="background:#EDE4D2;border:1px solid #D8CDB9;color:#3A2E1E;font:600 14px 'Hanken Grotesk';padding:13px;border-radius:13px">Add another</div></div>
+        <div style="margin-top:20px;font:500 11px 'Hanken Grotesk';color:#5E7E63;border:1px dashed #5E7E63;border-radius:999px;padding:5px 11px">&#9680; only motion: check-mark scale-in</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== AUTH ===================== -->
+<section style="max-width:1240px;margin:0 auto;padding:56px 40px 8px">
+  <div style="font:600 11px/1 'Hanken Grotesk';letter-spacing:.2em;text-transform:uppercase;color:#8A6A4A;margin-bottom:12px">06 — Sign in</div>
+  <h2 style="font-family:'Young Serif',serif;font-weight:400;font-size:44px;margin:0 0 8px;letter-spacing:-.01em">Secure, but warm</h2>
+  <p style="font-size:16px;color:#5A4D3C;max-width:680px;margin:0">SSO up top for the one-tap path; passwordless email underneath for everyone else. Trustworthy without feeling like a bank.</p>
+</section>
+
+<div style="padding:24px 40px 40px;display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start">
+
+  <!-- Sign in -->
+  <div style="flex:none">
+    <div style="font:600 12px 'Hanken Grotesk';color:#2A2018;margin-bottom:10px">Welcome &middot; SSO + email</div>
+    <div style="width:320px;height:640px;background:#1B140D;border-radius:44px;padding:10px;box-shadow:0 40px 60px -34px rgba(42,34,22,.75)">
+      <div style="width:100%;height:100%;border-radius:34px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(120% 70% at 50% 0%,#F1E7D6,#E7DDC9)">
+        <div style="padding:30px 26px 0;text-align:center">
+          <div style="padding-top:22px"></div>
+          <div style="width:66px;height:66px;border-radius:20px;margin:0 auto 18px;background:conic-gradient(from -30deg,#8FA98A,#C98A4E,#4E6E88,#A5482B,#8FA98A);box-shadow:0 16px 30px -14px rgba(42,34,22,.6);position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.12) 0 8px,rgba(20,14,8,.08) 8px 16px)"></div></div>
+          <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:32px;margin:0 0 6px;letter-spacing:-.01em">WhatsGlazin</h1>
+          <p style="font:400 14px/1.5 'Hanken Grotesk';color:#6B5E4C;margin:0">The Fine Line's living gallery &amp;<br>glaze library. Welcome back.</p>
+        </div>
+        <div style="padding:0 24px 30px">
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:#FBF7EE;border:1.5px solid #D8CDB9;border-radius:14px;padding:14px;font:600 15px 'Hanken Grotesk';color:#2A2018"><span style="font-family:Georgia,serif;font-weight:700;font-size:17px;background:conic-gradient(from -45deg,#EA4335,#FBBC05,#34A853,#4285F4,#EA4335);-webkit-background-clip:text;background-clip:text;color:transparent">G</span>Continue with Google</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:#2A2018;border-radius:14px;padding:14px;font:600 15px 'Hanken Grotesk';color:#FBF7EE"><span style="font-size:18px;margin-top:-2px">&#63743;</span>Continue with Apple</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;color:#A99A82;font:500 12px 'Hanken Grotesk'"><span style="flex:1;height:1px;background:#D8CDB9"></span>or with email<span style="flex:1;height:1px;background:#D8CDB9"></span></div>
+          <div style="display:flex;align-items:center;gap:9px;background:#FBF7EE;border:1.5px solid #D8CDB9;border-radius:13px;padding:13px 14px;margin-bottom:10px"><span style="color:#A99A82">&#9993;</span><span style="font:500 15px 'Hanken Grotesk';color:#A99A82">you@thefineline.studio</span></div>
+          <div style="text-align:center;background:#B0552F;color:#FBF7EE;font:600 15px 'Hanken Grotesk';padding:14px;border-radius:14px">Email me a magic link</div>
+          <p style="font:400 11px/1.5 'Hanken Grotesk';color:#8A7A64;text-align:center;margin:14px 0 0">No password to forget. By continuing you agree to the studio's <span style="color:#5E7E63;text-decoration:underline">member terms</span>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Magic link sent -->
+  <div style="flex:none">
+    <div style="font:600 12px 'Hanken Grotesk';color:#2A2018;margin-bottom:10px">Passwordless &middot; link sent</div>
+    <div style="width:320px;height:640px;background:#1B140D;border-radius:44px;padding:10px;box-shadow:0 40px 60px -34px rgba(42,34,22,.75)">
+      <div style="width:100%;height:100%;border-radius:34px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px;background:radial-gradient(120% 70% at 50% 0%,#F1E7D6,#E7DDC9)">
+        <div style="width:78px;height:78px;border-radius:22px;background:#FBF7EE;border:1px solid #E0D6C2;display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:22px;box-shadow:0 16px 30px -16px rgba(42,34,22,.5)">&#9993;</div>
+        <h1 style="font-family:'Young Serif',serif;font-weight:400;font-size:30px;margin:0 0 10px;letter-spacing:-.01em">Check your email</h1>
+        <p style="font:400 15px/1.6 'Hanken Grotesk';color:#5A4D3C;margin:0 0 26px">We sent a one-tap sign-in link to<br><b style="color:#2A2018">june@thefineline.studio</b>. It's good for 15 minutes.</p>
+        <div style="width:100%;background:#EDE4D2;border:1px solid #D8CDB9;color:#3A2E1E;font:600 15px 'Hanken Grotesk';padding:13px;border-radius:13px;text-align:center">Open mail app</div>
+        <p style="font:500 13px 'Hanken Grotesk';color:#8A7A64;margin:18px 0 0">Didn't get it? <span style="color:#B0552F;font-weight:600">Resend</span> &middot; <span style="color:#B0552F;font-weight:600">Use a different email</span></p>
+        <div style="margin-top:26px;font:500 11px 'Hanken Grotesk';color:#5E7E63;border:1px dashed #5E7E63;border-radius:999px;padding:5px 11px">&#9680; GSAP · envelope draws in on mount</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth notes -->
+  <div style="flex:1;min-width:240px;max-width:340px;display:flex;flex-direction:column;gap:16px;padding-top:34px">
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:16px;padding:20px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#B0552F;margin-bottom:12px">Why passwordless</div>
+      <p style="margin:0;font:400 14px/1.65 'Hanken Grotesk';color:#5A4D3C">Studio members span every age and comfort level. A magic link removes the single biggest failure point — forgotten passwords at the kiln — while SSO gives the confident one-tap in. Both paths land in the same warm, trusted home.</p>
+    </div>
+    <div style="background:#F6F1E7;border:1px solid #E0D6C2;border-radius:16px;padding:20px">
+      <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#8A7A64;margin-bottom:12px">Accessibility built in</div>
+      <ul style="margin:0;padding-left:18px;font:400 13.5px/1.7 'Hanken Grotesk';color:#5A4D3C">
+        <li>All text meets WCAG AA on its surface (ink #2A2018 on bone = 12:1).</li>
+        <li>Tap targets &ge; 44px throughout; SSO &amp; submit are 48px+.</li>
+        <li>Real <code style="font:500 12px ui-monospace,monospace;color:#B0552F">&lt;label&gt;</code> on every field incl. the type-ahead.</li>
+        <li>Full keyboard nav; visible focus rings on the warm palette.</li>
+        <li><code style="font:500 12px ui-monospace,monospace;color:#B0552F">prefers-reduced-motion</code> degrades every reveal to a fade.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div style="max-width:1240px;margin:0 auto;padding:8px 40px 80px">
+  <div style="border-top:1px solid #C9B99E;padding-top:22px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font:500 13px 'Hanken Grotesk';color:#8A7A64">
+    <span style="font-family:'Young Serif',serif;font-size:16px;color:#2A2018">WhatsGlazin &mdash; visual system for The Fine Line</span>
+    <span>Tokens &middot; Components &middot; 3 landing directions &middot; live app prototype &middot; add-flow states &middot; auth</span>
+  </div>
+</div></x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { screen:'browse', activePieceId:'p2', activeGlazeId:'g1', profileMaker:'June Park', filterGlaze:null, gQuery:'', upStep:'empty', upGlazes:['g1','g3'], taQuery:'', showAdv:false, saved:false };
+
+  GLAZES = [
+    { id:'g1', name:'Studio Celadon', family:'Celadon', hex:'#8FA98A', hex2:'#6E8A6C', on:'#22301F', finish:'satin', chem:'Fe · reduction', desc:'Soft sea-green that breaks translucent over carved texture. The studio workhorse — forgiving, food-safe, endlessly re-glazable.' },
+    { id:'g2', name:'Tenmoku', family:'Iron', hex:'#2E2016', hex2:'#5C3A22', on:'#F0E4D2', finish:'glossy', chem:'high Fe', desc:'Deep glossy iron-black that breaks rust-brown on the rims and where it thins. Reads black in the shade, amber in the light.' },
+    { id:'g3', name:'Shino', family:'Feldspathic', hex:'#C98A4E', hex2:'#A9662F', on:'#3A2410', finish:'matte', chem:'soda · Na', desc:'Warm toasty orange with carbon-trap crawls and pinholes. Every pot comes out a little different — that\u2019s the point.' },
+    { id:'g4', name:'Chun Blue', family:'Ash · Blue', hex:'#55708A', hex2:'#3E566E', on:'#EAF0F5', finish:'glossy', chem:'P\u2082O\u2085 opal', desc:'Milky lavender-blue with optical opalescence. Pools thick and blue in the hollows, thin and clear on the edges.' },
+    { id:'g5', name:'Iron Red', family:'Iron', hex:'#A5482B', hex2:'#7E3320', on:'#F5E7E0', finish:'satin', chem:'Fe\u2082O\u2083', desc:'Rusty red-orange that grows tiny iron crystals where it sits thick. Wants an oxidation firing and a patient kiln.' },
+    { id:'g6', name:'Nuka Oatmeal', family:'Ash', hex:'#D8C6A2', hex2:'#B9A379', on:'#3A3018', finish:'satin', chem:'rice-ash', desc:'Creamy oatmeal with iron speckle bleeding up from the clay. Quiet and soft — a beautiful liner and a beautiful outside.' },
+    { id:'g7', name:'Copper Green', family:'Copper', hex:'#3F7A66', hex2:'#2C5B4B', on:'#E7F1EC', finish:'glossy', chem:'CuCO\u2083', desc:'Vivid copper green that flashes metallic at the thickest edges. Volatile in reduction — keep it off your neighbour\u2019s pots.' },
+    { id:'g8', name:'Ash Falls', family:'Ash', hex:'#7E8574', hex2:'#5E6455', on:'#EDF0E9', finish:'runny', chem:'wood-ash', desc:'Runny wood-ash that moves from olive to amber and pools glassy at the foot. Wax your feet or glue them to the shelf.' },
+    { id:'g9', name:'Kaki Persimmon', family:'Iron', hex:'#B4622C', hex2:'#8C4A1E', on:'#F7EBE0', finish:'satin', chem:'sat. Fe', desc:'Saturated persimmon — Iron Red\u2019s louder cousin. Breaks black over edges and glows orange across the belly.' },
+    { id:'g10', name:'Bone Matte', family:'Liner', hex:'#E7DDCC', hex2:'#CFC3AC', on:'#3A3018', finish:'dry matte', chem:'MgO · liner', desc:'Dry chalky bone-white, food-safe and calm. The studio\u2019s default liner and a gorgeous canvas under a rim of colour.' },
+  ];
+
+  PIECES = [
+    { id:'p1',  title:'Morning Tumbler',  maker:'June Park',        form:'Tumbler',    glazes:['g1'],        aspect:1.2,  when:'2d' },
+    { id:'p2',  title:'Ash Vessel No.4',  maker:'Marcus Webb',      form:'Vase',       glazes:['g8','g2'],   aspect:1.35, when:'2d' },
+    { id:'p3',  title:'Persimmon Bowl',   maker:'Priya Anand',      form:'Bowl',       glazes:['g9'],        aspect:0.82, when:'3d' },
+    { id:'p4',  title:'Twilight Jar',     maker:'Lena \u00d8stergaard', form:'Lidded jar', glazes:['g4','g10'], aspect:1.28, when:'4d' },
+    { id:'p5',  title:'Table Salt Cellar',maker:'Tom\u00e1s Rivera',    form:'Cellar',     glazes:['g6'],        aspect:0.86, when:'5d' },
+    { id:'p6',  title:'Rust Study',       maker:'Devon Wright',     form:'Plate',      glazes:['g5','g2'],   aspect:0.8,  when:'6d' },
+    { id:'p7',  title:'Copper Moon Plate',maker:'Hana Cole',        form:'Plate',      glazes:['g7'],        aspect:0.84, when:'1w' },
+    { id:'p8',  title:'Shino Mug',        maker:'Sadie Kwon',       form:'Mug',        glazes:['g3'],        aspect:1.15, when:'1w' },
+    { id:'p9',  title:'Field Bottle',     maker:'Marcus Webb',      form:'Bottle',     glazes:['g8','g1'],   aspect:1.4,  when:'1w' },
+    { id:'p10', title:'Dipped Beaker',    maker:'June Park',        form:'Beaker',     glazes:['g1','g3'],   aspect:1.25, when:'2w' },
+    { id:'p11', title:'Snow Bowl',        maker:'Priya Anand',      form:'Bowl',       glazes:['g10','g4'],  aspect:0.82, when:'2w' },
+    { id:'p12', title:'Ember Teabowl',    maker:'Tom\u00e1s Rivera',    form:'Teabowl',    glazes:['g9','g2'],   aspect:0.95, when:'3w' },
+  ];
+
+  NEUTRALS = [
+    { name:'Bone', hex:'#FBF7EE' }, { name:'Paper', hex:'#F6F1E7' }, { name:'Unfired clay', hex:'#E7DDC9' },
+    { name:'Wet stoneware', hex:'#C4B49A' }, { name:'Slip grey', hex:'#8B7E6A' }, { name:'Kiln shadow', hex:'#2A2018' },
+  ];
+  SPACING = [ {n:'4',px:'12px'},{n:'8',px:'20px'},{n:'12',px:'30px'},{n:'16',px:'42px'},{n:'24',px:'60px'},{n:'32',px:'80px'} ];
+
+  glaze(id){ return this.GLAZES.find(g=>g.id===id) || {id, name:id, hex:'#9A8A72', hex2:'#7A6A52', on:'#fff', finish:'new', chem:'new', family:'New', desc:''}; }
+  thumb(a,b){ return `repeating-linear-gradient(135deg, rgba(255,255,255,.055) 0 9px, rgba(28,18,8,.05) 9px 18px), linear-gradient(158deg, ${a} 0%, ${b} 96%)`; }
+
+  pieceVM = (p) => {
+    const gs = p.glazes.map(id=>this.glaze(id));
+    const b = gs[1] ? gs[1].hex2 : gs[0].hex2;
+    return { id:p.id, title:p.title, maker:p.maker, form:p.form, when:p.when, aspect:p.aspect,
+      thumb:this.thumb(gs[0].hex, b),
+      combo: gs.length>1,
+      chips: gs.map(g=>({name:g.name, hex:g.hex, on:g.on})),
+      glazeNames: gs.map(g=>g.name).join(' + '),
+      pad: (p.aspect*112)+'px',
+      open: ()=>this.setState({screen:'pieceDetail', activePieceId:p.id}) };
+  };
+
+  // ---- handlers ----
+  go = (s)=> this.setState({screen:s, saved:false});
+  openPiece = (id)=> this.setState({screen:'pieceDetail', activePieceId:id});
+  openGlaze = (id)=> this.setState({screen:'glazeDetail', activeGlazeId:id});
+  openProfile = (m)=> this.setState({screen:'profile', profileMaker:m});
+  toggleFilter = (id)=> this.setState(s=>({filterGlaze: s.filterGlaze===id?null:id}));
+  clearFilter = ()=> this.setState({filterGlaze:null, gQuery:''});
+  onSearch = (e)=> this.setState({gQuery:e.target.value});
+  onTa = (e)=> this.setState({taQuery:e.target.value});
+  taAdd = (id)=> this.setState(s=> s.upGlazes.includes(id)?{taQuery:''}:{upGlazes:[...s.upGlazes,id], taQuery:''});
+  taAddNew = ()=> this.setState(s=>{ const nm=s.taQuery.trim(); if(!nm) return {}; const id='new-'+nm.toLowerCase(); return {upGlazes:[...s.upGlazes,id], taQuery:''}; });
+  upRemove = (id)=> this.setState(s=>({upGlazes:s.upGlazes.filter(x=>x!==id)}));
+  upStepTo = (st)=> this.setState({upStep:st});
+  upSubmit = ()=> { this.setState({upStep:'saving'}); clearTimeout(this._t); this._t=setTimeout(()=>this.setState({upStep:'success'}), 1400); };
+  upReset = ()=> this.setState({upStep:'empty', upGlazes:[], taQuery:'', showAdv:false});
+  toggleAdv = ()=> this.setState(s=>({showAdv:!s.showAdv}));
+
+  renderVals(){
+    const S=this.state;
+    const q=S.gQuery.trim().toLowerCase();
+    let list=this.PIECES.slice();
+    if(S.filterGlaze) list=list.filter(p=>p.glazes.includes(S.filterGlaze));
+    if(q) list=list.filter(p=>{ const gn=p.glazes.map(id=>this.glaze(id).name.toLowerCase()).join(' '); return (p.title+' '+p.maker+' '+gn).toLowerCase().includes(q); });
+
+    const filterChips=this.GLAZES.map(g=>({ id:g.id, name:g.name, hex:g.hex, on:g.on,
+      active:S.filterGlaze===g.id,
+      bg: S.filterGlaze===g.id? g.hex : '#F1EADB',
+      fg: S.filterGlaze===g.id? g.on : '#5A4D3C',
+      bd: S.filterGlaze===g.id? g.hex : '#D8CDB9',
+      toggle:()=>this.toggleFilter(g.id) }));
+
+    const activePiece=this.pieceVM(this.PIECES.find(p=>p.id===S.activePieceId)||this.PIECES[1]);
+    const apGlazes=(this.PIECES.find(p=>p.id===S.activePieceId)||this.PIECES[1]).glazes.map(id=>{ const g=this.glaze(id); return {...g, open:()=>this.openGlaze(g.id)}; });
+
+    const ag=this.glaze(S.activeGlazeId);
+    const glazePieces=this.PIECES.filter(p=>p.glazes.includes(S.activeGlazeId)).map(this.pieceVM);
+
+    const taq=S.taQuery.trim().toLowerCase();
+    const taSug=taq? this.GLAZES.filter(g=>g.name.toLowerCase().includes(taq)||g.family.toLowerCase().includes(taq)).filter(g=>!S.upGlazes.includes(g.id)).map(g=>({...g, add:()=>this.taAdd(g.id)})) : [];
+    const taExact=this.GLAZES.some(g=>g.name.toLowerCase()===taq);
+
+    const upChips=S.upGlazes.map(id=>{ const g=this.glaze(id); return {id, name:g.name, hex:g.hex, on:g.on, isNew:id.startsWith('new-'), remove:()=>this.upRemove(id)}; });
+
+    const makerPieces=this.PIECES.filter(p=>p.maker===S.profileMaker).map(this.pieceVM);
+    const makerGlazeIds=[...new Set(this.PIECES.filter(p=>p.maker===S.profileMaker).flatMap(p=>p.glazes))];
+    const makerGlazes=makerGlazeIds.map(id=>{ const g=this.glaze(id); return {...g, open:()=>this.openGlaze(id)}; });
+
+    return {
+      // tokens board
+      neutrals:this.NEUTRALS,
+      glazeTokens:this.GLAZES.map(g=>({name:g.name, chem:g.chem, finish:g.finish, on:g.on, swatch:this.thumb(g.hex,g.hex2)})),
+      spacing:this.SPACING,
+
+      // data
+      allGlazes:this.GLAZES.map(g=>({...g, count:this.PIECES.filter(p=>p.glazes.includes(g.id)).length, swatch:this.thumb(g.hex,g.hex2), open:()=>this.openGlaze(g.id)})),
+      pieces:this.PIECES.map(this.pieceVM),
+      featured:this.PIECES.slice(0,4).map(this.pieceVM),
+      glazePeek:this.GLAZES.slice(0,6).map(g=>({...g, count:this.PIECES.filter(p=>p.glazes.includes(g.id)).length, swatch:this.thumb(g.hex,g.hex2), open:()=>this.openGlaze(g.id)})),
+      filteredPieces:list.map(this.pieceVM),
+      resultCount:list.length,
+      filterChips,
+
+      // screen flags
+      screen:S.screen,
+      isBrowse:S.screen==='browse', isPiece:S.screen==='pieceDetail', isGlazeLib:S.screen==='glazeLib',
+      isGlazeDetail:S.screen==='glazeDetail', isUpload:S.screen==='upload', isProfile:S.screen==='profile',
+      navBrowse:S.screen==='browse'||S.screen==='pieceDetail',
+      navGlaze:S.screen==='glazeLib'||S.screen==='glazeDetail',
+      navUpload:S.screen==='upload',
+      navProfile:S.screen==='profile',
+
+      // piece detail
+      activePiece, apGlazes,
+      seeMoreGlaze: apGlazes[0]?apGlazes[0].name:'',
+      seeMoreOpen: apGlazes[0]?apGlazes[0].open:(()=>{}),
+
+      // glaze detail
+      ag:{...ag, swatch:this.thumb(ag.hex,ag.hex2)}, glazePieces, glazeCount:glazePieces.length,
+
+      // gallery
+      gQuery:S.gQuery, onSearch:this.onSearch, hasFilter:!!S.filterGlaze||!!q, clearFilter:this.clearFilter,
+      filterName:S.filterGlaze?this.glaze(S.filterGlaze).name:'',
+
+      // upload
+      upStep:S.upStep, upEmpty:S.upStep==='empty', upSaving:S.upStep==='saving', upSuccess:S.upStep==='success',
+      upActive:S.upStep!=='success'&&S.upStep!=='saving',
+      showSubmitBar:S.screen==='upload'&&S.upStep!=='success'&&S.upStep!=='saving',
+      taQuery:S.taQuery, onTa:this.onTa, taSug, taShowNew:!!taq&&!taExact, taAddNew:this.taAddNew,
+      upChips, upHasGlazes:S.upGlazes.length>0, upCount:S.upGlazes.length,
+      showAdv:S.showAdv, toggleAdv:this.toggleAdv,
+      upSubmit:this.upSubmit, upReset:this.upReset, hasPhoto:true,
+
+      // profile
+      profileMaker:S.profileMaker, makerPieces, makerGlazes, makerCount:makerPieces.length,
+
+      // nav handlers
+      goBrowse:()=>this.go('browse'), goGlaze:()=>this.go('glazeLib'), goUpload:()=>this.go('upload'), goProfile:()=>this.openProfile('June Park'),
+      openPiece:this.openPiece, openGlaze:this.openGlaze,
+    };
+  }
+}
+</script>
+</body>
+</html>

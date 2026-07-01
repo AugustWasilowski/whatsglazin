@@ -1,0 +1,16 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "whatsglazin-dev",
+      "runtimeExecutable": "wsl.exe",
+      "runtimeArgs": [
+        "-e",
+        "bash",
+        "-lc",
+        "cd /home/mayorawesome/whatsglazin && npm run dev -- -p 3000 -H 0.0.0.0"
+      ],
+      "port": 3000
+    }
+  ]
+}
