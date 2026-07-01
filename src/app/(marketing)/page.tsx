@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { GLAZES } from "@/lib/glazes";
-import { PIECES } from "@/lib/data";
+import { getPieces, getGlazesWithCounts, getMembers } from "@/lib/db";
+import { pieceFill, swatchFill } from "@/lib/glazes";
 import { ButtonLink } from "@/components/ui/Button";
 import { PotteryCard } from "@/components/PotteryCard";
 import { GlazeTile } from "@/components/GlazeTile";
-import { LandingHero } from "@/components/landing/LandingHero";
+import { LandingHero, type WallTile } from "@/components/landing/LandingHero";
 import { Reveal } from "@/components/motion/Reveal";
 
 const STEPS = [
@@ -13,11 +13,34 @@ const STEPS = [
   { n: "03", color: "text-cobalt", title: "It's remembered", body: "It joins a gallery the whole studio can search — by colour, recipe, maker, and combination." },
 ];
 
-/** Landing — "1c: Living gallery wall". GSAP showpiece motion in LandingHero + Reveal. */
-export default function Landing() {
+const ASPECTS = ["3 / 4", "1 / 1", "4 / 5"];
+
+/** Landing — "1c: Living gallery wall", fed from the database. */
+export default async function Landing() {
+  const [pieces, glazes, members] = await Promise.all([
+    getPieces(),
+    getGlazesWithCounts(),
+    getMembers(),
+  ]);
+
+  // Build the hero wall from real pieces (or glaze swatches if none yet).
+  const wall: WallTile[] = Array.from({ length: 24 }, (_, i) => {
+    const aspect = ASPECTS[i % 3];
+    if (pieces.length) {
+      return { fill: pieceFill(pieces[i % pieces.length].glazes), aspect };
+    }
+    return { fill: swatchFill(glazes[i % glazes.length]), aspect };
+  });
+
+  const stats = [
+    { n: pieces.length, label: "pieces" },
+    { n: members.length, label: "members" },
+    { n: glazes.length, label: "glazes" },
+  ];
+
   return (
     <>
-      <LandingHero />
+      <LandingHero wall={wall} stats={stats} />
 
       {/* ---------- HOW IT WORKS ---------- */}
       <section className="bg-bone">
@@ -41,21 +64,23 @@ export default function Landing() {
       </section>
 
       {/* ---------- RECENT PIECES ---------- */}
-      <section className="bg-clay">
-        <div className="mx-auto w-full max-w-[1180px] px-6 py-16 sm:px-10 sm:py-20">
-          <div className="flex items-end justify-between">
-            <h2 className="font-display text-3xl text-ink sm:text-4xl">Recent pieces</h2>
-            <Link href="/gallery" className="text-sm font-semibold text-celadon hover:text-ink">
-              See all {PIECES.length} →
-            </Link>
+      {pieces.length > 0 && (
+        <section className="bg-clay">
+          <div className="mx-auto w-full max-w-[1180px] px-6 py-16 sm:px-10 sm:py-20">
+            <div className="flex items-end justify-between">
+              <h2 className="font-display text-3xl text-ink sm:text-4xl">Recent pieces</h2>
+              <Link href="/gallery" className="text-sm font-semibold text-celadon hover:text-ink">
+                See all {pieces.length} →
+              </Link>
+            </div>
+            <Reveal className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4" stagger={0.06}>
+              {pieces.slice(0, 4).map((p, i) => (
+                <PotteryCard key={p.id} piece={p} priority={i === 0} />
+              ))}
+            </Reveal>
           </div>
-          <Reveal className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4" stagger={0.06}>
-            {PIECES.slice(0, 4).map((p, i) => (
-              <PotteryCard key={p.id} piece={p} priority={i === 0} />
-            ))}
-          </Reveal>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ---------- GLAZE PEEK ---------- */}
       <section className="bg-bone">
@@ -63,12 +88,12 @@ export default function Landing() {
           <div className="flex items-end justify-between">
             <h2 className="font-display text-3xl text-ink sm:text-4xl">The glaze library</h2>
             <Link href="/glazes" className="text-sm font-semibold text-celadon hover:text-ink">
-              Explore all {GLAZES.length} →
+              Explore all {glazes.length} →
             </Link>
           </div>
           <Reveal className="mt-8 grid grid-cols-3 gap-4 sm:grid-cols-6" stagger={0.05}>
-            {GLAZES.slice(0, 6).map((g) => (
-              <GlazeTile key={g.id} glaze={g} />
+            {glazes.slice(0, 6).map((g) => (
+              <GlazeTile key={g.id} glaze={g} count={g.pieceCount} />
             ))}
           </Reveal>
         </div>

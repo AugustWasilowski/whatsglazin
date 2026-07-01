@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PIECES } from "@/lib/data";
+import { getPieces, getGlazes } from "@/lib/db";
 import { GalleryBrowser } from "@/components/gallery/GalleryBrowser";
 
 export const metadata: Metadata = {
@@ -8,9 +8,7 @@ export const metadata: Metadata = {
 };
 
 // The search tab reuses the gallery browser (search + glaze filters).
-export default function SearchPage() {
-  const pieces = [...PIECES].sort(
-    (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt),
-  );
-  return <GalleryBrowser pieces={pieces} />;
+export default async function SearchPage() {
+  const [pieces, glazes] = await Promise.all([getPieces(), getGlazes()]);
+  return <GalleryBrowser pieces={pieces} glazes={glazes} />;
 }

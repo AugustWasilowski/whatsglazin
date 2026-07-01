@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { GlazeTile } from "@/components/GlazeTile";
-import type { Glaze } from "@/lib/types";
+import type { GlazeWithCount } from "@/lib/types";
 
 /** Glaze library — searchable grid of the studio's glaze tiles. */
-export function GlazeLibrary({ glazes }: { glazes: Glaze[] }) {
+export function GlazeLibrary({ glazes }: { glazes: GlazeWithCount[] }) {
   const [query, setQuery] = useState("");
 
   const results = useMemo(() => {
@@ -38,7 +38,7 @@ export function GlazeLibrary({ glazes }: { glazes: Glaze[] }) {
 
       <div className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
         {results.map((g) => (
-          <GlazeTile key={g.id} glaze={g} swatchClassName="aspect-[4/3]" />
+          <GlazeTile key={g.id} glaze={g} count={g.pieceCount} swatchClassName="aspect-[4/3]" />
         ))}
       </div>
     </div>

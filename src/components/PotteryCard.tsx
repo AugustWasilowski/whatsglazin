@@ -1,10 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { getGlazes, pieceFill } from "@/lib/glazes";
-import { getMember } from "@/lib/data";
+import { pieceFill } from "@/lib/glazes";
 import { GlazeChip } from "@/components/ui/GlazeChip";
-import type { Piece } from "@/lib/types";
+import type { EnrichedPiece } from "@/lib/types";
 
 /**
  * Pottery card — photo-forward, whole card links to the piece detail.
@@ -16,14 +15,13 @@ export function PotteryCard({
   aspect = "aspect-[4/5]",
   priority = false,
 }: {
-  piece: Piece;
+  piece: EnrichedPiece;
   className?: string;
   /** Tailwind aspect class — vary it for masonry. */
   aspect?: string;
   priority?: boolean;
 }) {
-  const glazes = getGlazes(piece.glazeIds);
-  const maker = getMember(piece.makerId);
+  const { glazes, maker } = piece;
   const isCombo = glazes.length > 1;
   const cover = piece.photos[0]?.url ?? null;
 
@@ -59,7 +57,7 @@ export function PotteryCard({
         <p className="truncate text-[15px] font-semibold text-ink">
           {piece.title ?? piece.form}
         </p>
-        <p className="mt-0.5 text-xs font-medium text-slip">by {maker?.name}</p>
+        <p className="mt-0.5 text-xs font-medium text-slip">by {maker?.name ?? "—"}</p>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {glazes.map((g) => (
             <GlazeChip key={g.id} glaze={g} variant="soft" />

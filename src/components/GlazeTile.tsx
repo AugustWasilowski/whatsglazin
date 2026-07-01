@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { swatchFill } from "@/lib/glazes";
-import { piecesWithGlaze } from "@/lib/data";
 import type { Glaze } from "@/lib/types";
 
 /**
@@ -10,25 +9,19 @@ import type { Glaze } from "@/lib/types";
  */
 export function GlazeTile({
   glaze,
+  count = 0,
   className,
   swatchClassName = "aspect-square",
 }: {
   glaze: Glaze;
+  count?: number;
   className?: string;
   swatchClassName?: string;
 }) {
-  const count = piecesWithGlaze(glaze.id).length;
-
   return (
-    <Link
-      href={`/glazes/${glaze.slug}`}
-      className={cn("group block", className)}
-    >
+    <Link href={`/glazes/${glaze.slug}`} className={cn("group block", className)}>
       <div
-        className={cn(
-          "relative w-full overflow-hidden rounded-card",
-          swatchClassName,
-        )}
+        className={cn("relative w-full overflow-hidden rounded-card", swatchClassName)}
         style={{ background: swatchFill(glaze) }}
       >
         <span
@@ -37,15 +30,12 @@ export function GlazeTile({
         >
           {glaze.finish}
         </span>
-        {/* shimmer sweep on hover */}
         <span
           aria-hidden
           className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full motion-reduce:hidden"
         />
       </div>
-      <p className="mt-2 font-display text-lg leading-tight text-ink">
-        {glaze.name}
-      </p>
+      <p className="mt-2 font-display text-lg leading-tight text-ink">{glaze.name}</p>
       <p className="text-xs text-slip">
         {glaze.family} · {count} {count === 1 ? "piece" : "pieces"}
       </p>

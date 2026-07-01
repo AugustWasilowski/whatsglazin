@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PIECES } from "@/lib/data";
+import { getPieces, getGlazes } from "@/lib/db";
 import { GalleryBrowser } from "@/components/gallery/GalleryBrowser";
 
 export const metadata: Metadata = {
@@ -7,10 +7,7 @@ export const metadata: Metadata = {
   description: "Browse and search The Fine Line's pottery by glaze, maker, and combination.",
 };
 
-export default function GalleryPage() {
-  // Newest first. In Phase 2 this comes from Supabase.
-  const pieces = [...PIECES].sort(
-    (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt),
-  );
-  return <GalleryBrowser pieces={pieces} />;
+export default async function GalleryPage() {
+  const [pieces, glazes] = await Promise.all([getPieces(), getGlazes()]);
+  return <GalleryBrowser pieces={pieces} glazes={glazes} />;
 }

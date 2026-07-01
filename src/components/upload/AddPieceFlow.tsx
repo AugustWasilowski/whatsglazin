@@ -6,7 +6,6 @@ import { Camera, Plus, Check, ChevronDown } from "lucide-react";
 import { GlazeTypeahead } from "./GlazeTypeahead";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { GlazeChip } from "@/components/ui/GlazeChip";
-import { getGlaze } from "@/lib/glazes";
 import type { Glaze } from "@/lib/types";
 
 type Photo = { id: string; url: string; progress: number };
@@ -48,7 +47,7 @@ export function AddPieceFlow({ glazes }: { glazes: Glaze[] }) {
   }
 
   function addGlaze(id: string) {
-    const g = getGlaze(id);
+    const g = glazes.find((x) => x.id === id);
     if (!g || chips.some((c) => c.key === id)) return;
     setChips((prev) => [...prev, { key: id, glaze: g, name: g.name }]);
   }

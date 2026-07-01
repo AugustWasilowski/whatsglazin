@@ -5,17 +5,21 @@ import Fuse from "fuse.js";
 import { X } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap, Flip, registerGsap, shouldAnimate } from "@/lib/motion";
-import { GLAZES, getGlazes, getGlaze } from "@/lib/glazes";
-import { getMember } from "@/lib/data";
 import { PotteryCard } from "@/components/PotteryCard";
 import { cn } from "@/lib/utils";
-import type { Piece } from "@/lib/types";
+import type { EnrichedPiece, Glaze } from "@/lib/types";
 
-type SearchItem = { piece: Piece; title: string; maker: string; glazes: string };
+type SearchItem = { piece: EnrichedPiece; title: string; maker: string; glazes: string };
 
 /** Gallery browser — fuzzy search + single-glaze filter chips over a masonry,
  *  with a GSAP Flip reflow when the result set changes. */
-export function GalleryBrowser({ pieces }: { pieces: Piece[] }) {
+export function GalleryBrowser({
+  pieces,
+  glazes,
+}: {
+  pieces: EnrichedPiece[];
+  glazes: Glaze[];
+}) {
   const [query, setQuery] = useState("");
   const [filterGlaze, setFilterGlaze] = useState<string | null>(null);
 
@@ -23,7 +27,8 @@ export function GalleryBrowser({ pieces }: { pieces: Piece[] }) {
   const flipState = useRef<ReturnType<typeof Flip.getState> | null>(null);
   const entranceDone = useRef(false);
 
-  // Capture positions before a state change so we can animate the reflow.
+  const glazeById = useMemo(() => new Map(glazes.map((g) => [g.id, g])), [glazes]);
+
   function captureFlip() {
     const el = gridRef.current;
     if (!el || !shouldAnimate()) return;
@@ -36,8 +41,8 @@ export function GalleryBrowser({ pieces }: { pieces: Piece[] }) {
       pieces.map((piece) => ({
         piece,
         title: piece.title ?? piece.form,
-        maker: getMember(piece.makerId)?.name ?? "",
-        glazes: getGlazes(piece.glazeIds).map((g) => g.name).join(" "),
+        maker: piece.maker?.name ?? "",
+        glazes: piece.glazes.map((g) => g.name).join(" "),
       })),
     [pieces],
   );
@@ -53,7 +58,6 @@ export function GalleryBrowser({ pieces }: { pieces: Piece[] }) {
     return base;
   }, [query, filterGlaze, fuse, pieces]);
 
-  // Reflow (Flip) on change, or a first-load stagger.
   useGSAP(
     () => {
       const el = gridRef.current;
@@ -84,7 +88,7 @@ export function GalleryBrowser({ pieces }: { pieces: Piece[] }) {
   );
 
   const isFiltering = query.trim() !== "" || filterGlaze !== null;
-  const activeGlaze = filterGlaze ? getGlaze(filterGlaze) : null;
+  const activeGlaze = filterGlaze ? glazeById.get(filterGlaze) : null;
 
   return (
     <div className="mx-auto w-full max-w-[1180px] px-5 py-8 sm:px-10">
@@ -111,7 +115,7 @@ export function GalleryBrowser({ pieces }: { pieces: Piece[] }) {
       </div>
 
       <div className="mt-4 -mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {GLAZES.map((g) => {
+        {glazes.map((g) => {
           const active = filterGlaze === g.id;
           return (
             <button

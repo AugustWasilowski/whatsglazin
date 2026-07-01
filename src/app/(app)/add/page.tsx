@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GLAZES } from "@/lib/glazes";
+import { getGlazes } from "@/lib/db";
 import { AddPieceFlow } from "@/components/upload/AddPieceFlow";
 
 export const metadata: Metadata = {
@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   description: "Photo → glaze → done.",
 };
 
-export default function AddPage() {
-  return <AddPieceFlow glazes={GLAZES} />;
+export default async function AddPage() {
+  const glazes = await getGlazes();
+  return <AddPieceFlow glazes={glazes} />;
 }

@@ -79,3 +79,15 @@ export interface Member {
   memberSince: number;
   disciplines: string[];
 }
+
+/** A piece with its glazes (ordered) and maker resolved — the shape screens
+ *  and client components consume. Built at the server/DB boundary. */
+export interface EnrichedPiece extends Piece {
+  glazes: Glaze[];
+  maker: Member | null;
+}
+
+/** A glaze plus how many pieces use it (for library/landing tiles). */
+export interface GlazeWithCount extends Glaze {
+  pieceCount: number;
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MEMBERS, piecesByMaker } from "@/lib/data";
+import { getMembers, getPieces } from "@/lib/db";
 import { Avatar } from "@/components/ui/Avatar";
 
 export const metadata: Metadata = {
@@ -8,13 +8,17 @@ export const metadata: Metadata = {
   description: "The makers of The Fine Line.",
 };
 
-export default function MembersPage() {
+export default async function MembersPage() {
+  const [members, pieces] = await Promise.all([getMembers(), getPieces()]);
+  const countByMaker = new Map<string, number>();
+  for (const p of pieces) countByMaker.set(p.makerId, (countByMaker.get(p.makerId) ?? 0) + 1);
+
   return (
     <div className="mx-auto w-full max-w-[1180px] px-5 py-8 sm:px-10">
       <h1 className="font-display text-4xl text-ink sm:text-5xl">Members</h1>
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {MEMBERS.map((m) => {
-          const count = piecesByMaker(m.id).length;
+        {members.map((m) => {
+          const count = countByMaker.get(m.id) ?? 0;
           return (
             <Link
               key={m.id}
@@ -25,7 +29,9 @@ export default function MembersPage() {
               <div className="min-w-0">
                 <p className="truncate font-display text-xl text-ink">{m.name}</p>
                 <p className="truncate text-xs text-slip">
-                  {m.disciplines.join(" · ")} · {count} {count === 1 ? "piece" : "pieces"}
+                  {m.disciplines.join(" · ")}
+                  {m.disciplines.length ? " · " : ""}
+                  {count} {count === 1 ? "piece" : "pieces"}
                 </p>
               </div>
             </Link>

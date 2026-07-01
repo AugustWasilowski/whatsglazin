@@ -3,38 +3,28 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGsap, shouldAnimate } from "@/lib/motion";
-import { getGlazes, pieceFill } from "@/lib/glazes";
-import { PIECES, MEMBERS } from "@/lib/data";
-import { GLAZES } from "@/lib/glazes";
 import { ButtonLink } from "@/components/ui/Button";
-
-const STATS = [
-  { n: PIECES.length, label: "pieces" },
-  { n: MEMBERS.length, label: "members" },
-  { n: GLAZES.length, label: "glazes" },
-];
 
 const HEADLINE = ["A wall of", "what", "we made."];
 
-export function LandingHero() {
-  const scope = useRef<HTMLElement>(null);
+export type WallTile = { fill: string; aspect: string };
+export type HeroStat = { n: number; label: string };
 
-  // A dense wall from the seed pieces (repeated to fill).
-  const wall = Array.from({ length: 24 }, (_, i) => {
-    const p = PIECES[i % PIECES.length];
-    return {
-      fill: pieceFill(getGlazes(p.glazeIds)),
-      aspect: i % 3 === 0 ? "3 / 4" : i % 3 === 1 ? "1 / 1" : "4 / 5",
-    };
-  });
+/** Living-gallery-wall hero. Data (wall fills + stats) comes from the server. */
+export function LandingHero({
+  wall,
+  stats,
+}: {
+  wall: WallTile[];
+  stats: HeroStat[];
+}) {
+  const scope = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
-      registerGsap();
       const el = scope.current;
       if (!el || !shouldAnimate()) return;
 
-      // Load-in choreography.
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
       tl.from(".hero-tile", {
         opacity: 0,
@@ -44,13 +34,8 @@ export function LandingHero() {
         stagger: { each: 0.035, from: "random" },
       })
         .from(".hero-line", { yPercent: 115, opacity: 0, duration: 0.8, stagger: 0.1 }, 0.15)
-        .from(
-          ".hero-fade",
-          { opacity: 0, y: 16, duration: 0.6, stagger: 0.08 },
-          "-=0.4",
-        );
+        .from(".hero-fade", { opacity: 0, y: 16, duration: 0.6, stagger: 0.08 }, "-=0.4");
 
-      // Slow parallax drift + scrim fade on scroll.
       gsap.to(".hero-wall", {
         yPercent: -12,
         ease: "none",
@@ -67,7 +52,6 @@ export function LandingHero() {
 
   return (
     <section ref={scope} className="relative overflow-hidden">
-      {/* masonry wall (over-scanned so parallax leaves no gap) */}
       <div
         aria-hidden
         className="hero-wall pointer-events-none absolute -inset-x-0 -top-[10%] h-[130%] columns-3 gap-3 p-3 sm:columns-4 lg:columns-6"
@@ -81,7 +65,6 @@ export function LandingHero() {
         ))}
       </div>
 
-      {/* warm scrim for legibility */}
       <div
         aria-hidden
         className="hero-scrim absolute inset-0"
@@ -115,7 +98,7 @@ export function LandingHero() {
             </ButtonLink>
           </div>
           <dl className="hero-fade mt-10 flex gap-8">
-            {STATS.map((s) => (
+            {stats.map((s) => (
               <div key={s.label}>
                 <dt className="sr-only">{s.label}</dt>
                 <dd className="font-display text-3xl text-ink">

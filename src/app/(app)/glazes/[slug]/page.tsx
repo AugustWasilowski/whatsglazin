@@ -2,15 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { GLAZES, getGlazeBySlug, swatchFill } from "@/lib/glazes";
-import { piecesWithGlaze } from "@/lib/data";
-import { coOccurringGlazes } from "@/lib/queries";
+import { getGlazeBySlug, getPieces, coOccurring } from "@/lib/db";
+import { swatchFill } from "@/lib/glazes";
 import { PotteryCard } from "@/components/PotteryCard";
 import { BackButton } from "@/components/ui/BackButton";
-
-export function generateStaticParams() {
-  return GLAZES.map((g) => ({ slug: g.slug }));
-}
 
 export async function generateMetadata({
   params,
@@ -18,12 +13,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const glaze = getGlazeBySlug(slug);
+  const glaze = await getGlazeBySlug(slug);
   if (!glaze) return { title: "Glaze not found" };
-  return {
-    title: glaze.name,
-    description: glaze.description,
-  };
+  return { title: glaze.name, description: glaze.description };
 }
 
 export default async function GlazeDetail({
@@ -32,20 +24,17 @@ export default async function GlazeDetail({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const glaze = getGlazeBySlug(slug);
+  const glaze = await getGlazeBySlug(slug);
   if (!glaze) notFound();
 
-  const pieces = piecesWithGlaze(glaze.id);
-  const combos = coOccurringGlazes(glaze.id);
-  const chips = [glaze.chemistry, glaze.finish, glaze.family];
+  const allPieces = await getPieces();
+  const pieces = allPieces.filter((p) => p.glazeIds.includes(glaze.id));
+  const combos = coOccurring(glaze.id, allPieces);
+  const chips = [glaze.chemistry, glaze.finish, glaze.family].filter(Boolean);
 
   return (
     <div>
-      {/* swatch header */}
-      <header
-        className="relative flex h-[220px] items-end"
-        style={{ background: swatchFill(glaze) }}
-      >
+      <header className="relative flex h-[220px] items-end" style={{ background: swatchFill(glaze) }}>
         <div className="absolute left-4 top-4">
           <BackButton fallback="/glazes" />
         </div>
@@ -58,9 +47,9 @@ export default async function GlazeDetail({
       </header>
 
       <div className="mx-auto w-full max-w-[1180px] px-5 py-8 sm:px-10">
-        <p className="max-w-[70ch] text-[16px] leading-relaxed text-ink-2">
-          {glaze.description}
-        </p>
+        {glaze.description && (
+          <p className="max-w-[70ch] text-[16px] leading-relaxed text-ink-2">{glaze.description}</p>
+        )}
 
         <div className="mt-5 flex flex-wrap gap-2">
           {chips.map((c) => (
@@ -73,7 +62,6 @@ export default async function GlazeDetail({
           ))}
         </div>
 
-        {/* common combinations */}
         {combos.length > 0 && (
           <section className="mt-10">
             <h2 className="font-display text-2xl text-ink">Often combined with</h2>
@@ -84,11 +72,7 @@ export default async function GlazeDetail({
                   href={`/glazes/${g.slug}`}
                   className="inline-flex items-center gap-2 rounded-pill border border-line bg-bone py-1.5 pl-1.5 pr-3 text-sm font-medium text-ink transition-colors hover:border-slip"
                 >
-                  <span
-                    className="h-6 w-6 rounded-full"
-                    style={{ background: swatchFill(g) }}
-                    aria-hidden
-                  />
+                  <span className="h-6 w-6 rounded-full" style={{ background: swatchFill(g) }} aria-hidden />
                   {g.name}
                   <span className="text-xs text-slip">×{count}</span>
                 </Link>
@@ -97,7 +81,6 @@ export default async function GlazeDetail({
           </section>
         )}
 
-        {/* pieces */}
         <section className="mt-10">
           <h2 className="font-display text-2xl text-ink">
             {pieces.length} {pieces.length === 1 ? "piece" : "pieces"} in this glaze
