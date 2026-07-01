@@ -4,6 +4,7 @@ import { getSessionMember } from "@/lib/auth";
 import { getPieces } from "@/lib/db";
 import { initialsOf } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/Button";
+import { Avatar } from "@/components/ui/Avatar";
 import { PotteryCard } from "@/components/PotteryCard";
 
 export const metadata = { title: "You" };
@@ -22,10 +23,14 @@ export default async function YouPage() {
   return (
     <div className="mx-auto w-full max-w-[1180px] px-5 py-10 sm:px-10">
       <div className="flex items-center gap-4">
-        <span className="grid h-16 w-16 place-items-center rounded-full bg-terracotta font-display text-xl text-on-terracotta">
-          {initialsOf(name)}
-        </span>
-        <div className="min-w-0">
+        {member ? (
+          <Avatar member={member} size={64} />
+        ) : (
+          <span className="grid h-16 w-16 place-items-center rounded-full bg-terracotta font-display text-xl text-on-terracotta">
+            {initialsOf(name)}
+          </span>
+        )}
+        <div className="min-w-0 flex-1">
           <h1 className="truncate font-display text-3xl text-ink">{name}</h1>
           {user.email && <p className="truncate text-sm text-slip">{user.email}</p>}
           {member && (
@@ -40,6 +45,11 @@ export default async function YouPage() {
             </p>
           )}
         </div>
+        {member && (
+          <ButtonLink href="/you/edit" variant="secondary">
+            Edit profile
+          </ButtonLink>
+        )}
       </div>
 
       <section className="mt-9">

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { Member } from "@/lib/types";
 
@@ -17,7 +18,12 @@ function pick(id: string): string {
   return GRADIENTS[h % GRADIENTS.length];
 }
 
-/** Gradient initials avatar. */
+/** `avatar` holding an uploaded image URL vs. a short initials string. */
+function isPhoto(avatar?: string): avatar is string {
+  return typeof avatar === "string" && /^https?:\/\//.test(avatar);
+}
+
+/** Member avatar — uploaded photo when present, otherwise gradient initials. */
 export function Avatar({
   member,
   size = 44,
@@ -27,6 +33,23 @@ export function Avatar({
   size?: number;
   className?: string;
 }) {
+  if (isPhoto(member.avatar)) {
+    return (
+      <span
+        className={cn("relative block shrink-0 overflow-hidden rounded-full", className)}
+        style={{ width: size, height: size }}
+      >
+        <Image
+          src={member.avatar}
+          alt={member.name}
+          fill
+          sizes={`${size}px`}
+          className="object-cover"
+        />
+      </span>
+    );
+  }
+
   const initials =
     member.avatar ??
     member.name

@@ -12,6 +12,9 @@ export type CreatePieceResult =
   | { ok: true; slug: string }
   | { ok: false; error: string };
 export type DeletePieceResult = { ok: true } | { ok: false; error: string };
+export type ProfileResult = { ok: true } | { ok: false; error: string };
+
+const AVATAR_BUCKET = "avatars";
 
 /** One entry of the edit form's ordered photo list: keep an existing photo
  *  (by URL) or slot in the next newly-uploaded file. */
@@ -384,6 +387,83 @@ export async function deletePiece(slug: string): Promise<DeletePieceResult> {
   revalidatePath("/");
   revalidatePath(`/members/${member.slug}`);
   revalidatePath("/you");
+
+  return { ok: true };
+}
+
+/* -------------------------------- profile ---------------------------------- */
+
+/** Remove every object under the member's avatar folder (old photos). */
+async function clearAvatarFolder(supabase: SupabaseClient, memberId: string) {
+  const { data: files } = await supabase.storage.from(AVATAR_BUCKET).list(memberId);
+  if (files?.length) {
+    await supabase.storage.from(AVATAR_BUCKET).remove(files.map((f) => `${memberId}/${f.name}`));
+  }
+}
+
+/**
+ * Update the signed-in member's profile: display name, disciplines, and avatar
+ * (upload a new photo, remove the current one, or leave it as-is). Email changes
+ * are handled client-side through Supabase Auth, not here.
+ */
+export async function updateProfile(formData: FormData): Promise<ProfileResult> {
+  const { member } = await getSessionMember();
+  if (!member) return { ok: false, error: "Please sign in again." };
+
+  const supabase = await createClient();
+
+  const name = cap(((formData.get("name") as string) ?? "").trim(), 60);
+  if (!name) return { ok: false, error: "Your display name can’t be empty." };
+
+  let disciplines: string[] = [];
+  try {
+    const parsed = JSON.parse(((formData.get("disciplines") as string) ?? "[]") || "[]");
+    if (Array.isArray(parsed)) {
+      disciplines = parsed
+        .filter((d) => typeof d === "string")
+        .map((d) => cap(d.trim(), 24))
+        .filter(Boolean)
+        .slice(0, 8);
+    }
+  } catch {
+    disciplines = [];
+  }
+
+  const update: { name: string; disciplines: string[]; avatar?: string | null } = {
+    name,
+    disciplines,
+  };
+
+  const removeAvatar = formData.get("removeAvatar") === "1";
+  const avatarFile = formData.get("avatar");
+
+  if (removeAvatar) {
+    await clearAvatarFolder(supabase, member.id);
+    update.avatar = null;
+  } else if (avatarFile instanceof File && avatarFile.size > 0) {
+    if (!ALLOWED_TYPES.has(avatarFile.type) || avatarFile.size > MAX_PHOTO_BYTES) {
+      return { ok: false, error: "Avatar must be a JPG, PNG, WebP, or HEIC under 15 MB." };
+    }
+    // Replace any existing avatar so the folder never accumulates orphans.
+    await clearAvatarFolder(supabase, member.id);
+    const ext =
+      (avatarFile.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+    const path = `${member.id}/avatar-${randomUUID().slice(0, 8)}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from(AVATAR_BUCKET)
+      .upload(path, avatarFile, { contentType: avatarFile.type || "image/jpeg", upsert: true });
+    if (upErr) return { ok: false, error: "Could not upload the photo. Please try again." };
+    const { data: pub } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path);
+    update.avatar = pub.publicUrl;
+  }
+
+  const { error } = await supabase.from("members").update(update).eq("id", member.id);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/you");
+  revalidatePath("/you/edit");
+  revalidatePath("/members");
+  revalidatePath(`/members/${member.slug}`);
 
   return { ok: true };
 }

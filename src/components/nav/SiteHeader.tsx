@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/gallery", label: "Gallery" },
   { href: "/glazes", label: "Glazes" },
   { href: "/members", label: "Members" },
+  { href: "/add", label: "Add" },
 ];
 
 export type HeaderMember = { name: string; initials: string } | null;
