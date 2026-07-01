@@ -127,7 +127,7 @@ export default async function Landing() {
             <Link href="/auth" className="hover:text-bone">Sign in</Link>
           </nav>
           <p className="text-xs text-bone/50">
-            whatsglazin.com · The Fine Line, est. 2014
+            whatsglazin.com · The Fine Line, est. 1979
             <span className="mt-1 block italic text-bone/40">This is Jill&rsquo;s idea.</span>
           </p>
         </div>
