@@ -12,8 +12,10 @@ const LINKS = [
   { href: "/members", label: "Members" },
 ];
 
-/** Desktop / marketing header — wordmark + section links + Sign in. */
-export function SiteHeader() {
+export type HeaderMember = { name: string; initials: string } | null;
+
+/** Desktop / marketing header — wordmark + section links + account/sign-in. */
+export function SiteHeader({ member }: { member?: HeaderMember }) {
   const pathname = usePathname();
 
   return (
@@ -37,9 +39,24 @@ export function SiteHeader() {
             );
           })}
         </nav>
-        <ButtonLink href="/auth" variant="secondary" size="md" className="min-h-[40px] px-4">
-          Sign in
-        </ButtonLink>
+        {member ? (
+          <Link
+            href="/you"
+            aria-label="Your account"
+            className="flex items-center gap-2 rounded-pill py-1 pl-1 pr-3 transition-colors hover:bg-bone/60"
+          >
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-terracotta text-xs font-semibold text-on-terracotta">
+              {member.initials}
+            </span>
+            <span className="hidden text-sm font-medium text-ink sm:inline">
+              {member.name.split(" ")[0]}
+            </span>
+          </Link>
+        ) : (
+          <ButtonLink href="/auth" variant="secondary" size="md" className="min-h-[40px] px-4">
+            Sign in
+          </ButtonLink>
+        )}
       </div>
     </header>
   );

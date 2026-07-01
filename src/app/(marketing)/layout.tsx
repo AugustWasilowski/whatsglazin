@@ -1,13 +1,18 @@
 import { SiteHeader } from "@/components/nav/SiteHeader";
+import { getSessionMember } from "@/lib/auth";
+import { initialsOf } from "@/lib/utils";
 
-export default function MarketingLayout({
+export default async function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { member } = await getSessionMember();
   return (
     <div className="flex min-h-full flex-col bg-clay">
-      <SiteHeader />
+      <SiteHeader
+        member={member ? { name: member.name, initials: initialsOf(member.name) } : null}
+      />
       <div className="flex-1">{children}</div>
     </div>
   );

@@ -3,22 +3,53 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Mail } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
-/**
- * Auth panel — SSO one-tap + passwordless email.
- * NOTE: handlers are stubbed until Supabase keys land (Phase 3). `sendMagicLink`
- * will call supabase.auth.signInWithOtp; the SSO buttons will call
- * signInWithOAuth({ provider: "google" | "apple" }).
- */
+/** Auth panel — Google/Apple SSO + passwordless email magic link. */
 export function AuthPanel() {
+  const [supabase] = useState(() => createClient());
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState<null | "google" | "apple" | "email">(null);
+  const [error, setError] = useState<string | null>(null);
 
-  function sendMagicLink(e: React.FormEvent) {
+  function callbackUrl() {
+    const next =
+      new URLSearchParams(window.location.search).get("next") || "/gallery";
+    return `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+  }
+
+  async function oauth(provider: "google" | "apple") {
+    setBusy(provider);
+    setError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: callbackUrl() },
+    });
+    if (error) {
+      // e.g. provider not yet enabled in the Supabase dashboard.
+      setError(
+        provider === "apple"
+          ? "Apple sign-in isn’t set up yet — try Google or email."
+          : error.message,
+      );
+      setBusy(null);
+    }
+    // On success the browser redirects to the provider.
+  }
+
+  async function sendMagicLink(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
-    // TODO(Phase 3): await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo }})
-    setSent(true);
+    setBusy("email");
+    setError(null);
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: callbackUrl() },
+    });
+    setBusy(null);
+    if (error) setError(error.message);
+    else setSent(true);
   }
 
   if (sent) {
@@ -29,8 +60,8 @@ export function AuthPanel() {
         </div>
         <h1 className="mt-6 font-display text-3xl text-ink">Check your email</h1>
         <p className="mt-2 text-ink-2">
-          We sent a one-tap sign-in link to <strong>{email}</strong>. It&rsquo;s good for
-          15 minutes.
+          We sent a one-tap sign-in link to <strong>{email}</strong>. It&rsquo;s good
+          for 15 minutes.
         </p>
         <div className="mt-6 flex flex-col gap-3">
           <a
@@ -45,7 +76,13 @@ export function AuthPanel() {
               Resend
             </button>{" "}
             ·{" "}
-            <button onClick={() => { setSent(false); setEmail(""); }} className="font-medium text-celadon hover:text-ink">
+            <button
+              onClick={() => {
+                setSent(false);
+                setEmail("");
+              }}
+              className="font-medium text-celadon hover:text-ink"
+            >
               Use a different email
             </button>
           </p>
@@ -57,7 +94,6 @@ export function AuthPanel() {
   return (
     <div className="w-full max-w-sm">
       <div className="flex flex-col items-center text-center">
-        {/* logo tile */}
         <span
           className="grid h-[66px] w-[66px] place-items-center overflow-hidden rounded-lg"
           style={{
@@ -82,19 +118,27 @@ export function AuthPanel() {
         </p>
       </div>
 
-      <div className="mt-7 flex flex-col gap-3">
-        {/* Google */}
+      {error && (
+        <p className="mt-5 rounded-md border border-error-line bg-error-bg px-4 py-2.5 text-sm text-error">
+          {error}
+        </p>
+      )}
+
+      <div className="mt-6 flex flex-col gap-3">
         <button
           type="button"
-          className="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-md border border-line-strong bg-bone px-5 font-semibold text-ink transition-colors hover:bg-clay/40"
+          onClick={() => oauth("google")}
+          disabled={busy !== null}
+          className="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-md border border-line-strong bg-bone px-5 font-semibold text-ink transition-colors hover:bg-clay/40 disabled:opacity-60"
         >
           <GoogleG />
-          Continue with Google
+          {busy === "google" ? "Redirecting…" : "Continue with Google"}
         </button>
-        {/* Apple */}
         <button
           type="button"
-          className="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-md bg-ink px-5 font-semibold text-bone transition-colors hover:bg-kiln"
+          onClick={() => oauth("apple")}
+          disabled={busy !== null}
+          className="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-md bg-ink px-5 font-semibold text-bone transition-colors hover:bg-kiln disabled:opacity-60"
         >
           <AppleGlyph />
           Continue with Apple
@@ -125,9 +169,10 @@ export function AuthPanel() {
         </div>
         <button
           type="submit"
-          className="inline-flex min-h-[48px] items-center justify-center rounded-md bg-terracotta px-5 font-semibold text-on-terracotta shadow-[var(--shadow-glow)] transition-colors hover:bg-terracotta-hover"
+          disabled={busy !== null}
+          className="inline-flex min-h-[48px] items-center justify-center rounded-md bg-terracotta px-5 font-semibold text-on-terracotta shadow-[var(--shadow-glow)] transition-colors hover:bg-terracotta-hover disabled:opacity-60"
         >
-          Email me a magic link
+          {busy === "email" ? "Sending…" : "Email me a magic link"}
         </button>
       </form>
 
