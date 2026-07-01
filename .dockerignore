@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.github
+*.log
+Dockerfile
+.dockerignore
+.env*
+.claude
+docs
+supabase
+scripts
+_design_handoff
+**/*.md

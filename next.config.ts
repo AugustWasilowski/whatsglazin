@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Emit a self-contained server build for a small Docker image on Fly.
+  output: "standalone",
   images: {
     remotePatterns: [
       {
