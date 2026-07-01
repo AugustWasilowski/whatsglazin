@@ -1,22 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-/** Auth panel — Google SSO + passwordless email magic link. */
+/** Auth panel — Google SSO + passwordless email (6-digit code). */
 export function AuthPanel() {
   const [supabase] = useState(() => createClient());
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-  const [busy, setBusy] = useState<null | "google" | "email">(null);
+  const [code, setCode] = useState("");
+  const [stage, setStage] = useState<"form" | "code">("form");
+  const [busy, setBusy] = useState<null | "google" | "email" | "verify">(null);
   const [error, setError] = useState<string | null>(null);
 
-  function callbackUrl() {
-    const next =
-      new URLSearchParams(window.location.search).get("next") || "/gallery";
-    return `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+  function nextPath() {
+    return new URLSearchParams(window.location.search).get("next") || "/gallery";
   }
 
   async function signInWithGoogle() {
@@ -24,7 +22,9 @@ export function AuthPanel() {
     setError(null);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: callbackUrl() },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath())}`,
+      },
     });
     if (error) {
       setError(error.message);
@@ -33,59 +33,103 @@ export function AuthPanel() {
     // On success the browser redirects to Google.
   }
 
-  async function sendMagicLink(e: React.FormEvent) {
+  async function sendCode(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
     setBusy("email");
     setError(null);
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { emailRedirectTo: callbackUrl() },
+      options: { shouldCreateUser: true },
     });
     setBusy(null);
     if (error) setError(error.message);
-    else setSent(true);
+    else setStage("code");
   }
 
-  if (sent) {
+  async function verifyCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (code.trim().length < 6) return;
+    setBusy("verify");
+    setError(null);
+    const { error } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token: code.trim(),
+      type: "email",
+    });
+    if (error) {
+      setError(error.message);
+      setBusy(null);
+    } else {
+      // Full navigation so the server picks up the new session cookie.
+      window.location.href = nextPath();
+    }
+  }
+
+  // ---------- CODE ENTRY ----------
+  if (stage === "code") {
     return (
       <div className="w-full max-w-sm text-center">
         <div className="mx-auto grid h-[78px] w-[78px] place-items-center rounded-lg bg-clay-deep text-terracotta animate-[wg-pop_0.5s_cubic-bezier(0.16,1,0.3,1)_both] motion-reduce:animate-none">
           <Mail size={34} />
         </div>
-        <h1 className="mt-6 font-display text-3xl text-ink">Check your email</h1>
+        <h1 className="mt-6 font-display text-3xl text-ink">Enter your code</h1>
         <p className="mt-2 text-ink-2">
-          We sent a one-tap sign-in link to <strong>{email}</strong>. It&rsquo;s good
-          for 15 minutes.
+          We emailed a 6-digit code to <strong>{email}</strong>. It&rsquo;s good for
+          a few minutes.
         </p>
-        <div className="mt-6 flex flex-col gap-3">
-          <a
-            href="mailto:"
-            className="inline-flex min-h-[48px] items-center justify-center rounded-md border border-line-strong bg-clay-deep/70 px-5 font-semibold text-ink hover:bg-clay-deep"
-          >
-            Open mail app
-          </a>
-          <p className="text-sm text-slip">
-            Didn&rsquo;t get it?{" "}
-            <button onClick={() => setSent(false)} className="font-medium text-celadon hover:text-ink">
-              Resend
-            </button>{" "}
-            ·{" "}
-            <button
-              onClick={() => {
-                setSent(false);
-                setEmail("");
-              }}
-              className="font-medium text-celadon hover:text-ink"
-            >
-              Use a different email
-            </button>
+
+        {error && (
+          <p className="mt-5 rounded-md border border-error-line bg-error-bg px-4 py-2.5 text-sm text-error">
+            {error}
           </p>
-        </div>
+        )}
+
+        <form onSubmit={verifyCode} className="mt-6 flex flex-col gap-3">
+          <label htmlFor="code" className="sr-only">
+            6-digit code
+          </label>
+          <input
+            id="code"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9]*"
+            maxLength={6}
+            required
+            autoFocus
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+            placeholder="123456"
+            className="h-14 w-full rounded-md border-[1.5px] border-line-strong bg-bone px-4 text-center font-mono text-2xl tracking-[0.4em] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
+          />
+          <button
+            type="submit"
+            disabled={busy !== null || code.length < 6}
+            className="inline-flex min-h-[48px] items-center justify-center rounded-md bg-terracotta px-5 font-semibold text-on-terracotta shadow-[var(--shadow-glow)] transition-colors hover:bg-terracotta-hover disabled:opacity-60"
+          >
+            {busy === "verify" ? "Verifying…" : "Sign in"}
+          </button>
+        </form>
+
+        <p className="mt-4 text-sm text-slip">
+          Didn&rsquo;t get it?{" "}
+          <button
+            onClick={() => {
+              setStage("form");
+              setCode("");
+              setError(null);
+            }}
+            className="font-medium text-celadon hover:text-ink"
+          >
+            Use a different email
+          </button>
+        </p>
       </div>
     );
   }
 
+  // ---------- SIGN IN ----------
   return (
     <div className="w-full max-w-sm">
       <div className="flex flex-col items-center text-center">
@@ -137,7 +181,7 @@ export function AuthPanel() {
         <span className="h-px flex-1 bg-line-strong" />
       </div>
 
-      <form onSubmit={sendMagicLink} className="flex flex-col gap-3">
+      <form onSubmit={sendCode} className="flex flex-col gap-3">
         <label htmlFor="email" className="sr-only">
           Email address
         </label>
@@ -158,17 +202,9 @@ export function AuthPanel() {
           disabled={busy !== null}
           className="inline-flex min-h-[48px] items-center justify-center rounded-md bg-terracotta px-5 font-semibold text-on-terracotta shadow-[var(--shadow-glow)] transition-colors hover:bg-terracotta-hover disabled:opacity-60"
         >
-          {busy === "email" ? "Sending…" : "Email me a magic link"}
+          {busy === "email" ? "Sending…" : "Email me a code"}
         </button>
       </form>
-
-      <p className="mt-5 text-center text-xs text-slip">
-        By continuing you agree to the{" "}
-        <Link href="/terms" className="underline hover:text-ink">
-          member terms
-        </Link>
-        .
-      </p>
     </div>
   );
 }
@@ -183,4 +219,3 @@ function GoogleG() {
     </svg>
   );
 }
-
