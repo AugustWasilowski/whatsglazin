@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "danger" | "onDark";
 type Size = "md" | "lg";
 
 const base =
@@ -14,6 +14,9 @@ const variants: Record<Variant, string> = {
   secondary:
     "bg-clay-deep/70 text-ink border border-line-strong hover:bg-clay-deep",
   ghost: "text-celadon hover:text-ink bg-transparent",
+  danger: "bg-error text-on-terracotta hover:bg-terracotta-hover",
+  // For kiln-dark bands — brighter ember so it doesn't muddy.
+  onDark: "bg-ember text-kiln-3 hover:bg-terracotta-soft shadow-[var(--shadow-glow)]",
 };
 
 const sizes: Record<Size, string> = {

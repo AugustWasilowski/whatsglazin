@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { getPieces, getGlazesWithCounts, getMembers } from "@/lib/db";
-import { pieceFill, swatchFill } from "@/lib/glazes";
 import { ButtonLink } from "@/components/ui/Button";
+import { SpecLabel } from "@/components/ui/Spec";
 import { PotteryCard } from "@/components/PotteryCard";
-import { GlazeTile } from "@/components/GlazeTile";
-import { LandingHero, type WallTile } from "@/components/landing/LandingHero";
+import { LandingHero } from "@/components/landing/LandingHero";
+import { TestTileBoard } from "@/components/landing/TestTileBoard";
 import { Reveal } from "@/components/motion/Reveal";
+import { HeadlineReveal } from "@/components/motion/HeadlineReveal";
+import { SpecStrip } from "@/components/motion/SpecStrip";
+import { Magnetic } from "@/components/motion/Magnetic";
 
 const STEPS = [
   { n: "01", color: "text-celadon", title: "Shoot it", body: "Snap the piece straight off the kiln shelf — one hand, one tap. Add a few angles if you like." },
@@ -13,29 +16,13 @@ const STEPS = [
   { n: "03", color: "text-cobalt", title: "It's remembered", body: "It joins a gallery the whole studio can search — by color, recipe, maker, and combination." },
 ];
 
-const ASPECTS = ["3 / 4", "1 / 1", "4 / 5"];
-
-/** Landing — "1c: Living gallery wall", fed from the database. */
+/** Landing — "The Kiln Catalog": molten hero + editorial studio record. */
 export default async function Landing() {
   const [pieces, glazes, members] = await Promise.all([
     getPieces(),
     getGlazesWithCounts(),
     getMembers(),
   ]);
-
-  // Build the hero wall from real pieces (or glaze swatches if none yet, or a
-  // neutral clay gradient when the studio is brand-new and has neither).
-  const FALLBACK_FILL = "linear-gradient(135deg, #C4B49A, #8A7A64)";
-  const wall: WallTile[] = Array.from({ length: 24 }, (_, i) => {
-    const aspect = ASPECTS[i % 3];
-    if (pieces.length) {
-      return { fill: pieceFill(pieces[i % pieces.length].glazes), aspect };
-    }
-    if (glazes.length) {
-      return { fill: swatchFill(glazes[i % glazes.length]), aspect };
-    }
-    return { fill: FALLBACK_FILL, aspect };
-  });
 
   const stats = [
     { n: pieces.length, label: "pieces" },
@@ -45,21 +32,28 @@ export default async function Landing() {
 
   return (
     <>
-      <LandingHero wall={wall} stats={stats} />
+      <LandingHero stats={stats} />
 
       {/* ---------- HOW IT WORKS ---------- */}
-      <section className="bg-bone">
-        <Reveal className="mx-auto w-full max-w-[1180px] px-6 py-16 sm:px-10 sm:py-20">
-          <p className="font-sans text-[12px] font-medium uppercase tracking-[0.2em] text-terracotta">
-            Three taps at the shelf
-          </p>
-          <h2 className="mt-2 max-w-[16ch] font-display text-4xl text-ink sm:text-5xl">
+      <section className="overflow-hidden bg-bone">
+        <SpecStrip text="Cone 6 — Δ6 · 2232°F — Oxidation" className="text-clay-deep" />
+        <Reveal className="mx-auto w-full max-w-[1180px] px-5 pb-20 pt-4 sm:px-10 sm:pb-28">
+          <SpecLabel>Three taps at the shelf</SpecLabel>
+          <HeadlineReveal className="mt-3 max-w-[16ch] font-display text-display-lg text-ink">
             The kiln forgets. We don&rsquo;t.
-          </h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+          </HeadlineReveal>
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
             {STEPS.map((s) => (
-              <div key={s.n} className="rounded-card border border-line bg-paper p-6">
-                <div className={`font-display text-4xl ${s.color}`}>{s.n}</div>
+              <div
+                key={s.n}
+                className="relative rounded-card border border-line bg-paper p-6 pt-12"
+              >
+                <div
+                  aria-hidden
+                  className={`text-outline pointer-events-none absolute -top-7 left-4 font-display text-[88px] leading-none ${s.color}`}
+                >
+                  {s.n}
+                </div>
                 <h3 className="mt-3 text-xl font-semibold text-ink">{s.title}</h3>
                 <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{s.body}</p>
               </div>
@@ -70,15 +64,25 @@ export default async function Landing() {
 
       {/* ---------- RECENT PIECES ---------- */}
       {pieces.length > 0 && (
-        <section className="bg-clay">
-          <div className="mx-auto w-full max-w-[1180px] px-6 py-16 sm:px-10 sm:py-20">
+        <section className="overflow-hidden bg-clay">
+          <SpecStrip text="Fresh from the kiln — Δ6 — 2232°F" className="text-stoneware" />
+          <div className="mx-auto w-full max-w-[1180px] px-5 pb-20 pt-4 sm:px-10 sm:pb-28">
             <div className="flex items-end justify-between">
-              <h2 className="font-display text-3xl text-ink sm:text-4xl">Recent pieces</h2>
-              <Link href="/gallery" className="text-sm font-semibold text-celadon hover:text-ink">
+              <div>
+                <SpecLabel>The latest unload</SpecLabel>
+                <HeadlineReveal className="mt-3 font-display text-display-lg text-ink">
+                  Recent pieces
+                </HeadlineReveal>
+              </div>
+              <Link
+                href="/gallery"
+                data-cursor="link"
+                className="mb-1 shrink-0 font-mono text-label uppercase text-celadon hover:text-ink"
+              >
                 See all {pieces.length} →
               </Link>
             </div>
-            <Reveal className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4" stagger={0.06}>
+            <Reveal className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4" stagger={0.06}>
               {pieces.slice(0, 4).map((p, i) => (
                 <PotteryCard key={p.id} piece={p} priority={i === 0} />
               ))}
@@ -87,56 +91,53 @@ export default async function Landing() {
         </section>
       )}
 
-      {/* ---------- GLAZE PEEK ---------- */}
-      <section className="bg-bone">
-        <div className="mx-auto w-full max-w-[1180px] px-6 py-16 sm:px-10 sm:py-20">
+      {/* ---------- THE TEST TILE BOARD ---------- */}
+      <section className="overflow-hidden bg-bone py-20 sm:py-28">
+        <div className="mx-auto w-full max-w-[1180px] px-5 sm:px-10">
           <div className="flex items-end justify-between">
-            <h2 className="font-display text-3xl text-ink sm:text-4xl">The glaze library</h2>
-            <Link href="/glazes" className="text-sm font-semibold text-celadon hover:text-ink">
-              Explore all {glazes.length} →
+            <div>
+              <SpecLabel>{glazes.length} studio glazes · Cone 6 · Oxidation</SpecLabel>
+              <HeadlineReveal className="mt-3 font-display text-display-lg text-ink">
+                The test tile board
+              </HeadlineReveal>
+            </div>
+            <Link
+              href="/glazes"
+              data-cursor="link"
+              className="mb-1 shrink-0 font-mono text-label uppercase text-celadon hover:text-ink"
+            >
+              Explore all →
             </Link>
           </div>
-          <Reveal className="mt-8 grid grid-cols-3 gap-4 sm:grid-cols-6" stagger={0.05}>
-            {glazes.slice(0, 6).map((g) => (
-              <GlazeTile key={g.id} glaze={g} count={g.pieceCount} />
-            ))}
-          </Reveal>
+        </div>
+        <div className="mt-10">
+          <TestTileBoard glazes={glazes} />
         </div>
       </section>
 
       {/* ---------- CTA ---------- */}
-      <section className="bg-kiln text-bone">
-        <Reveal className="mx-auto w-full max-w-[1180px] px-6 py-20 text-center sm:px-10 sm:py-28">
-          <h2 className="font-display text-4xl leading-tight sm:text-[56px]">
-            Made something?<br />
-            <span className="text-terracotta-soft">Add it to the wall.</span>
-          </h2>
-          <div className="mt-8 flex justify-center">
-            <ButtonLink href="/auth" size="lg" className="rounded-pill px-8">
-              Continue with Google or Email
-            </ButtonLink>
+      <section className="on-dark grain-strong overflow-hidden bg-kiln text-bone">
+        <Reveal className="mx-auto w-full max-w-[1180px] px-5 py-24 text-center sm:px-10 sm:py-32">
+          <SpecLabel className="text-ember">Members of The Fine Line</SpecLabel>
+          <HeadlineReveal className="mt-4 font-display text-display-xl leading-tight">
+            Made something?
+            <span className="block text-ember">Add it to the wall.</span>
+          </HeadlineReveal>
+          <div className="mt-10 flex justify-center">
+            <Magnetic>
+              <ButtonLink
+                href="/auth"
+                variant="onDark"
+                size="lg"
+                className="rounded-pill px-8"
+                data-cursor="link"
+              >
+                Continue with Google or Email
+              </ButtonLink>
+            </Magnetic>
           </div>
         </Reveal>
       </section>
-
-      {/* ---------- FOOTER ---------- */}
-      <footer className="bg-[#241A12] text-bone/70">
-        <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-4 px-6 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-10">
-          <p className="font-display text-lg text-bone">
-            What&rsquo;sGlazin<span className="text-terracotta">?</span>
-          </p>
-          <nav className="flex gap-6 text-sm">
-            <Link href="/gallery" className="hover:text-bone">Gallery</Link>
-            <Link href="/glazes" className="hover:text-bone">Glazes</Link>
-            <Link href="/members" className="hover:text-bone">Members</Link>
-            <Link href="/auth" className="hover:text-bone">Sign in</Link>
-          </nav>
-          <p className="text-xs text-bone/50">
-            whatsglazin.com · The Fine Line, est. 1979
-            <span className="mt-1 block italic text-bone/40">This is all Jill&rsquo;s idea.</span>
-          </p>
-        </div>
-      </footer>
     </>
   );
 }

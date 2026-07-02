@@ -2,11 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { pieceFill } from "@/lib/glazes";
-import { GlazeChip } from "@/components/ui/GlazeChip";
 import type { EnrichedPiece } from "@/lib/types";
 
 /**
- * Pottery card — photo-forward, whole card links to the piece detail.
+ * Pottery card — "catalog plate": the photo alone carries the frame while the
+ * caption sits below on the page background, like a plate in a printed catalog.
  * Falls back to the glaze-fill placeholder until a real photo exists.
  */
 export function PotteryCard({
@@ -28,19 +28,27 @@ export function PotteryCard({
   return (
     <Link
       href={`/pieces/${piece.slug}`}
+      data-cursor="link"
+      data-glaze={glazes[0]?.baseHex}
       className={cn(
-        "group block overflow-hidden rounded-card border border-line-2 bg-bone shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[var(--shadow-elevated)]",
+        "group block transition-transform duration-300 hover:-translate-y-1",
         className,
       )}
     >
-      <div className={cn("relative w-full", aspect)} style={{ background: pieceFill(glazes) }}>
+      <div
+        className={cn(
+          "relative w-full overflow-hidden rounded-card shadow-[var(--shadow-card)] transition-shadow duration-300 group-hover:shadow-[var(--shadow-elevated)]",
+          aspect,
+        )}
+        style={{ background: pieceFill(glazes) }}
+      >
         {cover && (
           <Image
             src={cover}
             alt={piece.photos[0]?.alt ?? piece.title ?? "Pottery piece"}
             fill
             sizes="(max-width: 640px) 50vw, 300px"
-            className="object-cover"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             placeholder={piece.photos[0]?.blurDataURL ? "blur" : "empty"}
             blurDataURL={piece.photos[0]?.blurDataURL}
             priority={priority}
@@ -53,16 +61,13 @@ export function PotteryCard({
         )}
       </div>
 
-      <div className="p-3.5">
-        <p className="truncate text-[15px] font-semibold text-ink">
+      <div className="mt-2.5 px-0.5">
+        <p className="truncate font-display text-[17px] leading-snug text-ink">
           {piece.title ?? piece.form}
         </p>
-        <p className="mt-0.5 text-xs font-medium text-slip">by {maker?.name ?? "—"}</p>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {glazes.map((g) => (
-            <GlazeChip key={g.id} glaze={g} variant="soft" />
-          ))}
-        </div>
+        <p className="mt-1 truncate font-mono text-[10.5px] uppercase tracking-wider text-slip">
+          {glazes.map((g) => g.name).join(" / ")} — by {maker?.name ?? "—"}
+        </p>
       </div>
     </Link>
   );

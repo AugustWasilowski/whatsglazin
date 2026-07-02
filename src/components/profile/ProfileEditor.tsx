@@ -6,6 +6,7 @@ import { Camera, X, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { updateProfile } from "@/lib/actions";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import type { Member } from "@/lib/types";
 
 const GRAD = "linear-gradient(140deg,#C98A4E,#8C4A1E)";
@@ -169,7 +170,8 @@ export function ProfileEditor({ member, email }: { member: Member; email?: strin
         <label htmlFor="display-name" className="mb-1.5 block text-sm font-medium text-ink-2">
           Display name
         </label>
-        <input
+        <Input
+          inputSize="md"
           id="display-name"
           type="text"
           value={name}
@@ -178,7 +180,6 @@ export function ProfileEditor({ member, email }: { member: Member; email?: strin
             setName(e.target.value);
             setSaved(false);
           }}
-          className="h-11 w-full rounded-md border-[1.5px] border-line-strong bg-bone px-3 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
         />
       </div>
 
@@ -208,7 +209,8 @@ export function ProfileEditor({ member, email }: { member: Member; email?: strin
           </div>
         )}
         <div className="flex gap-2">
-          <input
+          <Input
+            inputSize="md"
             id="discipline"
             type="text"
             value={disciplineDraft}
@@ -221,7 +223,7 @@ export function ProfileEditor({ member, email }: { member: Member; email?: strin
               }
             }}
             placeholder="Wheel, Hand-building, Glaze chem…"
-            className="h-11 flex-1 rounded-md border-[1.5px] border-line-strong bg-bone px-3 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
+            className="flex-1"
           />
           <button
             type="button"
@@ -265,13 +267,14 @@ export function ProfileEditor({ member, email }: { member: Member; email?: strin
           <label htmlFor="new-email" className="sr-only">
             New email address
           </label>
-          <input
+          <Input
+            inputSize="md"
             id="new-email"
             type="email"
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
             placeholder="new@email.com"
-            className="h-11 flex-1 rounded-md border-[1.5px] border-line-strong bg-bone px-3 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
+            className="flex-1"
           />
           <button
             type="submit"

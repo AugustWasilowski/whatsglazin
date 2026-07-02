@@ -1,4 +1,5 @@
 import { SiteHeader } from "@/components/nav/SiteHeader";
+import { SiteFooter } from "@/components/nav/SiteFooter";
 import { getSessionMember } from "@/lib/auth";
 import { initialsOf } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ export default async function MarketingLayout({
         member={member ? { name: member.name, initials: initialsOf(member.name) } : null}
       />
       <div className="flex-1">{children}</div>
+      <SiteFooter />
     </div>
   );
 }

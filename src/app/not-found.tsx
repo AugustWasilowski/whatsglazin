@@ -4,7 +4,9 @@ export default function NotFound() {
   return (
     <div className="grid min-h-[70vh] place-items-center px-6 text-center">
       <div className="max-w-sm">
-        <p className="font-mono text-sm uppercase tracking-[0.2em] text-terracotta">404</p>
+        <p aria-hidden className="text-outline font-display text-[88px] leading-none text-terracotta">
+          404
+        </p>
         <h1 className="mt-3 font-display text-4xl text-ink">We couldn’t find that.</h1>
         <p className="mt-2 text-ink-2">
           The piece, glaze, or page may have been removed — or the link was mistyped.

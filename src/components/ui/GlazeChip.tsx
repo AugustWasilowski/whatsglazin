@@ -22,7 +22,7 @@ export function GlazeChip({
     return (
       <span
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-pill bg-[#F1EADB] px-2 py-0.5 text-[11px] font-medium text-ink-2",
+          "inline-flex items-center gap-1.5 rounded-pill bg-chip px-2 py-0.5 text-[11px] font-medium text-ink-2",
           className,
         )}
       >

@@ -1,12 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { GlazeTile } from "@/components/GlazeTile";
+import { HeadlineReveal } from "@/components/motion/HeadlineReveal";
+import { Container } from "@/components/ui/Container";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Input } from "@/components/ui/Input";
+import { SpecLabel } from "@/components/ui/Spec";
+import { canHover, shouldAnimate } from "@/lib/motion";
 import type { GlazeWithCount } from "@/lib/types";
 
-/** Glaze library — searchable grid of the studio's glaze tiles. */
+/** Glaze library — "The Board": searchable grid of the studio's glaze tiles. */
 export function GlazeLibrary({ glazes }: { glazes: GlazeWithCount[] }) {
   const [query, setQuery] = useState("");
+  const boardRef = useRef<HTMLDivElement>(null);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -19,41 +26,59 @@ export function GlazeLibrary({ glazes }: { glazes: GlazeWithCount[] }) {
     );
   }, [query, glazes]);
 
+  // One delegated pointermove drives every tile's specular highlight: set the
+  // --mx/--my vars on whichever swatch the cursor is over. Hover-only, cheap.
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!board || !canHover() || !shouldAnimate()) return;
+    const onMove = (e: PointerEvent) => {
+      const swatch = (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-swatch]");
+      if (!swatch) return;
+      const r = swatch.getBoundingClientRect();
+      swatch.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      swatch.style.setProperty("--my", `${e.clientY - r.top}px`);
+    };
+    board.addEventListener("pointermove", onMove);
+    return () => board.removeEventListener("pointermove", onMove);
+  }, []);
+
   return (
-    <div className="mx-auto w-full max-w-[1180px] px-5 py-8 sm:px-10">
-      <h1 className="font-display text-4xl text-ink sm:text-5xl">Glaze library</h1>
+    <Container className="py-8">
+      <SpecLabel>{glazes.length} Studio Glazes · Cone 6 · Oxidation</SpecLabel>
+      <HeadlineReveal as="h1" className="mt-1 font-display text-display-xl text-ink">
+        Glaze library
+      </HeadlineReveal>
       <div className="mt-6">
         <label htmlFor="glaze-search" className="sr-only">
           Search the studio glazes
         </label>
-        <input
+        <Input
           id="glaze-search"
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={`Search ${glazes.length} studio glazes…`}
-          className="h-12 w-full rounded-md border-[1.5px] border-line-strong bg-bone px-4 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
         />
       </div>
 
-      {results.length ? (
-        <div className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-          {results.map((g) => (
-            <GlazeTile key={g.id} glaze={g} count={g.pieceCount} swatchClassName="aspect-[4/3]" />
-          ))}
-        </div>
-      ) : (
-        <div className="mt-8 rounded-card border border-dashed border-line-strong bg-bone/60 p-10 text-center">
-          <p className="font-display text-2xl text-ink">
-            {glazes.length ? "No glazes match" : "No glazes yet"}
-          </p>
-          <p className="mt-1 text-sm text-slip">
+      <div ref={boardRef}>
+        {results.length ? (
+          <div className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+            {results.map((g) => (
+              <GlazeTile key={g.id} glaze={g} count={g.pieceCount} swatchClassName="aspect-[4/3]" />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            className="mt-8"
+            title={glazes.length ? "No glazes match" : "No glazes yet"}
+          >
             {glazes.length
               ? "Try a different name, family, or finish."
               : "Glazes appear here as members log the ones they use."}
-          </p>
-        </div>
-      )}
-    </div>
+          </EmptyState>
+        )}
+      </div>
+    </Container>
   );
 }

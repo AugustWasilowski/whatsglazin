@@ -5,6 +5,8 @@ import { getPieces } from "@/lib/db";
 import { initialsOf } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
+import { Container } from "@/components/ui/Container";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { PotteryCard } from "@/components/PotteryCard";
 
 export const metadata = { title: "You" };
@@ -21,7 +23,7 @@ export default async function YouPage() {
     : [];
 
   return (
-    <div className="mx-auto w-full max-w-[1180px] px-5 py-10 sm:px-10">
+    <Container className="py-10">
       <div className="flex items-center gap-4">
         {member ? (
           <Avatar member={member} size={64} />
@@ -32,7 +34,11 @@ export default async function YouPage() {
         )}
         <div className="min-w-0 flex-1">
           <h1 className="truncate font-display text-3xl text-ink">{name}</h1>
-          {user.email && <p className="truncate text-sm text-slip">{user.email}</p>}
+          {user.email && (
+            <p className="truncate font-mono text-[11px] uppercase tracking-wider text-slip">
+              {user.email}
+            </p>
+          )}
           {member && (
             <p className="text-sm text-slip">
               Member since {member.memberSince} ·{" "}
@@ -74,15 +80,17 @@ export default async function YouPage() {
             ))}
           </div>
         ) : (
-          <div className="mt-5 rounded-card border border-line bg-bone p-6 text-center">
-            <p className="font-display text-2xl text-ink">Nothing logged yet</p>
-            <p className="mt-1 text-sm text-slip">
-              Pull a piece from the kiln and add your first one.
-            </p>
-            <ButtonLink href="/add" size="lg" className="mt-5">
-              Add a piece
-            </ButtonLink>
-          </div>
+          <EmptyState
+            className="mt-5"
+            title="Nothing logged yet"
+            action={
+              <ButtonLink href="/add" size="lg">
+                Add a piece
+              </ButtonLink>
+            }
+          >
+            Pull a piece from the kiln and add your first one.
+          </EmptyState>
         )}
       </section>
 
@@ -94,6 +102,6 @@ export default async function YouPage() {
           Sign out
         </button>
       </form>
-    </div>
+    </Container>
   );
 }

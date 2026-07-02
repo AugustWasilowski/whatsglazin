@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 
 /** Auth panel — Google SSO + passwordless email (6-digit code). */
 export function AuthPanel() {
@@ -103,13 +105,9 @@ export function AuthPanel() {
             placeholder="Code from email"
             className="h-14 w-full rounded-md border-[1.5px] border-line-strong bg-bone px-4 text-center font-mono text-xl tracking-[0.3em] text-ink placeholder:tracking-normal placeholder:text-base placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
           />
-          <button
-            type="submit"
-            disabled={busy !== null || code.length < 6}
-            className="inline-flex min-h-[48px] items-center justify-center rounded-md bg-terracotta px-5 font-semibold text-on-terracotta shadow-[var(--shadow-glow)] transition-colors hover:bg-terracotta-hover disabled:opacity-60"
-          >
+          <Button type="submit" disabled={busy !== null || code.length < 6} className="w-full">
             {busy === "verify" ? "Verifying…" : "Sign in"}
-          </button>
+          </Button>
         </form>
 
         <p className="mt-4 text-sm text-slip">
@@ -187,23 +185,19 @@ export function AuthPanel() {
         </label>
         <div className="relative">
           <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slip" />
-          <input
+          <Input
             id="email"
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@thefineline.studio"
-            className="h-12 w-full rounded-md border-[1.5px] border-line-strong bg-bone pl-11 pr-4 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
+            className="pl-11"
           />
         </div>
-        <button
-          type="submit"
-          disabled={busy !== null}
-          className="inline-flex min-h-[48px] items-center justify-center rounded-md bg-terracotta px-5 font-semibold text-on-terracotta shadow-[var(--shadow-glow)] transition-colors hover:bg-terracotta-hover disabled:opacity-60"
-        >
+        <Button type="submit" disabled={busy !== null} className="w-full">
           {busy === "email" ? "Sending…" : "Email me a code"}
-        </button>
+        </Button>
       </form>
     </div>
   );

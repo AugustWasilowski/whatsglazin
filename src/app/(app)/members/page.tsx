@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getMembers, getPieces } from "@/lib/db";
 import { Avatar } from "@/components/ui/Avatar";
+import { Container } from "@/components/ui/Container";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { SpecLabel } from "@/components/ui/Spec";
+import { HeadlineReveal } from "@/components/motion/HeadlineReveal";
 
 export const metadata: Metadata = {
   title: "Members",
@@ -14,39 +18,41 @@ export default async function MembersPage() {
   for (const p of pieces) countByMaker.set(p.makerId, (countByMaker.get(p.makerId) ?? 0) + 1);
 
   return (
-    <div className="mx-auto w-full max-w-[1180px] px-5 py-8 sm:px-10">
-      <h1 className="font-display text-4xl text-ink sm:text-5xl">Members</h1>
+    <Container className="py-8 sm:py-10">
+      <SpecLabel>The Fine Line · Roster</SpecLabel>
+      <HeadlineReveal as="h1" className="mt-3 font-display text-display-xl text-ink">
+        The Makers
+      </HeadlineReveal>
       {members.length === 0 ? (
-        <div className="mt-8 rounded-card border border-dashed border-line-strong bg-bone/60 p-10 text-center">
-          <p className="font-display text-2xl text-ink">No members yet</p>
-          <p className="mt-1 text-sm text-slip">
-            Makers show up here once they’ve logged a piece.
-          </p>
-        </div>
+        <EmptyState className="mt-8" title="No members yet">
+          Makers show up here once they’ve logged a piece.
+        </EmptyState>
       ) : (
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {members.map((m) => {
-          const count = countByMaker.get(m.id) ?? 0;
-          return (
-            <Link
-              key={m.id}
-              href={`/members/${m.slug}`}
-              className="flex items-center gap-4 rounded-card border border-line bg-bone p-4 transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]"
-            >
-              <Avatar member={m} size={52} />
-              <div className="min-w-0">
-                <p className="truncate font-display text-xl text-ink">{m.name}</p>
-                <p className="truncate text-xs text-slip">
-                  {m.disciplines.join(" · ")}
-                  {m.disciplines.length ? " · " : ""}
-                  {count} {count === 1 ? "piece" : "pieces"}
-                </p>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+        <ul className="mt-10 divide-y divide-line border-y border-line">
+          {members.map((m) => {
+            const count = countByMaker.get(m.id) ?? 0;
+            return (
+              <li key={m.id}>
+                <Link
+                  href={`/members/${m.slug}`}
+                  data-cursor="link"
+                  className="group flex flex-wrap items-center gap-x-5 gap-y-1 px-2 py-5 transition-colors hover:bg-bone/60 sm:px-4"
+                >
+                  <Avatar member={m} size={56} />
+                  <span className="min-w-0 flex-1 truncate font-display text-2xl text-ink transition-colors group-hover:text-terracotta">
+                    {m.name}
+                  </span>
+                  <span className="w-full font-mono text-label uppercase text-slip sm:w-auto sm:text-right">
+                    {m.disciplines.join(" · ")}
+                    {m.disciplines.length ? " · " : ""}
+                    {count} {count === 1 ? "piece" : "pieces"}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       )}
-    </div>
+    </Container>
   );
 }

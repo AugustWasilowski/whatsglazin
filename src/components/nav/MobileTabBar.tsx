@@ -35,7 +35,7 @@ export function MobileTabBar() {
           <Link
             href="/add"
             aria-label="Add a piece"
-            className="grid h-[46px] w-[46px] -translate-y-3 place-items-center rounded-full bg-terracotta text-on-terracotta shadow-[var(--shadow-glow)] transition-transform active:scale-95"
+            className="grid h-[46px] w-[46px] -translate-y-3 place-items-center rounded-full bg-terracotta text-on-terracotta shadow-[var(--shadow-glow),var(--shadow-pool)] transition-transform active:scale-95"
           >
             <Plus size={24} strokeWidth={2.5} />
           </Link>
@@ -65,7 +65,7 @@ function TabLink({
       href={href}
       className={cn(
         "flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors",
-        active ? "text-ink" : "text-[#A99A82]",
+        active ? "text-ink" : "text-tab-idle",
       )}
       aria-current={active ? "page" : undefined}
     >

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Young_Serif, Hanken_Grotesk } from "next/font/google";
+import { Young_Serif, Hanken_Grotesk, IBM_Plex_Mono } from "next/font/google";
+import { GlazeCursor } from "@/components/motion/GlazeCursor";
 import "./globals.css";
 
 // Display face — headlines, glaze names, numerals. Weight 400 only.
@@ -15,6 +16,15 @@ const hanken = Hanken_Grotesk({
   variable: "--font-hanken",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Lab face — spec labels, chemistry notation, firing tags.
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
   style: ["normal", "italic"],
   display: "swap",
 });
@@ -53,10 +63,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${youngSerif.variable} ${hanken.variable} h-full`}
+      className={`${youngSerif.variable} ${hanken.variable} ${plexMono.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-canvas text-ink">
         {children}
+        <GlazeCursor />
       </body>
     </html>
   );

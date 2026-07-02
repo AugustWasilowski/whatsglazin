@@ -128,7 +128,9 @@ export function GlazeTypeahead({
                 aria-hidden
               />
               <span className="flex-1 font-medium text-ink">{g.name}</span>
-              <span className="text-xs text-slip">{g.family}</span>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-slip">
+                {g.family}
+              </span>
             </li>
           ))}
 

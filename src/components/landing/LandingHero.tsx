@@ -3,113 +3,150 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGsap, shouldAnimate } from "@/lib/motion";
+import { useMagnetic } from "@/components/motion/useMagnetic";
+import { HeadlineReveal } from "@/components/motion/HeadlineReveal";
+import { ShaderCanvas } from "@/components/gfx/ShaderCanvas";
+import { MOLTEN_FRAG } from "@/components/gfx/shaders/molten";
 import { ButtonLink } from "@/components/ui/Button";
+import { getGlazeBySlug } from "@/lib/glazes";
 
-const HEADLINE = ["A wall of", "what", "we made."];
-
-export type WallTile = { fill: string; aspect: string };
 export type HeroStat = { n: number; label: string };
 
-/** Living-gallery-wall hero. Data (wall fills + stats) comes from the server. */
-export function LandingHero({
-  wall,
-  stats,
-}: {
-  wall: WallTile[];
-  stats: HeroStat[];
-}) {
+// The bucket: four studio glazes the molten surface melts between.
+const MELT_SLUGS = ["floating-blue", "butterscotch", "oribe-6", "satin-white"] as const;
+const MELT = MELT_SLUGS.map((s) => getGlazeBySlug(s)!);
+const MELT_COLORS = MELT.map((g) => g.baseHex) as [string, string, string, string];
+
+// Static stand-in: the same four glazes as a layered pour.
+const MELT_FALLBACK = [
+  "repeating-linear-gradient(135deg, rgba(255,255,255,.055) 0 9px, rgba(28,18,8,.05) 9px 18px)",
+  `linear-gradient(158deg, ${MELT[0].baseHex} 0%, ${MELT[1].baseHex} 38%, ${MELT[2].baseHex} 72%, ${MELT[3].shade2Hex} 100%)`,
+].join(", ");
+
+/** "Molten" hero — a live glaze melt behind the studio's kiln log. */
+export function LandingHero({ stats }: { stats: HeroStat[] }) {
   const scope = useRef<HTMLElement>(null);
+  const primaryMag = useMagnetic<HTMLSpanElement>(0.25);
+  const secondaryMag = useMagnetic<HTMLSpanElement>(0.25);
 
   useGSAP(
     () => {
+      registerGsap();
       const el = scope.current;
       if (!el || !shouldAnimate()) return;
 
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tl.from(".hero-tile", {
-        opacity: 0,
-        scale: 0.92,
-        y: 16,
-        duration: 0.7,
-        stagger: { each: 0.035, from: "random" },
-      })
-        .from(".hero-line", { yPercent: 115, opacity: 0, duration: 0.8, stagger: 0.1 }, 0.15)
-        .from(".hero-fade", { opacity: 0, y: 16, duration: 0.6, stagger: 0.08 }, "-=0.4");
-
-      gsap.to(".hero-wall", {
-        yPercent: -12,
+      gsap.fromTo(
+        ".hero-fade",
+        { opacity: 0, y: 16 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.09,
+          delay: 0.25,
+          ease: "power3.out",
+          clearProps: "opacity,transform",
+        },
+      );
+      gsap.fromTo(
+        ".hero-arch",
+        { opacity: 0, scale: 0.96 },
+        { opacity: 1, scale: 1, duration: 1.1, ease: "power3.out" },
+      );
+      // Gentle parallax on the kiln door as the page scrolls away.
+      gsap.to(".hero-arch", {
+        yPercent: 7,
         ease: "none",
-        scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: true },
-      });
-      gsap.to(".hero-scrim", {
-        opacity: 0.35,
-        ease: "none",
-        scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: true },
+        scrollTrigger: {
+          trigger: el,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
       });
     },
     { scope },
   );
 
   return (
-    <section ref={scope} className="relative overflow-hidden">
-      <div
-        aria-hidden
-        className="hero-wall pointer-events-none absolute -inset-x-0 -top-[10%] h-[130%] columns-3 gap-3 p-3 sm:columns-4 lg:columns-6"
-      >
-        {wall.map((t, i) => (
-          <div
-            key={i}
-            className="hero-tile mb-3 w-full break-inside-avoid rounded-md"
-            style={{ background: t.fill, aspectRatio: t.aspect }}
-          />
-        ))}
+    <section ref={scope} className="relative overflow-hidden bg-clay">
+      {/* Mobile: the melt runs full-bleed behind a clay wash. */}
+      <div className="absolute inset-0 lg:hidden">
+        <ShaderCanvas
+          fragment={MOLTEN_FRAG}
+          colors={MELT_COLORS}
+          className="absolute inset-0"
+          fallback={
+            <div className="absolute inset-0" style={{ background: MELT_FALLBACK }} />
+          }
+        />
+        <div className="absolute inset-0 bg-clay/85" />
       </div>
 
-      <div
-        aria-hidden
-        className="hero-scrim absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(105deg, rgba(241,231,214,0.97) 30%, rgba(241,231,214,0.72) 48%, rgba(241,231,214,0.12) 68%, transparent)",
-        }}
-      />
-
-      <div className="relative mx-auto w-full max-w-[1180px] px-6 py-24 sm:px-10 sm:py-32">
-        <div className="max-w-[640px]">
-          <p className="hero-fade mb-5 font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-terracotta">
-            The Fine Line · St. Charles, IL
-          </p>
-          <h1 className="font-display text-[15vw] leading-[0.92] tracking-[-0.02em] text-ink sm:text-[84px]">
-            {HEADLINE.map((line) => (
-              <span key={line} className="block overflow-hidden">
-                <span className="hero-line block">{line}</span>
+      <div className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-10">
+        <div className="grid min-h-[88vh] items-center gap-12 py-20 sm:py-24 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+          {/* ---- copy ---- */}
+          <div className="max-w-[680px]">
+            <p className="hero-fade mb-6 font-mono text-label font-medium uppercase text-terracotta">
+              The Fine Line · St. Charles, IL · Cone 6 · est. 1979
+            </p>
+            <HeadlineReveal as="h1" className="font-display text-display-2xl text-ink">
+              A wall of what we made.
+            </HeadlineReveal>
+            <p className="hero-fade mt-7 max-w-[520px] text-lg leading-relaxed text-ink-3">
+              Snap a piece straight off the kiln shelf, log the glaze in three
+              taps, and it joins a gallery the whole studio can search — by
+              color, recipe, and maker.
+            </p>
+            <div className="hero-fade mt-9 flex flex-wrap gap-3">
+              <span ref={primaryMag} className="inline-block">
+                <ButtonLink href="/add" size="lg" data-cursor="link">
+                  Add your piece
+                </ButtonLink>
               </span>
-            ))}
-          </h1>
-          <p className="hero-fade mt-6 max-w-[520px] text-lg leading-relaxed text-ink-3">
-            Snap a piece straight off the kiln shelf, log the glaze in three taps,
-            and it joins a gallery the whole studio can search — by color, recipe,
-            and maker.
-          </p>
-          <div className="hero-fade mt-8 flex flex-wrap gap-3">
-            <ButtonLink href="/add" size="lg">Add your piece</ButtonLink>
-            <ButtonLink href="/gallery" variant="secondary" size="lg">
-              Browse the gallery
-            </ButtonLink>
-          </div>
-          <dl className="hero-fade mt-10 flex gap-8">
-            {stats.map((s) => (
-              <div key={s.label}>
-                <dt className="sr-only">{s.label}</dt>
-                <dd className="font-display text-3xl text-ink">
-                  {s.n}
-                  <span className="ml-1.5 align-middle font-sans text-sm font-medium text-slip">
+              <span ref={secondaryMag} className="inline-block">
+                <ButtonLink href="/gallery" variant="secondary" size="lg" data-cursor="link">
+                  Browse the gallery
+                </ButtonLink>
+              </span>
+            </div>
+
+            {/* ---- kiln log ---- */}
+            <dl className="hero-fade mt-14 flex max-w-[520px] divide-x divide-line-strong border-y border-line-strong">
+              {stats.map((s) => (
+                <div key={s.label} className="flex-1 px-5 py-4 first:pl-1">
+                  <dd className="font-mono text-2xl tabular-nums text-ink">
+                    {String(s.n).padStart(2, "0")}
+                  </dd>
+                  <dt className="mt-0.5 font-mono text-label uppercase text-slip">
                     {s.label}
-                  </span>
-                </dd>
-              </div>
-            ))}
-          </dl>
+                  </dt>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          {/* ---- the kiln door (desktop) ---- */}
+          <div className="hero-arch relative hidden h-[72vh] max-h-[780px] min-h-[420px] lg:block">
+            <div
+              className="rounded-arch absolute inset-0 overflow-hidden shadow-[var(--shadow-deep)]"
+              data-glaze={MELT[0].baseHex}
+            >
+              <ShaderCanvas
+                fragment={MOLTEN_FRAG}
+                colors={MELT_COLORS}
+                className="absolute inset-0"
+                fallback={
+                  <div className="absolute inset-0" style={{ background: MELT_FALLBACK }} />
+                }
+              />
+              {/* wet edge highlight */}
+              <div className="pointer-events-none absolute inset-0 rounded-arch border border-white/15" />
+            </div>
+            <p className="absolute -bottom-8 right-2 font-mono text-[11px] uppercase tracking-wider text-slip">
+              Live melt · {MELT.map((g) => g.name).join(" · ")}
+            </p>
+          </div>
         </div>
       </div>
     </section>

@@ -28,7 +28,7 @@ export function PieceGallery({
 
   return (
     <div
-      className="relative h-[62vh] max-h-[720px] min-h-[360px] w-full"
+      className="relative h-[62vh] max-h-[720px] min-h-[360px] w-full shadow-[var(--shadow-deep)]"
       style={{ background: fill }}
     >
       {current?.url && (
@@ -51,7 +51,7 @@ export function PieceGallery({
       </span>
 
       {photos.length > 1 && (
-        <div className="absolute bottom-4 left-4 flex gap-2">
+        <div className="absolute bottom-4 left-4 flex gap-1.5 rounded-lg bg-ink/45 p-1.5 pt-2 backdrop-blur-sm">
           {photos.map((ph, i) => (
             <button
               key={i}
@@ -59,8 +59,10 @@ export function PieceGallery({
               onClick={() => setActive(i)}
               aria-label={`View photo ${i + 1} of ${photos.length}`}
               aria-current={i === active}
-              className={`relative h-11 w-11 overflow-hidden rounded-md border-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-bone ${
-                i === active ? "border-bone" : "border-bone/40 hover:border-bone/70"
+              className={`relative h-11 w-11 overflow-hidden rounded-md border-2 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-bone ${
+                i === active
+                  ? "-translate-y-0.5 border-terracotta"
+                  : "border-bone/40 hover:border-bone/70"
               }`}
               style={{ background: fill }}
             >

@@ -141,6 +141,11 @@ const SWATCH_IMAGE_SLUGS = new Set([
   "spearmint", "oribe-6", "weathered-bronze", "metallic-black", "ketchup", "butterscotch",
 ]);
 
+/** Whether a real fired-tile photo exists for this glaze. */
+export function hasSwatchPhoto(glaze: Glaze): boolean {
+  return SWATCH_IMAGE_SLUGS.has(glaze.slug);
+}
+
 /** Background for a single glaze swatch: the real fired-tile photo when we
  *  have one, otherwise the gradient. Use in `style={{ background: swatchBg(g) }}`. */
 export function swatchBg(glaze: Glaze): string {

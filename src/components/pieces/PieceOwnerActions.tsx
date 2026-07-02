@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { deletePiece } from "@/lib/actions";
 
 /** Edit + Delete controls shown on a piece detail page to its maker only. */
@@ -42,32 +42,19 @@ export function PieceOwnerActions({ slug }: { slug: string }) {
             Its photos and glaze record will be removed. This can’t be undone.
           </p>
           <div className="mt-3 flex gap-2">
-            <button
-              type="button"
-              onClick={onDelete}
-              disabled={pending}
-              className="inline-flex min-h-[40px] items-center justify-center rounded-md bg-error px-4 text-sm font-semibold text-on-terracotta transition-colors hover:opacity-90 disabled:opacity-60"
-            >
+            <Button variant="danger" onClick={onDelete} disabled={pending}>
               {pending ? "Deleting…" : "Delete permanently"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setConfirming(false)}
-              disabled={pending}
-              className="inline-flex min-h-[40px] items-center justify-center rounded-md border border-line-strong bg-bone px-4 text-sm font-semibold text-ink transition-colors hover:bg-clay/40 disabled:opacity-60"
-            >
+            </Button>
+            <Button variant="secondary" onClick={() => setConfirming(false)} disabled={pending}>
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
         <div className="flex flex-wrap gap-2">
-          <Link
-            href={`/pieces/${slug}/edit`}
-            className="inline-flex min-h-[40px] items-center gap-2 rounded-md border border-line-strong bg-bone px-4 text-sm font-semibold text-ink transition-colors hover:bg-clay/40"
-          >
+          <ButtonLink variant="secondary" href={`/pieces/${slug}/edit`}>
             <Pencil size={15} /> Edit
-          </Link>
+          </ButtonLink>
           <button
             type="button"
             onClick={() => setConfirming(true)}

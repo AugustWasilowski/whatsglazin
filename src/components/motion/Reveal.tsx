@@ -32,14 +32,21 @@ export function Reveal({
       if (!el || !shouldAnimate()) return;
       const targets = Array.from(el.children);
       if (!targets.length) return;
-      gsap.from(targets, {
-        opacity: 0,
-        y,
-        duration: 0.6,
-        ease: "power3.out",
-        stagger,
-        scrollTrigger: { trigger: el, start, once: true },
-      });
+      // fromTo (not from): explicit end values survive React's dev double
+      // mount, where a second from() would capture the polluted start state.
+      gsap.fromTo(
+        targets,
+        { opacity: 0, y },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power3.out",
+          stagger,
+          clearProps: "opacity,transform",
+          scrollTrigger: { trigger: el, start, once: true },
+        },
+      );
     },
     { scope: ref },
   );

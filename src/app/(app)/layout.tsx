@@ -1,4 +1,5 @@
 import { SiteHeader } from "@/components/nav/SiteHeader";
+import { SiteFooter } from "@/components/nav/SiteFooter";
 import { MobileTabBar } from "@/components/nav/MobileTabBar";
 import { RouteFade } from "@/components/motion/RouteFade";
 import { getSessionMember } from "@/lib/auth";
@@ -24,6 +25,9 @@ export default async function AppLayout({
       <main className="flex-1 pb-24 md:pb-0">
         <RouteFade>{children}</RouteFade>
       </main>
+      <div className="hidden md:block">
+        <SiteFooter />
+      </div>
       <MobileTabBar />
     </div>
   );

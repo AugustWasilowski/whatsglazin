@@ -1,21 +1,22 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { GLAZES, glazeFill } from "@/lib/glazes";
 import type { Member } from "@/lib/types";
 
-// A few warm two-stop gradients, picked deterministically from the id.
-const GRADIENTS = [
-  "linear-gradient(140deg,#C98A4E,#8C4A1E)",
-  "linear-gradient(140deg,#8FA98A,#3E566E)",
-  "linear-gradient(140deg,#B0552F,#5C3A22)",
-  "linear-gradient(140deg,#55708A,#2C5B4B)",
-  "linear-gradient(140deg,#D8C6A2,#7E3320)",
-  "linear-gradient(140deg,#5E7E63,#241A12)",
-];
+// Member identity drawn from the studio's own materials: hash the id into
+// one of the real glaze fills. Bone initials sit on top, so only glazes dark
+// enough to carry them qualify.
+function luminance(hex: string): number {
+  const n = parseInt(hex.slice(1), 16);
+  return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 0xff) + 0.114 * (n & 0xff)) / 255;
+}
+const AVATAR_GLAZES = GLAZES.filter((g) => luminance(g.baseHex) < 0.55);
 
 function pick(id: string): string {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  return GRADIENTS[h % GRADIENTS.length];
+  const g = AVATAR_GLAZES[h % AVATAR_GLAZES.length];
+  return glazeFill(g.baseHex, g.shade2Hex);
 }
 
 /** `avatar` holding an uploaded image URL vs. a short initials string. */

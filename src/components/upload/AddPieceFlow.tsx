@@ -5,6 +5,7 @@ import { Camera, Plus, Check, ChevronDown, X } from "lucide-react";
 import { GlazeTypeahead } from "./GlazeTypeahead";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { GlazeChip } from "@/components/ui/GlazeChip";
+import { Input, Textarea } from "@/components/ui/Input";
 import { createPiece, updatePiece } from "@/lib/actions";
 import type { EnrichedPiece, Glaze } from "@/lib/types";
 
@@ -176,10 +177,23 @@ export function AddPieceFlow({
   // ---------- SUCCESS ----------
   if (step === "success") {
     const names = chips.map((c) => c.name).join(" + ");
+    const dripColors = chips
+      .map((c) => c.glaze?.baseHex ?? "#b0552f")
+      .slice(0, 5);
     return (
       <div className="grid min-h-[60vh] place-items-center px-6 text-center">
         <div className="max-w-sm">
-          <div className="mx-auto grid h-[88px] w-[88px] animate-[wg-pop_0.4s_cubic-bezier(0.16,1,0.3,1)_both] place-items-center rounded-full bg-success-bg text-success motion-reduce:animate-none">
+          {/* the glazes you just logged, dripping in */}
+          <div aria-hidden className="mb-3 flex h-8 items-start justify-center gap-3">
+            {dripColors.map((c, i) => (
+              <span
+                key={i}
+                className="h-6 w-2.5 rounded-b-full animate-[wg-drip_0.7s_cubic-bezier(0.5,0,0.6,1)_both] motion-reduce:hidden"
+                style={{ background: c, animationDelay: `${0.2 + i * 0.13}s` }}
+              />
+            ))}
+          </div>
+          <div className="mx-auto grid h-[88px] w-[88px] animate-[wg-pop_0.4s_cubic-bezier(0.16,1,0.3,1)_both] place-items-center rounded-full bg-success-bg text-success shadow-[var(--shadow-pool)] motion-reduce:animate-none">
             <Check size={44} strokeWidth={2.6} />
           </div>
           <h1 className="mt-6 font-display text-3xl text-ink">
@@ -206,7 +220,12 @@ export function AddPieceFlow({
   // ---------- FORM ----------
   return (
     <div className="mx-auto w-full max-w-[560px] px-5 py-8 sm:px-6">
-      <h1 className="font-display text-4xl text-ink">{isEdit ? "Edit piece" : "Add a piece"}</h1>
+      <p className="font-mono text-label font-medium uppercase text-terracotta">
+        {isEdit ? "The kiln log" : "Straight off the shelf"}
+      </p>
+      <h1 className="mt-2 font-display text-4xl text-ink">
+        {isEdit ? "Edit piece" : "Add a piece"}
+      </h1>
       <p className="mt-1 text-slip">
         {isEdit ? "Update the photos, glazes, or details." : "Photo → glaze → done."}
       </p>
@@ -234,7 +253,7 @@ export function AddPieceFlow({
         <button
           type="button"
           onClick={() => fileInput.current?.click()}
-          className="mt-6 flex w-full flex-col items-center gap-2 rounded-card border-2 border-dashed border-[#C9B48F] bg-bone px-6 py-12 text-center transition-colors hover:bg-clay/40"
+          className="mt-6 flex w-full flex-col items-center gap-2 rounded-card border-2 border-dashed border-sand bg-bone px-6 py-12 text-center transition-colors hover:bg-clay/40"
         >
           <span className="grid h-[50px] w-[50px] place-items-center rounded-md bg-clay-deep text-terracotta">
             <Camera size={26} />
@@ -264,7 +283,7 @@ export function AddPieceFlow({
           <button
             type="button"
             onClick={() => fileInput.current?.click()}
-            className="grid h-24 w-24 place-items-center rounded-md border-2 border-dashed border-[#C9B48F] text-slip hover:bg-clay/40"
+            className="grid h-24 w-24 place-items-center rounded-md border-2 border-dashed border-sand text-slip hover:bg-clay/40"
             aria-label="Add another angle"
           >
             <Plus size={22} />
@@ -335,12 +354,11 @@ export function AddPieceFlow({
             <Field label="Firing" placeholder="Cone 6 · oxidation" value={firing} onChange={(v) => { setFiring(v); setDirty(true); }} />
             <div>
               <label className="mb-1.5 block text-sm font-medium text-ink-2">Notes</label>
-              <textarea
+              <Textarea
                 rows={3}
                 value={notes}
                 onChange={(e) => { setNotes(e.target.value); setDirty(true); }}
                 placeholder="How you glazed it, what happened in the kiln…"
-                className="w-full rounded-md border-[1.5px] border-line-strong bg-bone px-3 py-2 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
               />
             </div>
           </div>
@@ -378,12 +396,12 @@ function Field({
   return (
     <div>
       <label className="mb-1.5 block text-sm font-medium text-ink-2">{label}</label>
-      <input
+      <Input
+        inputSize="md"
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-11 w-full rounded-md border-[1.5px] border-line-strong bg-bone px-3 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
       />
     </div>
   );

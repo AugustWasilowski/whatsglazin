@@ -1,12 +1,18 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Fuse from "fuse.js";
 import { X } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap, Flip, registerGsap, shouldAnimate } from "@/lib/motion";
+import { HeadlineReveal } from "@/components/motion/HeadlineReveal";
 import { PotteryCard } from "@/components/PotteryCard";
+import { Container } from "@/components/ui/Container";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Input } from "@/components/ui/Input";
+import { SpecLabel } from "@/components/ui/Spec";
+import { swatchBg } from "@/lib/glazes";
 import { cn } from "@/lib/utils";
 import type { EnrichedPiece, Glaze } from "@/lib/types";
 
@@ -34,6 +40,7 @@ export function GalleryBrowser({
   const gridRef = useRef<HTMLDivElement>(null);
   const flipState = useRef<ReturnType<typeof Flip.getState> | null>(null);
   const entranceDone = useRef(false);
+  const driftCleanup = useRef<(() => void) | null>(null);
 
   const glazeById = useMemo(() => new Map(glazes.map((g) => [g.id, g])), [glazes]);
 
@@ -66,11 +73,18 @@ export function GalleryBrowser({
     return base;
   }, [query, filterGlaze, fuse, pieces]);
 
+  const isFiltering = query.trim() !== "" || filterGlaze !== null;
+
   useGSAP(
     () => {
       const el = gridRef.current;
       if (!el || !shouldAnimate()) return;
       registerGsap();
+
+      // Retire any column drift before reflowing so it never fights Flip.
+      driftCleanup.current?.();
+      driftCleanup.current = null;
+
       if (flipState.current) {
         Flip.from(flipState.current, {
           duration: 0.5,
@@ -91,25 +105,79 @@ export function GalleryBrowser({
           stagger: 0.04,
         });
       }
+
+      // Subtle scroll drift for the desktop masonry — only on the full,
+      // unfiltered wall so it never fights the Flip reflow. The grid is
+      // CSS-columns (columns aren't real DOM), so drift individual cards
+      // by index instead. Created after the entrance settles, torn down via
+      // driftCleanup (useGSAP with deps only reverts its context on unmount).
+      if (!isFiltering) {
+        const mm = gsap.matchMedia();
+        mm.add("(min-width: 1024px) and (hover: hover) and (pointer: fine)", () => {
+          const drifts: gsap.core.Tween[] = [];
+          const delayed = gsap.delayedCall(0.75, () => {
+            el.querySelectorAll<HTMLElement>("[data-flip-id]").forEach((card, index) => {
+              const lane = index % 4;
+              if (lane === 0) return;
+              drifts.push(
+                gsap.fromTo(
+                  card,
+                  { y: 0 },
+                  {
+                    y: lane === 2 ? 20 : -28,
+                    ease: "none",
+                    scrollTrigger: {
+                      trigger: el,
+                      start: "top bottom",
+                      end: "bottom top",
+                      scrub: 0.8,
+                    },
+                  },
+                ),
+              );
+            });
+          });
+          return () => {
+            delayed.kill();
+            drifts.forEach((t) => {
+              t.scrollTrigger?.kill();
+              t.kill();
+            });
+            if (el.isConnected) {
+              gsap.set(el.querySelectorAll("[data-flip-id]"), { clearProps: "transform" });
+            }
+          };
+        });
+        driftCleanup.current = () => mm.revert();
+      }
     },
     { dependencies: [results], scope: gridRef },
   );
 
-  const isFiltering = query.trim() !== "" || filterGlaze !== null;
+  // Kill drift triggers on unmount (the useGSAP context only records tweens
+  // created synchronously — the drift is built in a delayed call).
+  useEffect(
+    () => () => {
+      driftCleanup.current?.();
+      driftCleanup.current = null;
+    },
+    [],
+  );
+
   const activeGlaze = filterGlaze ? glazeById.get(filterGlaze) : null;
 
   return (
-    <div className="mx-auto w-full max-w-[1180px] px-5 py-8 sm:px-10">
-      <p className="font-sans text-[12px] font-medium uppercase tracking-[0.2em] text-terracotta">
-        {eyebrow}
-      </p>
-      <h1 className="mt-1 font-display text-4xl text-ink sm:text-5xl">{heading}</h1>
+    <Container className="py-8">
+      <SpecLabel>{eyebrow}</SpecLabel>
+      <HeadlineReveal as="h1" className="mt-1 font-display text-display-xl text-ink">
+        {heading}
+      </HeadlineReveal>
 
       <div className="mt-6">
         <label htmlFor="gallery-search" className="sr-only">
           Search glaze, maker, or piece
         </label>
-        <input
+        <Input
           id="gallery-search"
           type="search"
           autoFocus={autoFocus}
@@ -119,7 +187,6 @@ export function GalleryBrowser({
             setQuery(e.target.value);
           }}
           placeholder="Search glaze, maker, piece…"
-          className="h-12 w-full rounded-md border-[1.5px] border-line-strong bg-bone px-4 text-[15px] text-ink placeholder:text-slip focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
         />
       </div>
 
@@ -135,11 +202,14 @@ export function GalleryBrowser({
                 setFilterGlaze(active ? null : g.id);
               }}
               aria-pressed={active}
+              data-glaze={g.baseHex}
               className={cn(
                 "inline-flex shrink-0 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-[13px] font-medium transition-colors",
-                active ? "border-transparent" : "border-line-strong bg-bone text-ink-2 hover:border-slip",
+                active
+                  ? "border-transparent shadow-[var(--shadow-pool)]"
+                  : "border-line-strong bg-bone text-ink-2 hover:border-slip",
               )}
-              style={active ? { background: g.baseHex, color: g.onColor } : undefined}
+              style={active ? { background: swatchBg(g), color: g.onColor } : undefined}
             >
               <span
                 className="h-2.5 w-2.5 rounded-full"
@@ -153,9 +223,10 @@ export function GalleryBrowser({
       </div>
 
       <div className="mt-4 flex items-center gap-3 text-sm text-slip">
-        <span>
-          {results.length} {results.length === 1 ? "piece" : "pieces"}
-          {activeGlaze && ` in ${activeGlaze.name}`}
+        <span className="font-mono text-label uppercase text-slip">
+          {isFiltering
+            ? `${results.length} ${results.length === 1 ? "result" : "results"}${activeGlaze ? ` in ${activeGlaze.name}` : ""}`
+            : `${results.length} ${results.length === 1 ? "piece" : "pieces"} on the wall`}
         </span>
         {isFiltering && (
           <button
@@ -184,22 +255,18 @@ export function GalleryBrowser({
           ))}
         </div>
       ) : isFiltering ? (
-        <div className="mt-12 rounded-card border border-dashed border-line-strong bg-bone/60 p-10 text-center">
-          <p className="font-display text-2xl text-ink">Nothing matches yet</p>
-          <p className="mt-1 text-sm text-slip">Try a different glaze, maker, or search term.</p>
-        </div>
+        <EmptyState className="mt-12" title="Nothing matches yet">
+          Try a different glaze, maker, or search term.
+        </EmptyState>
       ) : (
-        <div className="mt-12 rounded-card border border-dashed border-line-strong bg-bone/60 p-10 text-center">
-          <p className="font-display text-2xl text-ink">No pieces yet</p>
-          <p className="mt-1 text-sm text-slip">
-            The gallery fills up as members log their work.{" "}
-            <Link href="/add" className="font-medium text-terracotta hover:text-terracotta-hover">
-              Add the first piece
-            </Link>
-            .
-          </p>
-        </div>
+        <EmptyState className="mt-12" title="No pieces yet">
+          The gallery fills up as members log their work.{" "}
+          <Link href="/add" className="font-medium text-terracotta hover:text-terracotta-hover">
+            Add the first piece
+          </Link>
+          .
+        </EmptyState>
       )}
-    </div>
+    </Container>
   );
 }

@@ -25,12 +25,21 @@
   --color-kiln: #241a12; /* dark hero / CTA background */
   --color-kiln-2: #2e2016; /* dark background alt */
 
+  --color-kiln-3: #1a120b; /* deepest band: footer, specimen plates */
+
   /* ---- Glaze-chemistry accents ---- */
   --color-terracotta: #b0552f; /* PRIMARY / CTA */
   --color-terracotta-hover: #9a4726;
   --color-terracotta-soft: #c98a4e; /* warm highlight (CTA 2nd line) */
+  --color-ember: #d96f3f; /* accent on dark — terracotta muddies on kiln */
+  --color-halo: #f3ddc4; /* warm specular highlight / focus ring on dark */
   --color-celadon: #5e7e63; /* SECONDARY / link */
   --color-cobalt: #4e6e88; /* info accent */
+
+  /* tokens for formerly hardcoded surfaces */
+  --color-sand: #c9b48f; /* dashed dropzone border */
+  --color-chip: #f1eadb; /* soft glaze-chip background */
+  --color-tab-idle: #a99a82; /* inactive mobile tab */
 
   /* semantic surfaces */
   --color-success: #5e7e63;
@@ -46,7 +55,20 @@
   /* ---- Typography ---- */
   --font-display: var(--font-young-serif), Georgia, serif;
   --font-sans: var(--font-hanken), system-ui, sans-serif;
-  --font-mono: ui-monospace, Menlo, monospace;
+  --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;
+
+  /* ---- Editorial type scale (fluid) ---- */
+  --text-display-2xl: clamp(3.25rem, 9vw, 8rem);
+  --text-display-2xl--line-height: 0.9;
+  --text-display-2xl--letter-spacing: -0.025em;
+  --text-display-xl: clamp(2.5rem, 6.5vw, 5rem);
+  --text-display-xl--line-height: 0.95;
+  --text-display-xl--letter-spacing: -0.02em;
+  --text-display-lg: clamp(1.9rem, 4.5vw, 3.25rem);
+  --text-display-lg--line-height: 1.02;
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1.2;
+  --text-label--letter-spacing: 0.18em;
 
   /* ---- Radius (thrown, not corporate) ---- */
   --radius-sm: 8px;
@@ -61,12 +83,16 @@
     0 10px 22px -14px rgba(42, 34, 22, 0.5);
   --shadow-elevated: 0 30px 60px -34px rgba(42, 34, 22, 0.5);
   --shadow-glow: 0 12px 24px -11px rgba(176, 85, 47, 0.6);
+  --shadow-pool: inset 0 2px 14px rgba(28, 18, 8, 0.28),
+    inset 0 -2px 6px rgba(255, 255, 255, 0.18); /* pooled / wet-glaze surface */
+  --shadow-deep: 0 40px 80px -40px rgba(20, 12, 6, 0.65); /* lift on dark bands */
 
   /* ---- Motion keyframes (exposed as animate-* utilities) ---- */
   --animate-up: wg-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-shimmer: wg-shimmer 1.4s linear infinite;
   --animate-pulse-soft: wg-pulse 1.6s ease-in-out infinite;
   --animate-pop: wg-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-drip: wg-drip 0.6s cubic-bezier(0.5, 0, 0.6, 1) both;
 }
 
 @keyframes wg-up {
@@ -119,6 +145,20 @@
     transform: scale(1);
   }
 }
+@keyframes wg-drip {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px) scaleY(0.6);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(2px) scaleY(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(26px) scaleY(0.9);
+  }
+}
 
 /* ---- Base ---- */
 :root {
@@ -150,6 +190,40 @@ body::before {
   outline: 2px solid var(--color-terracotta);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Terracotta vanishes on kiln-dark bands — swap to the warm halo there. */
+.on-dark :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline-color: var(--color-halo);
+}
+
+/* ---- Signature surfaces ---- */
+
+/* Stronger grain for dark sections, where the multiply body grain disappears. */
+.grain-strong {
+  position: relative;
+}
+.grain-strong::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.09;
+  mix-blend-mode: soft-light;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Test-tile / kiln-door silhouette — the catalog's signature shape. */
+.rounded-arch {
+  border-radius: 46% 46% var(--radius-card) var(--radius-card) / 30% 30%
+    var(--radius-card) var(--radius-card);
+}
+
+/* Outlined ornament type (spec strips, giant numerals). Fill is cleared via
+   text-fill-color so currentColor still carries the stroke. */
+.text-outline {
+  -webkit-text-stroke: 1px currentColor;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Respect reduced motion everywhere (mirrors the prototype). */

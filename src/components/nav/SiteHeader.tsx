@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -15,13 +16,26 @@ const LINKS = [
 
 export type HeaderMember = { name: string; initials: string } | null;
 
-/** Desktop / marketing header — wordmark + section links + account/sign-in. */
+/** Desktop / marketing header — editorial at rest, condenses on scroll. */
 export function SiteHeader({ member }: { member?: HeaderMember }) {
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 border-b border-line/70 bg-clay/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-[1180px] items-center justify-between px-6 sm:px-10">
+      <div
+        className={cn(
+          "mx-auto flex w-full max-w-[1400px] items-center justify-between px-5 transition-[height] duration-300 ease-out sm:px-10",
+          scrolled ? "h-14" : "h-20",
+        )}
+      >
         <Wordmark />
         <nav className="hidden items-center gap-8 md:flex">
           {LINKS.map((l) => {
@@ -30,12 +44,21 @@ export function SiteHeader({ member }: { member?: HeaderMember }) {
               <Link
                 key={l.href}
                 href={l.href}
+                data-cursor="link"
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-ink",
+                  "relative py-1 font-mono text-label font-medium uppercase transition-colors hover:text-ink",
                   active ? "text-ink" : "text-ink-2",
                 )}
               >
                 {l.label}
+                {/* drip-dot marks the active section */}
+                <span
+                  className={cn(
+                    "absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-terracotta transition-opacity",
+                    active ? "opacity-100" : "opacity-0",
+                  )}
+                  aria-hidden
+                />
               </Link>
             );
           })}
