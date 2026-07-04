@@ -192,6 +192,8 @@ export async function createPiece(formData: FormData): Promise<CreatePieceResult
       clay_body: fields.clayBody || null,
       firing: fields.firing,
       notes: fields.notes || null,
+      // Snapshot the maker's studio at creation (kept if they later move on).
+      studio_id: member.studioId ?? null,
     })
     .select("id, slug")
     .single();
@@ -429,10 +431,33 @@ export async function updateProfile(formData: FormData): Promise<ProfileResult> 
     disciplines = [];
   }
 
-  const update: { name: string; disciplines: string[]; avatar?: string | null } = {
+  const update: {
+    name: string;
+    disciplines: string[];
+    avatar?: string | null;
+    studio_id?: string | null;
+  } = {
     name,
     disciplines,
   };
+
+  // Optional home-studio association ("" = no studio).
+  const studioIdRaw = formData.get("studioId");
+  if (typeof studioIdRaw === "string") {
+    const studioId = studioIdRaw.trim();
+    if (studioId) {
+      const { data: studioRow } = await supabase
+        .from("studios")
+        .select("id")
+        .eq("id", studioId)
+        .eq("is_active", true)
+        .maybeSingle();
+      if (!studioRow) return { ok: false, error: "That studio doesn't exist." };
+      update.studio_id = studioId;
+    } else {
+      update.studio_id = null;
+    }
+  }
 
   const removeAvatar = formData.get("removeAvatar") === "1";
   const avatarFile = formData.get("avatar");

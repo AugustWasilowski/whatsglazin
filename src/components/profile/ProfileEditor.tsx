@@ -3,11 +3,12 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Camera, X, Check } from "lucide-react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { updateProfile } from "@/lib/actions";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import type { Member } from "@/lib/types";
+import type { Member, StudioRef } from "@/lib/types";
 
 const GRAD = "linear-gradient(140deg,#C98A4E,#8C4A1E)";
 
@@ -18,7 +19,15 @@ function initials(name: string) {
   return name.trim().split(/\s+/).map((w) => w[0]?.toUpperCase() ?? "").slice(0, 2).join("");
 }
 
-export function ProfileEditor({ member, email }: { member: Member; email?: string }) {
+export function ProfileEditor({
+  member,
+  email,
+  studios = [],
+}: {
+  member: Member;
+  email?: string;
+  studios?: StudioRef[];
+}) {
   const router = useRouter();
   const [supabase] = useState(() => createClient());
 
@@ -26,6 +35,7 @@ export function ProfileEditor({ member, email }: { member: Member; email?: strin
   const [name, setName] = useState(member.name);
   const [disciplines, setDisciplines] = useState<string[]>(member.disciplines ?? []);
   const [disciplineDraft, setDisciplineDraft] = useState("");
+  const [studioId, setStudioId] = useState(member.studioId ?? "");
 
   // Avatar
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
@@ -80,6 +90,7 @@ export function ProfileEditor({ member, email }: { member: Member; email?: strin
       const fd = new FormData();
       fd.set("name", name);
       fd.set("disciplines", JSON.stringify(disciplines));
+      fd.set("studioId", studioId);
       if (avatarFile) fd.append("avatar", avatarFile, avatarFile.name);
       if (removeAvatar) fd.set("removeAvatar", "1");
 
@@ -235,6 +246,37 @@ export function ProfileEditor({ member, email }: { member: Member; email?: strin
           </button>
         </div>
         <p className="mt-1.5 text-xs text-slip">Up to 8. Press Enter to add.</p>
+      </div>
+
+      {/* Home studio */}
+      <div className="mt-6">
+        <label htmlFor="home-studio" className="mb-1.5 block text-sm font-medium text-ink-2">
+          Home studio
+        </label>
+        <select
+          id="home-studio"
+          value={studioId}
+          onChange={(e) => {
+            setStudioId(e.target.value);
+            setSaved(false);
+          }}
+          className="h-11 w-full rounded-md border-[1.5px] border-line-strong bg-bone px-3 text-[15px] text-ink focus:border-terracotta focus:outline-none focus:ring-[3px] focus:ring-terracotta/15"
+        >
+          <option value="">No studio — just me and my kiln</option>
+          {studios.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1.5 text-xs text-slip">
+          Optional — pre-fills your studio&rsquo;s glazes when you log a piece.
+          Not listed?{" "}
+          <Link href="/studios/new" className="underline underline-offset-2 hover:text-ink">
+            Start a studio
+          </Link>
+          .
+        </p>
       </div>
 
       <div className="sticky bottom-20 z-10 mt-7 md:bottom-4">
