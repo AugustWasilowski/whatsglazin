@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGsap, shouldAnimate } from "@/lib/motion";
 import { useMagnetic } from "@/components/motion/useMagnetic";
@@ -11,6 +13,15 @@ import { ButtonLink } from "@/components/ui/Button";
 import { getGlazeBySlug } from "@/lib/glazes";
 
 export type HeroStat = { n: number; label: string };
+
+/** A randomly-picked finished piece, chosen server-side on each page load. */
+export type FeaturedPiece = {
+  slug: string;
+  url: string;
+  alt: string;
+  /** e.g. "Floating Blue · by August" */
+  label: string;
+};
 
 // The bucket: four studio glazes the molten surface melts between.
 const MELT_SLUGS = ["floating-blue", "butterscotch", "oribe-6", "satin-white"] as const;
@@ -23,8 +34,14 @@ const MELT_FALLBACK = [
   `linear-gradient(158deg, ${MELT[0].baseHex} 0%, ${MELT[1].baseHex} 38%, ${MELT[2].baseHex} 72%, ${MELT[3].shade2Hex} 100%)`,
 ].join(", ");
 
-/** "Molten" hero — a live glaze melt behind the studio's kiln log. */
-export function LandingHero({ stats }: { stats: HeroStat[] }) {
+/** Hero — a piece straight off the wall (random each load) beside the intro. */
+export function LandingHero({
+  stats,
+  featured,
+}: {
+  stats: HeroStat[];
+  featured?: FeaturedPiece | null;
+}) {
   const scope = useRef<HTMLElement>(null);
   const primaryMag = useMagnetic<HTMLSpanElement>(0.25);
   const secondaryMag = useMagnetic<HTMLSpanElement>(0.25);
@@ -88,25 +105,26 @@ export function LandingHero({ stats }: { stats: HeroStat[] }) {
           {/* ---- copy ---- */}
           <div className="max-w-[680px]">
             <p className="hero-fade mb-6 font-mono text-label font-medium uppercase text-terracotta">
-              The Fine Line · St. Charles, IL · Cone 6 · est. 1979
+              The Fine Line · St. Charles, IL · est. 1979
             </p>
             <HeadlineReveal as="h1" className="font-display text-display-2xl text-ink">
-              A wall of what we made.
+              Real glazes on real pots.
             </HeadlineReveal>
             <p className="hero-fade mt-7 max-w-[520px] text-lg leading-relaxed text-ink-3">
-              Snap a piece straight off the kiln shelf, log the glaze in three
-              taps, and it joins a gallery the whole studio can search — by
-              color, recipe, and maker.
+              WhatsGlazin is the studio&rsquo;s glaze gallery — finished pieces,
+              each tagged with the exact glazes on it, so you can see how every
+              glaze actually fires, alone or layered. Searchable by glaze,
+              combination, and maker.
             </p>
             <div className="hero-fade mt-9 flex flex-wrap gap-3">
               <span ref={primaryMag} className="inline-block">
-                <ButtonLink href="/add" size="lg" data-cursor="link">
-                  Add your piece
+                <ButtonLink href="/gallery" size="lg" data-cursor="link">
+                  Browse the gallery
                 </ButtonLink>
               </span>
               <span ref={secondaryMag} className="inline-block">
-                <ButtonLink href="/gallery" variant="secondary" size="lg" data-cursor="link">
-                  Browse the gallery
+                <ButtonLink href="/glazes" variant="secondary" size="lg" data-cursor="link">
+                  The glaze board
                 </ButtonLink>
               </span>
             </div>
@@ -126,26 +144,51 @@ export function LandingHero({ stats }: { stats: HeroStat[] }) {
             </dl>
           </div>
 
-          {/* ---- the kiln door (desktop) ---- */}
+          {/* ---- off the wall (desktop): a random piece each load ---- */}
           <div className="hero-arch relative hidden h-[72vh] max-h-[780px] min-h-[420px] lg:block">
-            <div
-              className="rounded-arch absolute inset-0 overflow-hidden shadow-[var(--shadow-deep)]"
-              data-glaze={MELT[0].baseHex}
-            >
-              <ShaderCanvas
-                fragment={MOLTEN_FRAG}
-                colors={MELT_COLORS}
-                className="absolute inset-0"
-                fallback={
-                  <div className="absolute inset-0" style={{ background: MELT_FALLBACK }} />
-                }
-              />
-              {/* wet edge highlight */}
-              <div className="pointer-events-none absolute inset-0 rounded-arch border border-white/15" />
-            </div>
-            <p className="absolute -bottom-8 right-2 font-mono text-[11px] uppercase tracking-wider text-slip">
-              Live melt · {MELT.map((g) => g.name).join(" · ")}
-            </p>
+            {featured ? (
+              <>
+                <Link
+                  href={`/pieces/${featured.slug}`}
+                  data-cursor="link"
+                  className="rounded-arch absolute inset-0 block overflow-hidden shadow-[var(--shadow-deep)]"
+                >
+                  <Image
+                    src={featured.url}
+                    alt={featured.alt}
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 40vw, 0px"
+                    className="object-cover"
+                  />
+                  {/* wet edge highlight */}
+                  <span className="rounded-arch pointer-events-none absolute inset-0 border border-white/15" />
+                </Link>
+                <p className="absolute -bottom-8 right-2 font-mono text-[11px] uppercase tracking-wider text-slip">
+                  Off the wall · {featured.label}
+                </p>
+              </>
+            ) : (
+              <>
+                <div
+                  className="rounded-arch absolute inset-0 overflow-hidden shadow-[var(--shadow-deep)]"
+                  data-glaze={MELT[0].baseHex}
+                >
+                  <ShaderCanvas
+                    fragment={MOLTEN_FRAG}
+                    colors={MELT_COLORS}
+                    className="absolute inset-0"
+                    fallback={
+                      <div className="absolute inset-0" style={{ background: MELT_FALLBACK }} />
+                    }
+                  />
+                  <div className="pointer-events-none absolute inset-0 rounded-arch border border-white/15" />
+                </div>
+                <p className="absolute -bottom-8 right-2 font-mono text-[11px] uppercase tracking-wider text-slip">
+                  Live melt · {MELT.map((g) => g.name).join(" · ")}
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>

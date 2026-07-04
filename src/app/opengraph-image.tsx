@@ -25,8 +25,8 @@ export default function OpengraphImage() {
         </div>
         <div style={{ fontSize: 92, fontWeight: 700, marginTop: 16 }}>WhatsGlazin?</div>
         <div style={{ fontSize: 40, marginTop: 24, color: "#5a4a34", maxWidth: 900 }}>
-          Snap a piece off the kiln shelf, log the glaze, and it joins a gallery the whole studio can
-          search.
+          Real glazes on real pots — the studio’s glaze gallery, searchable by
+          glaze, combination, and maker.
         </div>
       </div>
     ),
