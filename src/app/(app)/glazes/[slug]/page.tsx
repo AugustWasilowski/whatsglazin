@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import { getGlazeBySlug, getPieces, coOccurring } from "@/lib/db";
+import { ChevronRight, ExternalLink } from "lucide-react";
+import {
+  getGlazeBySlug,
+  getPieces,
+  coOccurring,
+  getStudios,
+  getAdminStudioIds,
+} from "@/lib/db";
+import { getSessionMember } from "@/lib/auth";
 import { swatchBg } from "@/lib/glazes";
 import { PotteryCard } from "@/components/PotteryCard";
 import { BackButton } from "@/components/ui/BackButton";
+import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { SpecTable } from "@/components/ui/Spec";
 import { SpecimenHero } from "@/components/glazes/SpecimenHero";
@@ -31,9 +39,22 @@ export default async function GlazeDetail({
   const glaze = await getGlazeBySlug(slug);
   if (!glaze) notFound();
 
-  const allPieces = await getPieces();
+  const { member } = await getSessionMember();
+  const [allPieces, studios, adminOf] = await Promise.all([
+    getPieces(),
+    getStudios(true),
+    member ? getAdminStudioIds(member.id) : Promise.resolve([]),
+  ]);
   const pieces = allPieces.filter((p) => p.glazeIds.includes(glaze.id));
   const combos = coOccurring(glaze.id, allPieces);
+
+  const studio = glaze.studioId ? (studios.find((s) => s.id === glaze.studioId) ?? null) : null;
+  const canEdit =
+    Boolean(member) &&
+    (member!.isSiteAdmin ||
+      (glaze.studioId
+        ? adminOf.includes(glaze.studioId)
+        : glaze.createdBy === member!.id));
 
   const specRows = [
     { label: "Family", value: glaze.family },
@@ -64,6 +85,35 @@ export default async function GlazeDetail({
           <h1 className="relative z-10 -mt-7 font-display text-display-xl text-ink sm:-mt-10">
             {glaze.name}
           </h1>
+          <p className="mt-2 font-mono text-label uppercase text-slip">
+            {studio ? (
+              <>
+                From the{" "}
+                <Link
+                  href={`/studios/${studio.slug}`}
+                  data-cursor="link"
+                  className="text-terracotta transition-colors hover:text-ink"
+                >
+                  {studio.name}
+                </Link>{" "}
+                glaze board
+              </>
+            ) : (
+              "Personal glaze"
+            )}
+            {canEdit && (
+              <>
+                {" · "}
+                <Link
+                  href={`/glazes/${glaze.slug}/edit`}
+                  data-cursor="link"
+                  className="underline underline-offset-4 transition-colors hover:text-ink"
+                >
+                  Edit
+                </Link>
+              </>
+            )}
+          </p>
         </Container>
       </header>
 
@@ -107,6 +157,30 @@ export default async function GlazeDetail({
                 </Link>
               ))}
             </div>
+          </section>
+        )}
+        {/* ---- The recipe ---- */}
+        {(glaze.recipe || glaze.glazyUrl) && (
+          <section className="mt-14">
+            <h2 className="font-mono text-label font-medium uppercase text-terracotta">
+              The recipe
+            </h2>
+            {glaze.recipe && (
+              <pre className="mt-5 max-w-[62ch] whitespace-pre-wrap rounded-card border border-line bg-bone p-6 font-mono text-[13px] leading-relaxed text-ink-2 shadow-[var(--shadow-card)]">
+                {glaze.recipe}
+              </pre>
+            )}
+            {glaze.glazyUrl && (
+              <ButtonLink
+                href={glaze.glazyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="secondary"
+                className="mt-5"
+              >
+                View on glazy.org <ExternalLink size={15} aria-hidden />
+              </ButtonLink>
+            )}
           </section>
         )}
       </Container>

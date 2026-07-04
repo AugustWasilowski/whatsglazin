@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Member } from "./types";
 
@@ -10,6 +11,8 @@ function toMember(row: Record<string, unknown>): Member {
     avatar: (row.avatar as string) ?? undefined,
     memberSince: (row.member_since as number) ?? new Date().getFullYear(),
     disciplines: (row.disciplines as string[]) ?? [],
+    studioId: (row.studio_id as string) ?? undefined,
+    isSiteAdmin: Boolean(row.is_site_admin),
   };
 }
 
@@ -37,4 +40,14 @@ export async function getSessionMember(): Promise<{
     user: { id: user.id, email: user.email },
     member: data ? toMember(data) : null,
   };
+}
+
+/**
+ * UX gate for site-admin pages: 404 for everyone else (the page simply does
+ * not exist for non-admins). RLS is the actual enforcement underneath.
+ */
+export async function requireSiteAdmin(): Promise<Member> {
+  const { member } = await getSessionMember();
+  if (!member?.isSiteAdmin) notFound();
+  return member;
 }

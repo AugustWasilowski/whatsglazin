@@ -29,9 +29,36 @@ export interface Glaze {
   /** Short mono chemistry string, e.g. "Fe · reduction". */
   chemistry: string;
   description: string;
+  /** Derived: part of a studio's official library (studioId set). */
   isStudioGlaze: boolean;
+  /** The studio whose library this glaze belongs to; null/undefined = personal. */
+  studioId?: string;
+  /** Freeform recipe text (ingredients, amounts, process notes). */
+  recipe?: string;
+  /** Link to the recipe on glazy.org (or similar). */
+  glazyUrl?: string;
   createdBy?: string;
   createdAt: string;
+}
+
+/** A pottery studio with its own corner of WhatsGlazin. */
+export interface Studio {
+  id: string;
+  slug: string;
+  name: string;
+  location?: string;
+  description?: string;
+  established?: number;
+  isActive: boolean;
+  createdBy?: string;
+  createdAt: string;
+}
+
+/** Lightweight studio reference embedded on pieces/glazes. */
+export interface StudioRef {
+  id: string;
+  slug: string;
+  name: string;
 }
 
 export type PieceForm =
@@ -67,6 +94,8 @@ export interface Piece {
   /** Firing tags, e.g. ["CONE 10", "REDUCTION"]. */
   firing?: string[];
   notes?: string;
+  /** Snapshot of the maker's studio at creation time. */
+  studioId?: string;
   createdAt: string;
 }
 
@@ -78,6 +107,10 @@ export interface Member {
   avatar?: string;
   memberSince: number;
   disciplines: string[];
+  /** Optional home-studio association (filters dropdowns/gallery defaults). */
+  studioId?: string;
+  /** Platform-wide admin (metrics, moderation). */
+  isSiteAdmin: boolean;
 }
 
 /** A piece with its glazes (ordered) and maker resolved — the shape screens
@@ -85,9 +118,26 @@ export interface Member {
 export interface EnrichedPiece extends Piece {
   glazes: Glaze[];
   maker: Member | null;
+  studio: StudioRef | null;
 }
 
 /** A glaze plus how many pieces use it (for library/landing tiles). */
 export interface GlazeWithCount extends Glaze {
   pieceCount: number;
+}
+
+/** Site-admin dashboard aggregates. */
+export interface AdminStats {
+  members: number;
+  studios: number;
+  pieces: number;
+  glazes: number;
+  studioAdmins: number;
+}
+
+/** One aggregated page-view row (no PII — path + day + count). */
+export interface PageViewRow {
+  path: string;
+  day: string;
+  count: number;
 }

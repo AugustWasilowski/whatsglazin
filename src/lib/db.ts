@@ -5,6 +5,8 @@ import type {
   Member,
   EnrichedPiece,
   PieceForm,
+  Studio,
+  StudioRef,
 } from "./types";
 
 /* ----------------------------- row mappers ----------------------------- */
@@ -24,7 +26,12 @@ function mapGlaze(r: Row): Glaze {
     finish: r.finish as Glaze["finish"],
     chemistry: (r.chemistry as string) ?? "",
     description: (r.description as string) ?? "",
-    isStudioGlaze: Boolean(r.is_studio_glaze),
+    // studio_id is the source of truth; the legacy boolean covers the window
+    // between migration 002 and the cleanup migration.
+    isStudioGlaze: Boolean(r.studio_id ?? r.is_studio_glaze),
+    studioId: (r.studio_id as string) ?? undefined,
+    recipe: (r.recipe as string) ?? undefined,
+    glazyUrl: (r.glazy_url as string) ?? undefined,
     createdBy: (r.created_by as string) ?? undefined,
     createdAt: r.created_at as string,
   };
@@ -38,6 +45,22 @@ function mapMember(r: Row): Member {
     avatar: (r.avatar as string) ?? undefined,
     memberSince: (r.member_since as number) ?? new Date().getFullYear(),
     disciplines: (r.disciplines as string[]) ?? [],
+    studioId: (r.studio_id as string) ?? undefined,
+    isSiteAdmin: Boolean(r.is_site_admin),
+  };
+}
+
+function mapStudio(r: Row): Studio {
+  return {
+    id: r.id as string,
+    slug: r.slug as string,
+    name: r.name as string,
+    location: (r.location as string) ?? undefined,
+    description: (r.description as string) ?? undefined,
+    established: (r.established as number) ?? undefined,
+    isActive: Boolean(r.is_active),
+    createdBy: (r.created_by as string) ?? undefined,
+    createdAt: r.created_at as string,
   };
 }
 
@@ -59,6 +82,7 @@ function mapPiece(r: Row): EnrichedPiece {
     }));
 
   const makerRow = r.maker as Row | null;
+  const studioRow = r.studio as Row | null;
 
   return {
     id: r.id as string,
@@ -69,6 +93,14 @@ function mapPiece(r: Row): EnrichedPiece {
     glazeIds: glazes.map((g) => g.id),
     glazes,
     maker: makerRow ? mapMember(makerRow) : null,
+    studioId: (r.studio_id as string) ?? undefined,
+    studio: studioRow
+      ? {
+          id: studioRow.id as string,
+          slug: studioRow.slug as string,
+          name: studioRow.name as string,
+        }
+      : null,
     photos: photos.length ? photos : [{ url: null }],
     clayBody: (r.clay_body as string) ?? undefined,
     firing: (r.firing as string[]) ?? undefined,
@@ -78,10 +110,11 @@ function mapPiece(r: Row): EnrichedPiece {
 }
 
 const PIECE_SELECT = `
-  id, slug, title, maker_id, form, clay_body, firing, notes, created_at,
+  id, slug, title, maker_id, form, clay_body, firing, notes, created_at, studio_id,
   piece_glazes ( position, glazes ( * ) ),
   piece_photos ( url, blur_data_url, alt, position ),
-  maker:members!pieces_maker_id_fkey ( * )
+  maker:members!pieces_maker_id_fkey ( * ),
+  studio:studios!pieces_studio_id_fkey ( id, slug, name )
 `;
 
 /* ------------------------------- glazes -------------------------------- */
@@ -152,6 +185,60 @@ export async function getMemberBySlug(slug: string): Promise<Member | null> {
   const supabase = await createClient();
   const { data } = await supabase.from("members").select("*").eq("slug", slug).maybeSingle();
   return data ? mapMember(data) : null;
+}
+
+/* ------------------------------- studios ------------------------------- */
+
+/** Active studios, alphabetical. Pass includeInactive for admin views. */
+export async function getStudios(includeInactive = false): Promise<Studio[]> {
+  const supabase = await createClient();
+  let query = supabase.from("studios").select("*").order("name");
+  if (!includeInactive) query = query.eq("is_active", true);
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []).map(mapStudio);
+}
+
+export async function getStudioBySlug(slug: string): Promise<Studio | null> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("studios").select("*").eq("slug", slug).maybeSingle();
+  return data ? mapStudio(data) : null;
+}
+
+/** The members who administer a studio. */
+export async function getStudioAdmins(studioId: string): Promise<Member[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("studio_admins")
+    .select("member:members!studio_admins_member_id_fkey ( * )")
+    .eq("studio_id", studioId);
+  if (error) throw error;
+  return (data ?? [])
+    .map((r) => (r.member ? mapMember(r.member as unknown as Row) : null))
+    .filter((m): m is Member => Boolean(m));
+}
+
+/** Studio ids the given member administers (for conditional edit UI). */
+export async function getAdminStudioIds(memberId: string): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("studio_admins")
+    .select("studio_id")
+    .eq("member_id", memberId);
+  if (error) throw error;
+  return (data ?? []).map((r) => r.studio_id as string);
+}
+
+/** Quick lookup: studio id → StudioRef, for labels in client components. */
+export async function getStudioRefs(): Promise<StudioRef[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("studios")
+    .select("id, slug, name")
+    .eq("is_active", true)
+    .order("name");
+  if (error) throw error;
+  return (data ?? []) as StudioRef[];
 }
 
 /* ---------------------------- derived helpers -------------------------- */
