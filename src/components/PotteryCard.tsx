@@ -63,10 +63,10 @@ export function PotteryCard({
 
       <div className="mt-2.5 px-0.5">
         <p className="truncate font-display text-[17px] leading-snug text-ink">
-          {piece.title ?? piece.form}
+          {glazes.length ? glazes.map((g) => g.name).join(" / ") : (piece.title ?? piece.form)}
         </p>
         <p className="mt-1 truncate font-mono text-[10.5px] uppercase tracking-wider text-slip">
-          {glazes.map((g) => g.name).join(" / ")} — by {maker?.name ?? "—"}
+          by {maker?.name ?? "—"}
         </p>
       </div>
     </Link>
