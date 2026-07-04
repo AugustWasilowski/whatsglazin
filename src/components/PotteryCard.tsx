@@ -14,12 +14,15 @@ export function PotteryCard({
   className,
   aspect = "aspect-[4/5]",
   priority = false,
+  showStudio = false,
 }: {
   piece: EnrichedPiece;
   className?: string;
   /** Tailwind aspect class — vary it for masonry. */
   aspect?: string;
   priority?: boolean;
+  /** Label the card with its studio (for cross-studio browsing contexts). */
+  showStudio?: boolean;
 }) {
   const { glazes, maker } = piece;
   const isCombo = glazes.length > 1;
@@ -67,6 +70,7 @@ export function PotteryCard({
         </p>
         <p className="mt-1 truncate font-mono text-[10.5px] uppercase tracking-wider text-slip">
           by {maker?.name ?? "—"}
+          {showStudio && piece.studio ? ` · ${piece.studio.name}` : ""}
         </p>
       </div>
     </Link>

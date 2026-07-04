@@ -25,10 +25,16 @@ export function AddPieceFlow({
   glazes,
   mode = "create",
   initial,
+  homeStudioId,
+  studioNames,
 }: {
   glazes: Glaze[];
   mode?: "create" | "edit";
   initial?: EnrichedPiece;
+  /** The member's home studio — typeahead lists its glazes first/by default. */
+  homeStudioId?: string;
+  /** studio id → name, for labeling glazes from other studios. */
+  studioNames?: Record<string, string>;
 }) {
   const isEdit = mode === "edit";
 
@@ -298,6 +304,8 @@ export function AddPieceFlow({
           selectedIds={selectedGlazeIds}
           onAdd={addGlaze}
           onAddNew={addNewGlaze}
+          homeStudioId={homeStudioId}
+          studioNames={studioNames}
         />
       </div>
 

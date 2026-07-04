@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { getGlazes, getPieceBySlug } from "@/lib/db";
+import { getGlazes, getPieceBySlug, getStudioRefs } from "@/lib/db";
 import { getSessionMember } from "@/lib/auth";
 import { AddPieceFlow } from "@/components/upload/AddPieceFlow";
 
@@ -21,6 +21,16 @@ export default async function EditPiecePage({
   // Only the maker may edit; anyone else is bounced to the public view.
   if (piece.makerId !== member.id) redirect(`/pieces/${slug}`);
 
-  const glazes = await getGlazes();
-  return <AddPieceFlow glazes={glazes} mode="edit" initial={piece} />;
+  const [glazes, studios] = await Promise.all([getGlazes(), getStudioRefs()]);
+  const studioNames = Object.fromEntries(studios.map((s) => [s.id, s.name]));
+
+  return (
+    <AddPieceFlow
+      glazes={glazes}
+      mode="edit"
+      initial={piece}
+      homeStudioId={member.studioId}
+      studioNames={studioNames}
+    />
+  );
 }

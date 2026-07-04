@@ -14,28 +14,38 @@ import { Input } from "@/components/ui/Input";
 import { SpecLabel } from "@/components/ui/Spec";
 import { swatchBg } from "@/lib/glazes";
 import { cn } from "@/lib/utils";
-import type { EnrichedPiece, Glaze } from "@/lib/types";
+import type { EnrichedPiece, Glaze, StudioRef } from "@/lib/types";
 
 type SearchItem = { piece: EnrichedPiece; title: string; maker: string; glazes: string };
 
-/** Gallery browser — fuzzy search + single-glaze filter chips over a masonry,
- *  with a GSAP Flip reflow when the result set changes. The eyebrow/heading are
- *  overridable so /search can reuse this with its own identity. */
+/** Gallery browser — fuzzy search + studio context chips + single-glaze filter
+ *  chips over a masonry, with a GSAP Flip reflow when the result set changes.
+ *  The eyebrow/heading are overridable so /search can reuse this. */
 export function GalleryBrowser({
   pieces,
   glazes,
-  eyebrow = "The Fine Line",
+  studios = [],
+  initialStudioId = null,
+  eyebrow = "What's glazin",
   heading = "Gallery",
   autoFocus = false,
 }: {
   pieces: EnrichedPiece[];
   glazes: Glaze[];
+  /** Studios with work on the wall — renders the context chip row when >1. */
+  studios?: StudioRef[];
+  /** Default studio context (the viewer's home studio), null = all studios. */
+  initialStudioId?: string | null;
   eyebrow?: string;
   heading?: string;
   autoFocus?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [filterGlaze, setFilterGlaze] = useState<string | null>(null);
+  // Studio context is a view scope, not a "filter" — Clear filters leaves it.
+  const [filterStudio, setFilterStudio] = useState<string | null>(
+    initialStudioId && studios.some((s) => s.id === initialStudioId) ? initialStudioId : null,
+  );
 
   const gridRef = useRef<HTMLDivElement>(null);
   const flipState = useRef<ReturnType<typeof Flip.getState> | null>(null);
@@ -69,9 +79,10 @@ export function GalleryBrowser({
 
   const results = useMemo(() => {
     let base = query.trim() ? fuse.search(query.trim()).map((r) => r.item.piece) : pieces;
+    if (filterStudio) base = base.filter((p) => p.studioId === filterStudio);
     if (filterGlaze) base = base.filter((p) => p.glazeIds.includes(filterGlaze));
     return base;
-  }, [query, filterGlaze, fuse, pieces]);
+  }, [query, filterGlaze, filterStudio, fuse, pieces]);
 
   const isFiltering = query.trim() !== "" || filterGlaze !== null;
 
@@ -190,6 +201,34 @@ export function GalleryBrowser({
         />
       </div>
 
+      {/* Studio context — which corner of the wall you're looking at. */}
+      {studios.length > 1 && (
+        <div className="mt-5 -mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {[{ id: null as string | null, name: "All studios" }, ...studios].map((s) => {
+            const active = filterStudio === s.id;
+            return (
+              <button
+                key={s.id ?? "all"}
+                type="button"
+                onClick={() => {
+                  captureFlip();
+                  setFilterStudio(s.id);
+                }}
+                aria-pressed={active}
+                className={cn(
+                  "inline-flex shrink-0 items-center rounded-pill border px-3 py-1.5 font-mono text-[11px] font-medium uppercase tracking-wider transition-colors",
+                  active
+                    ? "border-transparent bg-ink text-bone"
+                    : "border-line-strong bg-bone text-ink-2 hover:border-slip",
+                )}
+              >
+                {s.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       <div className="mt-4 -mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {glazes.map((g) => {
           const active = filterGlaze === g.id;
@@ -250,6 +289,7 @@ export function GalleryBrowser({
               <PotteryCard
                 piece={p}
                 aspect={i % 3 === 0 ? "aspect-[3/4]" : i % 3 === 1 ? "aspect-square" : "aspect-[4/5]"}
+                showStudio={studios.length > 1 && !filterStudio}
               />
             </div>
           ))}

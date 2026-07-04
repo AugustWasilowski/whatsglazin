@@ -7,19 +7,27 @@ import type { Glaze } from "@/lib/types";
 
 /**
  * Accessible glaze type-ahead (ARIA combobox).
- * Suggests existing studio glazes as you type; offers a "New glaze" row only
- * when nothing matches exactly. Keyboard: ↑/↓ move, Enter select, Esc close.
+ * Idle: shows the member's home-studio glazes (or everything if unassociated).
+ * Typing: fuzzy-searches ALL glazes, home studio ranked first, with studio
+ * labels on foreign rows. "New glaze" row only when nothing matches exactly.
+ * Keyboard: ↑/↓ move, Enter select, Esc close.
  */
 export function GlazeTypeahead({
   glazes,
   selectedIds,
   onAdd,
   onAddNew,
+  homeStudioId,
+  studioNames = {},
 }: {
   glazes: Glaze[];
   selectedIds: string[];
   onAdd: (glazeId: string) => void;
   onAddNew: (name: string) => void;
+  /** The member's home studio — its glazes list first and show by default. */
+  homeStudioId?: string;
+  /** studio id → display name, for labeling rows from other studios. */
+  studioNames?: Record<string, string>;
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -27,9 +35,18 @@ export function GlazeTypeahead({
   const listId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Home-studio glazes first, then other studios, then personal glazes.
+  const rank = (g: Glaze) =>
+    homeStudioId && g.studioId === homeStudioId ? 0 : g.studioId ? 1 : 2;
+
   const available = useMemo(
-    () => glazes.filter((g) => !selectedIds.includes(g.id)),
-    [glazes, selectedIds],
+    () =>
+      glazes
+        .filter((g) => !selectedIds.includes(g.id))
+        .slice()
+        .sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [glazes, selectedIds, homeStudioId],
   );
   const fuse = useMemo(
     () => new Fuse(available, { keys: ["name", "family"], threshold: 0.4, ignoreLocation: true }),
@@ -37,9 +54,26 @@ export function GlazeTypeahead({
   );
 
   const q = query.trim();
-  const matches = q ? fuse.search(q).map((r) => r.item) : available;
+  const homeOnly = useMemo(
+    () => (homeStudioId ? available.filter((g) => g.studioId === homeStudioId) : available),
+    [available, homeStudioId],
+  );
+  // Idle → the home board (all glazes if unassociated or the board is empty);
+  // typing → search everything, home-ranked by the sort above.
+  const matches = q
+    ? fuse.search(q).map((r) => r.item)
+    : homeOnly.length
+      ? homeOnly
+      : available;
   const exact = available.some((g) => g.name.toLowerCase() === q.toLowerCase());
   const showNew = q.length > 0 && !exact;
+
+  /** Right-hand row label: family at home, studio name abroad, "personal" otherwise. */
+  const rowLabel = (g: Glaze) => {
+    if (!g.studioId) return g.createdBy ? "personal" : g.family;
+    if (homeStudioId && g.studioId === homeStudioId) return g.family;
+    return studioNames[g.studioId] ?? g.family;
+  };
 
   // Rows = matches + optional "new" row.
   const rowCount = matches.length + (showNew ? 1 : 0);
@@ -88,7 +122,7 @@ export function GlazeTypeahead({
         aria-activedescendant={open && rowCount > 0 ? `${listId}-opt-${active}` : undefined}
         type="text"
         value={query}
-        placeholder="Search studio glazes…"
+        placeholder="Search glazes…"
         onChange={(e) => {
           setQuery(e.target.value);
           setOpen(true);
@@ -129,7 +163,7 @@ export function GlazeTypeahead({
               />
               <span className="flex-1 font-medium text-ink">{g.name}</span>
               <span className="font-mono text-[10px] uppercase tracking-wider text-slip">
-                {g.family}
+                {rowLabel(g)}
               </span>
             </li>
           ))}
