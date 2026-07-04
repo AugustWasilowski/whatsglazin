@@ -3,12 +3,6 @@
 begin;
 
 -- Members
-insert into public.members (id, slug, name, avatar, member_since, disciplines) values ('m-june', 'june', 'June Park', 'JP', 2016, ARRAY['Wheel', 'Porcelain']::text[]) on conflict (id) do update set slug=excluded.slug, name=excluded.name, avatar=excluded.avatar, member_since=excluded.member_since, disciplines=excluded.disciplines;
-insert into public.members (id, slug, name, avatar, member_since, disciplines) values ('m-marco', 'marco', 'Marco Reyes', 'MR', 2018, ARRAY['Hand-building', 'Sculpture']::text[]) on conflict (id) do update set slug=excluded.slug, name=excluded.name, avatar=excluded.avatar, member_since=excluded.member_since, disciplines=excluded.disciplines;
-insert into public.members (id, slug, name, avatar, member_since, disciplines) values ('m-lena', 'lena', 'Lena Osei', 'LO', 2019, ARRAY['Wheel', 'Tableware']::text[]) on conflict (id) do update set slug=excluded.slug, name=excluded.name, avatar=excluded.avatar, member_since=excluded.member_since, disciplines=excluded.disciplines;
-insert into public.members (id, slug, name, avatar, member_since, disciplines) values ('m-theo', 'theo', 'Theo Nakamura', 'TN', 2015, ARRAY['Wheel', 'Glaze chem']::text[]) on conflict (id) do update set slug=excluded.slug, name=excluded.name, avatar=excluded.avatar, member_since=excluded.member_since, disciplines=excluded.disciplines;
-insert into public.members (id, slug, name, avatar, member_since, disciplines) values ('m-priya', 'priya', 'Priya Shah', 'PS', 2021, ARRAY['Hand-building']::text[]) on conflict (id) do update set slug=excluded.slug, name=excluded.name, avatar=excluded.avatar, member_since=excluded.member_since, disciplines=excluded.disciplines;
-insert into public.members (id, slug, name, avatar, member_since, disciplines) values ('m-else', 'else', 'Else Vang', 'EV', 2014, ARRAY['Wheel', 'Wood-fire']::text[]) on conflict (id) do update set slug=excluded.slug, name=excluded.name, avatar=excluded.avatar, member_since=excluded.member_since, disciplines=excluded.disciplines;
 
 -- Glazes (the studio's Cone 6 board)
 insert into public.glazes (id, slug, name, family, cone, base_hex, shade2_hex, on_color, finish, chemistry, description, is_studio_glaze) values ('g-satin-white', 'satin-white', 'Satin White', 'White', 6, '#ECE6D8', '#D6CCB8', '#37301F', 'satin', 'Ca · Zn matte · liner', 'A soft, opaque satin white that stays smooth enough to line a cup. The quiet base most combinations start from.', true) on conflict (id) do update set slug=excluded.slug, name=excluded.name, family=excluded.family, cone=excluded.cone, base_hex=excluded.base_hex, shade2_hex=excluded.shade2_hex, on_color=excluded.on_color, finish=excluded.finish, chemistry=excluded.chemistry, description=excluded.description, is_studio_glaze=excluded.is_studio_glaze;
@@ -26,48 +20,5 @@ insert into public.glazes (id, slug, name, family, cone, base_hex, shade2_hex, o
 insert into public.glazes (id, slug, name, family, cone, base_hex, shade2_hex, on_color, finish, chemistry, description, is_studio_glaze) values ('g-butterscotch', 'butterscotch', 'Butterscotch', 'Amber', 6, '#C1893B', '#94611E', '#2E2010', 'glossy', 'Fe · Ti · amber', 'A golden amber that breaks toasty over texture. Warm and honeyed on its own; glows under a clear or over a tan.', true) on conflict (id) do update set slug=excluded.slug, name=excluded.name, family=excluded.family, cone=excluded.cone, base_hex=excluded.base_hex, shade2_hex=excluded.shade2_hex, on_color=excluded.on_color, finish=excluded.finish, chemistry=excluded.chemistry, description=excluded.description, is_studio_glaze=excluded.is_studio_glaze;
 
 -- Demo pieces (illustrative; replaced by real uploads)
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-floating-bowl', 'floating-blue-bowl', 'Floating Blue Bowl', 'm-june', 'Bowl', 'Stoneware', ARRAY['CONE 6', 'OXIDATION']::text[], 'Floating Blue over a Bone liner — the blue breaks amber right where the rim rolls over.') on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-floating-bowl';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-floating-bowl', 'g-bone', 0);
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-floating-bowl', 'g-floating-blue', 1);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-oribe-tumbler', 'oribe-satin-tumbler', 'Oribe Tumbler', 'm-else', 'Tumbler', 'Stoneware', ARRAY['CONE 6', 'OXIDATION']::text[], 'Oribe 6 poured over Satin White — pools deep green and breaks bright on the throwing rings.') on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-oribe-tumbler';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-oribe-tumbler', 'g-satin-white', 0);
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-oribe-tumbler', 'g-oribe-6', 1);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-nutmeg-mug', 'nutmeg-mug', 'Nutmeg Mug', 'm-lena', 'Mug', 'Stoneware', ARRAY['CONE 6', 'OXIDATION']::text[], 'Straight Nutmeg, breaking rust over the handle pulls.') on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-nutmeg-mug';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-nutmeg-mug', 'g-nutmeg', 0);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-spearmint-cup', 'spearmint-cup', 'Spearmint Cup', 'm-marco', 'Cup', 'Stoneware', ARRAY['CONE 6', 'OXIDATION']::text[], 'Spearmint over Bone for a brighter, cooler mint.') on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-spearmint-cup';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-spearmint-cup', 'g-bone', 0);
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-spearmint-cup', 'g-spearmint', 1);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-butterscotch-vase', 'butterscotch-vase', 'Butterscotch Bud Vase', 'm-theo', 'Vase', 'Stoneware', ARRAY['CONE 6', 'OXIDATION']::text[], null) on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-butterscotch-vase';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-butterscotch-vase', 'g-butterscotch', 0);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-bronze-jar', 'weathered-bronze-jar', 'Weathered Jar', 'm-priya', 'Jar', 'Stoneware', ARRAY['CONE 6', 'OXIDATION']::text[], 'Weathered Bronze over Metallic Black — crystallizes into a patinated shoulder.') on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-bronze-jar';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-bronze-jar', 'g-metallic-black', 0);
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-bronze-jar', 'g-weathered-bronze', 1);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-celadon-bowl', 'blue-celadon-bowl', 'Blue Celadon Bowl', 'm-lena', 'Bowl', 'Porcelain', ARRAY['CONE 6', 'OXIDATION']::text[], 'JR Blue Celadon poured thick to pool the carved lines.') on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-celadon-bowl';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-celadon-bowl', 'g-jr-blue-celadon', 0);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-ketchup-plate', 'ketchup-butterscotch-plate', 'Ember Plate', 'm-theo', 'Plate', 'Stoneware', ARRAY['CONE 6', 'OXIDATION']::text[], 'Ketchup over Butterscotch — the overlap runs a glassy oxblood.') on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-ketchup-plate';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-ketchup-plate', 'g-butterscotch', 0);
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-ketchup-plate', 'g-ketchup', 1);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-floating-vase', 'floating-blue-vase', 'Floating Blue Vase', 'm-else', 'Vase', 'Stoneware', ARRAY['CONE 6', 'OXIDATION']::text[], null) on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-floating-vase';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-floating-vase', 'g-floating-blue', 0);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-tan-planter', 'tan-nutmeg-planter', 'Sandbank Planter', 'm-marco', 'Planter', 'Stoneware', ARRAY['CONE 6', 'OXIDATION']::text[], 'Nutmeg brushed over 440 Tan — warm bands where they meet.') on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-tan-planter';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-tan-planter', 'g-440-tan', 0);
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-tan-planter', 'g-nutmeg', 1);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-spearmint-beaker', 'spearmint-beaker', 'Mint Beaker', 'm-priya', 'Beaker', 'Porcelain', ARRAY['CONE 6', 'OXIDATION']::text[], null) on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-spearmint-beaker';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-spearmint-beaker', 'g-spearmint', 0);
-insert into public.pieces (id, slug, title, maker_id, form, clay_body, firing, notes) values ('p-oribe-nutmeg-vessel', 'oribe-nutmeg-vessel', 'Deep Woods Vessel', 'm-june', 'Vessel', 'Stoneware', ARRAY['CONE 6', 'OXIDATION']::text[], 'Oribe 6 over Nutmeg — the copper goes near-black over the iron and breaks green on the edges.') on conflict (id) do update set slug=excluded.slug, title=excluded.title, maker_id=excluded.maker_id, form=excluded.form, clay_body=excluded.clay_body, firing=excluded.firing, notes=excluded.notes;
-delete from public.piece_glazes where piece_id = 'p-oribe-nutmeg-vessel';
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-oribe-nutmeg-vessel', 'g-nutmeg', 0);
-insert into public.piece_glazes (piece_id, glaze_id, position) values ('p-oribe-nutmeg-vessel', 'g-oribe-6', 1);
 
 commit;
