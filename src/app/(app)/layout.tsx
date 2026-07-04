@@ -13,7 +13,7 @@ export default async function AppLayout({
 }) {
   const { member } = await getSessionMember();
   const headerMember = member
-    ? { name: member.name, initials: initialsOf(member.name) }
+    ? { name: member.name, initials: initialsOf(member.name), isSiteAdmin: member.isSiteAdmin }
     : null;
 
   return (

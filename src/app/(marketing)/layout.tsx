@@ -12,7 +12,11 @@ export default async function MarketingLayout({
   return (
     <div className="flex min-h-full flex-col bg-clay">
       <SiteHeader
-        member={member ? { name: member.name, initials: initialsOf(member.name) } : null}
+        member={
+          member
+            ? { name: member.name, initials: initialsOf(member.name), isSiteAdmin: member.isSiteAdmin }
+            : null
+        }
       />
       <div className="flex-1">{children}</div>
       <SiteFooter />

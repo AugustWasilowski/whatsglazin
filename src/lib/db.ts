@@ -1,9 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
+  AdminStats,
   Glaze,
   GlazeWithCount,
   Member,
   EnrichedPiece,
+  PageViewRow,
   PieceForm,
   Studio,
   StudioRef,
@@ -239,6 +241,52 @@ export async function getStudioRefs(): Promise<StudioRef[]> {
     .order("name");
   if (error) throw error;
   return (data ?? []) as StudioRef[];
+}
+
+/* ----------------------------- site admin ------------------------------ */
+
+/** Head-count aggregates for the /admin dashboard. */
+export async function getAdminStats(): Promise<AdminStats> {
+  const supabase = await createClient();
+  const count = async (table: string) => {
+    const { count: n, error } = await supabase
+      .from(table)
+      .select("*", { count: "exact", head: true });
+    if (error) throw error;
+    return n ?? 0;
+  };
+  const [members, studios, pieces, glazes, studioAdmins] = await Promise.all([
+    count("members"),
+    count("studios"),
+    count("pieces"),
+    count("glazes"),
+    count("studio_admins"),
+  ]);
+  return { members, studios, pieces, glazes, studioAdmins };
+}
+
+/** Aggregated page views for the last N days (RLS: site admin only). */
+export async function getPageViews(days = 30): Promise<PageViewRow[]> {
+  const supabase = await createClient();
+  const cutoff = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+  const { data, error } = await supabase
+    .from("page_views")
+    .select("path, day, count")
+    .gte("day", cutoff)
+    .order("day");
+  if (error) throw error;
+  return (data ?? []) as PageViewRow[];
+}
+
+/** Piece creation timestamps (for the uploads-over-time chart). */
+export async function getPieceDates(): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("pieces")
+    .select("created_at")
+    .order("created_at");
+  if (error) throw error;
+  return (data ?? []).map((r) => r.created_at as string);
 }
 
 /* ---------------------------- derived helpers -------------------------- */

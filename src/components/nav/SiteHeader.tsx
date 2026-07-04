@@ -15,7 +15,7 @@ const LINKS = [
   { href: "/add", label: "Add" },
 ];
 
-export type HeaderMember = { name: string; initials: string } | null;
+export type HeaderMember = { name: string; initials: string; isSiteAdmin?: boolean } | null;
 
 /** Desktop / marketing header — editorial at rest, condenses on scroll. */
 export function SiteHeader({ member }: { member?: HeaderMember }) {
@@ -39,7 +39,7 @@ export function SiteHeader({ member }: { member?: HeaderMember }) {
       >
         <Wordmark />
         <nav className="hidden items-center gap-8 md:flex">
-          {LINKS.map((l) => {
+          {[...LINKS, ...(member?.isSiteAdmin ? [{ href: "/admin", label: "Admin" }] : [])].map((l) => {
             const active = pathname.startsWith(l.href);
             return (
               <Link
