@@ -51,7 +51,8 @@ export function GlazeTile({
       </div>
       <p className="mt-2 font-display text-lg leading-tight text-ink">{glaze.name}</p>
       <p className="font-mono text-[11px] uppercase tracking-wider text-slip">
-        {glaze.family} · {count} {count === 1 ? "piece" : "pieces"}
+        {glaze.family}
+        {glaze.cone ? ` · Δ${glaze.cone}` : ""} · {count} {count === 1 ? "piece" : "pieces"}
       </p>
     </Link>
   );

@@ -35,7 +35,7 @@ export function SiteFooter() {
           <div className="font-mono text-[11px] uppercase tracking-wider text-bone/40">
             <p>whatsglazin.com · The Fine Line · St. Charles, IL · est. 1979</p>
             <p className="mt-1">
-              Cone 6 · Oxidation ·{" "}
+              Cone 6 & 10 ·{" "}
               <span className="normal-case italic tracking-normal">
                 This is all Jill&rsquo;s idea.
               </span>

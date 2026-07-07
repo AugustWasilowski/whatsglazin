@@ -47,7 +47,7 @@ export default async function Landing() {
       {/* ---------- RECENT PIECES ---------- */}
       {pieces.length > 0 && (
         <section className="overflow-hidden bg-bone">
-          <SpecStrip text="Fresh from the kiln — Δ6 — 2232°F" className="text-clay-deep" />
+          <SpecStrip text="Fresh from the kiln — Δ6 · Δ10" className="text-clay-deep" />
           <div className="mx-auto w-full max-w-[1180px] px-5 pb-20 pt-4 sm:px-10 sm:pb-28">
             <div className="flex items-end justify-between">
               <div>
@@ -78,7 +78,7 @@ export default async function Landing() {
         <div className="mx-auto w-full max-w-[1180px] px-5 sm:px-10">
           <div className="flex items-end justify-between">
             <div>
-              <SpecLabel>{glazes.length} studio glazes · Cone 6 · Oxidation</SpecLabel>
+              <SpecLabel>{glazes.length} studio glazes · Cone 6 & 10</SpecLabel>
               <HeadlineReveal className="mt-3 font-display text-display-lg text-ink">
                 The test tile board
               </HeadlineReveal>

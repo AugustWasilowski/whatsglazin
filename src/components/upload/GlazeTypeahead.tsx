@@ -68,11 +68,17 @@ export function GlazeTypeahead({
   const exact = available.some((g) => g.name.toLowerCase() === q.toLowerCase());
   const showNew = q.length > 0 && !exact;
 
-  /** Right-hand row label: family at home, studio name abroad, "personal" otherwise. */
+  /** Right-hand row label: family at home, studio name abroad, "personal"
+   *  otherwise — plus the cone, which disambiguates same-named glazes. */
   const rowLabel = (g: Glaze) => {
-    if (!g.studioId) return g.createdBy ? "personal" : g.family;
-    if (homeStudioId && g.studioId === homeStudioId) return g.family;
-    return studioNames[g.studioId] ?? g.family;
+    const where = !g.studioId
+      ? g.createdBy
+        ? "personal"
+        : g.family
+      : homeStudioId && g.studioId === homeStudioId
+        ? g.family
+        : (studioNames[g.studioId] ?? g.family);
+    return g.cone ? `${where} · Δ${g.cone}` : where;
   };
 
   // Rows = matches + optional "new" row.
